@@ -63,6 +63,7 @@ class MainSubstance(Enemy):
         super().__init__("Субстанция",30,3,6)
 
 
+
 class SubMini1(Enemy):
     def __init__(self):
         super().__init__("\u001b[30;1mМерзкая субстанция\u001b[0m",9,3,2)
