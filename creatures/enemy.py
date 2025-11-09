@@ -66,7 +66,7 @@ class MainSubstance(Enemy):
 
 class SubMini1(Enemy):
     def __init__(self):
-        super().__init__("\u001b[30;1mМерзкая субстанция\u001b[0m",9,3,2)
+        super().__init__("\u001b[32mМерзкая субстанция\u001b[0m",9,3,2)
 
 
 class SubMini2(Enemy):
@@ -77,4 +77,4 @@ class SubMini2(Enemy):
 # Некромант
 class Necromancer(Enemy):
     def __init__(self):
-        super().__init__("\u001b[35mНекромант\u001b[0m",30,3,3)
+        super().__init__("\u001b[35;1mНекромант\u001b[0m",30,3,3)
