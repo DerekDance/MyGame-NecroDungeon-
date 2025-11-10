@@ -1,5 +1,5 @@
 from creatures import Hero,Dummy,Acolyte,NecroStudent,MainSubstance,SubMini1,SubMini2,Necromancer
-from system import HelpSystem
+from system import HelpSystem, InventorySystem
 import sys
 import threading
 import random
@@ -20,9 +20,9 @@ necromancer = Necromancer()
 # Создание обьекта класса HelpSystem
 hp = HelpSystem()
 
-hero_potion_of_regen_hp = 2
-regen_health_left = 0  # Сколько здоровья осталось восстановить
-regen_ticks = 0        # Через сколько действий сработает следующее восстановление
+# Создание обьекта класса InventorySystem
+inventory_system = InventorySystem()
+
 part_1 =""
 part_2 =""
 list_of_command =["в","н","а","р","п","у","о","с"]
@@ -35,11 +35,11 @@ start_point = "\u001b[33;1m..............................\u001b[0m\n"
 end_point = "\n\u001b[33;1m..............................\u001b[0m\n"
 
 #Пропуск комнат для их тестирования по отдельности. Значение True, чтобы пропустить комнату, False - не пропускать.
-pass_null_room = True
-pass_first_room = True
-pass_second_room = True
-pass_three_room = True
-pass_four_room_phase_one = True
+pass_null_room = False
+pass_first_room = False
+pass_second_room = False
+pass_three_room = False
+pass_four_room_phase_one = False
 pass_four_room_phase_two = False
 pass_five_room_phase_one = False
 pass_five_room_phase_two = False
@@ -70,7 +70,7 @@ def price():
         print(f"{F(1)}(🎁) Вы вернулись в подземелье с прокаченными характеристиками, ниже представлены эти характеристики.")
         print(f"{F(1)}{random.choice(jokes_bonuses)}")
         used_commands.add("уверенность")
-        hero_potion_of_regen_hp_action_hero()
+        hero.hero_potion_of_regen_hp_action_hero()
     elif action_hero == "абсурд":
         hero.count_crit_attack += 1
         print(f"{F(1)}(🎁) Вы осознали(наверное),что не стоит сражаться с магическим зеркалом.\n{P(1)}(🎁) Первый ваш удар в новой игре будет с \u001b[36;1m двойным уроном\u001b[0m, желательно не бить по зеркалу.{P(2)}")
@@ -119,62 +119,6 @@ def P(n):
 		return start_point
 	elif n == 2:
 		return end_point
-
-#Универсальная функция для использования предмета из рюкзака.
-def use_item(item, item_count, item_message, item_action_hero):
-  global hero_potion_of_regen_hp
-
-  if item in backpack and item_count >= 1:
-    item_action_hero()
-    print(f"**********\n{item_message}\n**********")
-    return True
-  else:
-    print("Нет такого предмета в рюкзаке.")
-    return False
-#Рюкзак
-backpack = ["зелье силы", "зелье лечения", "свиток искр","зелье регенерации здоровья"]
-
-def hero_scroll_of_sparks_action_hero():
-	hero.bullet_of_sparks += 1
-	print(f"{P(1)}(📜)  \u001b[33;1mПрочитав свиток на вашем ружье появились раскаленные красные символы.{P(2)}")
-
-def hero_potion_strength_action_hero():
-    hero.count_crit_attack += 1
-    print(f"{P(1)}(🗡️)  \u001b[36;1mВы выпили зелье силы.{P(2)}")
-
-def hero_potion_heal_action_hero():
-    hero.hero_health = min(hero.hero_health + 5, hero.hero_max_health) #Чтобы не превысить максимальное здоровье
-    print(f"{P(1)}(❤️‍🩹)  \u001b[32;1mВы выпили зелье лечения.{P(2)}")
-
-##Для зелья регенерации здоровья##
-def hero_potion_of_regen_hp_action_hero():
-    global regen_health_left, regen_ticks,hero_potion_of_regen_hp
-    if action_hero == "уверенность": #Активация утешительного приза
-    	regen_health_left = 1
-    	regen_ticks = 4
-    	print(f"{P(1)}(💊) Активирована регенерация здоровья от остатков зелья регенерации в качестве утешительного приза. Будет восстановлено только одно очко здоровья.{P(2)}")
-    else:
-	    hero_potion_of_regen_hp -= 1
-	    regen_health_left = 3  # Всего восстановим 3 HP
-	    regen_ticks = 4      # Интервал: каждые 4 действия
-	    print(f"{P(1)}(💊) \u001b[35;1m Активирована регенерация здоровья.{P(2)}")
-
-#Процесс регенерации
-def process_regen():
-    global regen_health_left, regen_ticks
-    if regen_health_left > 0 and hero.hero_health < hero.hero_max_health:  #Проверка
-        regen_ticks -= 1       # Уменьшаем счетчик действий
-        if regen_ticks <= 0:   # Если пришло время лечиться
-            # Проверяем, чтобы не превысить максимальное здоровье
-            if hero.hero_health < hero.hero_max_health:
-                hero.hero_health += 1  # Лечим
-                regen_health_left -= 1  # Уменьшаем "долг"
-                regen_ticks = 4 # Сбрасываем таймер
-                print(f"{F(1)}(💊) \u001b[35;1m Вы восстановили 1 Здоровье\nЕще будет восстановлено: {regen_health_left}\u001b[0m{F(2)}")
-            else:
-                print(f"{F(1)}(💊) \u001b[35;1m Регенерация завершена (достигнут максимум здоровья)\u001b[0m{F(2)}")
-                regen_health_left = 0
-               # Завершаем регенерацию
 
 #(4)Команда"у" для мерзкой субстанции(вторая фаза)
 def dodge_sub_mini1():
@@ -379,7 +323,7 @@ print(
 while hero.hero_health > 0:
     try:
         crit()
-        process_regen()
+        
         price()
 
         if pass_first_room:
@@ -497,37 +441,7 @@ while hero.hero_health > 0:
             hp.show_full_help(hero)
 
         elif action_hero == "р":
-            hero_choice = ""
-            while hero_choice != "0":
-                try:
-                    hero_choice = input(
-                        f"{P(1)}Какой предмет вам нужен?\n"
-                        f"Введите цифру соответствующую предмету:\n"
-                        f" (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n "
-                        f"(3) свиток искр\n (4) зелье регенерации здоровья{P(2)}"
-                    ).lower()
-                    if hero_choice == "0":
-                        break
-                    elif hero_choice == "1" and hero.hero_potion_strength > 0:
-                        use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы",
-                                 hero.hero_potion_strength_action_hero)
-                        hero.hero_potion_strength -= 1
-                    elif hero_choice == "2" and hero.hero_potion_heal > 0:
-                        use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения",
-                                 hero.hero_potion_heal_action_hero)
-                        hero.hero_potion_heal -= 1
-                    elif hero_choice == "3" and hero.hero_scroll_of_sparks > 0:
-                        use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр",
-                                 hero.hero_scroll_of_sparks_action_hero)
-                        hero.hero_scroll_of_sparks -= 1
-                    elif hero_choice == "4" and hero_potion_of_regen_hp > 0:
-                        use_item("зелье регенерации здоровья", hero_potion_of_regen_hp,
-                                 "Вы использовали зелье регенерации здоровья", hero_potion_of_regen_hp_action_hero)
-                        hero_potion_of_regen_hp -= 1
-                    else:
-                        print("Нет такого предмета или он закончился.")
-                except Exception as e:
-                    print(f"Возникла какая-то ошибка: \u001b[31;1m{e}\u001b[0m")
+            inventory_system.open_backpack(hero)
 
         # Недопустимая дистанция для выстрела Аколита (без атаки)
         elif acolyte.distance in not_attack:
@@ -569,7 +483,6 @@ bluff_lines = [
 while hero.hero_health > 0:
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
     print("\n\n\n\n\n\n")
-    process_regen()
     crit()
     if pass_second_room == True:
         break
@@ -751,28 +664,7 @@ while hero.hero_health > 0:
 
     #(2) Рюкзак
     elif action_hero == "р":
-        hero_choice = ""
-        while hero_choice != "0":
-            try:
-                hero_choice = input(f"{P(1)}Какой предмет вам нужен?\nВведите цифру соответствующую предмету:\n (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n (3) свиток искр{P(2)}").lower()
-                if hero_choice == "0":
-                    break
-                elif hero_choice == "1" and hero.hero_potion_strength > 0:
-                    use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы", hero.hero_potion_strength_action_hero)
-                    hero.hero_potion_strength -= 1
-                elif hero_choice == "2" and hero.hero_potion_heal > 0:
-                    use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения", hero.hero_potion_heal_action_hero)
-                    hero.hero_potion_heal -= 1
-                elif hero_choice == "3" and hero.hero_scroll_of_sparks > 0:
-                    use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр", hero.hero_scroll_of_sparks_action_hero)
-                    hero.hero_scroll_of_sparks -= 1
-                elif hero_choice == "4" and hero_potion_of_regen_hp > 0:
-                    use_item("зелье регенерации здоровья", hero_potion_of_regen_hp, "Вы использовали зелье регенерации здоровья", hero_potion_of_regen_hp_action_hero)
-                    hero_potion_of_regen_hp -= 1
-                else:
-                    print("Нет такого предмета или он закончился.")
-            except:
-                print("Возникла какая-то ошибка")
+        inventory_system.open_backpack(hero)
 
     else:
         print(f"{F(1)}Неизвестная команда.{F(2)}")
@@ -800,7 +692,7 @@ count_search = 0
 print(f"{F(1)}(🪞) Двигаясь дальше вы замечаете стоящее волшебное зеркало. Вы раньше о нем слышали, зеркало позволяет менять золото на какие-либо предметы. Для покупки необходимо ввести - \u001b[36mкупить а потом номер предмета\u001b[0m.{F(2)}")
 
 while hero.hero_health > 0:
-    process_regen()
+    
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ")
     print("\n\n\n\n\n\n")
 
@@ -873,9 +765,9 @@ while hero.hero_health > 0:
                 elif hero_choice == "4" and hero.hero_gold >= 1:
                     if mirror_potion_of_regen_hp > 0:
                         mirror_potion_of_regen_hp -= 1
-                        hero_potion_of_regen_hp += 1
+                        hero.hero_potion_of_regen_hp += 1
                         hero.hero_gold -= 1
-                        print(f"\u001b[33m***************\n(💊) Вы купили Зелье регенерации здоровья:\nЗелье регенерации здоровья: {hero_potion_of_regen_hp}\nВаше золото: {hero.hero_gold}\n***************\u001b[0m")
+                        print(f"\u001b[33m***************\n(💊) Вы купили Зелье регенерации здоровья:\nЗелье регенерации здоровья: {hero.hero_potion_of_regen_hp}\nВаше золото: {hero.hero_gold}\n***************\u001b[0m")
                     else:
                         print(f"{F(1)}(💊) Зелья регенерации здоровья закончились.{F(2)}")
                 elif hero_choice == "5" and hero.hero_gold >= 1:
@@ -975,31 +867,7 @@ while hero.hero_health > 0:
 
     # (3) Здесь прописан рюкзак для 3-ой комнаты
     elif action_hero == "р":
-        hero_choice = ""
-        while hero_choice != "0":
-            try:
-                hero_choice = input(f"{P(1)}Какой предмет вам нужен?\nВведите цифру соответствующую предмету:\n (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n (3) свиток искр\n (4) зелье регенерации здоровья{P(2)}").lower()
-                if hero_choice == "0":
-                    break
-                elif hero_choice == "1" and hero.hero_potion_strength > 0:
-                    use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы", hero.hero_potion_strength_action_hero)
-                    hero.hero_potion_strength -= 1
-                elif hero_choice == "2" and hero.hero_potion_heal > 0:
-                    use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения", hero.hero_potion_heal_action_hero)
-                    hero.hero_potion_heal -= 1
-                elif hero_choice == "3" and hero.hero_scroll_of_sparks > 0:
-                    use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр", hero.hero_scroll_of_sparks_action_hero)
-                    hero.hero_scroll_of_sparks -= 1
-                elif hero_choice == "4" and hero_potion_of_regen_hp > 0:
-                    use_item("зелье регенерации здоровья", hero_potion_of_regen_hp, "Вы использовали зелье регенерации здоровья", hero_potion_of_regen_hp_action_hero)
-                    hero_potion_of_regen_hp -= 1
-                else:
-                    print("Нет такого предмета или он закончился.")
-            except:
-                print("Возникла какая-то ошибка")
-
-    else:
-        print(f"{F(1)}Неизвестная команда.{F(2)}")
+        inventory_system.open_backpack(hero)
 
 else:
     print(f"{F(1)}(☠️) Вы мертвы. Вы забили себя своим же мечом досмерти или застрелили себя.{F(2)}")
@@ -1023,7 +891,7 @@ else:
 
 #(4)Бой с единственной субстанцией
 while sub.health not in split_health:
-	process_regen()
+	
 	if pass_four_room_phase_one == True:
 		break
 #(4)Подсказки соратника
@@ -1242,29 +1110,7 @@ while sub.health not in split_health:
 			sub.distance += 2
 			print(f"{F(1)}(🦠) \u001b[32;1m Пока вы пытались открыть сумку, субстанция наносит вам урон и отбрасывет вас от себя.\u001b[0m{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{F(2)}")
 	elif action_hero == "р" and lock_backpack == False:
-						hero_choice = ""
-						while hero_choice != "0":
-							try:
-								hero_choice = input(f"{P(1)}Какой предмет вам нужен?\nВведите цифру соответствующую предмету:\n (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n (3) свиток искр\n (4) зелье регенерации здоровья{P(2)}").lower()
-								if hero_choice == "0":
-									break
-								elif hero_choice == "1" and hero.hero_potion_strength > 0:
-									use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы", hero.hero_potion_strength_action_hero)
-									hero.hero_potion_strength -= 1
-								elif hero_choice == "2" and hero.hero_potion_heal > 0:
-									use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения", hero.hero_potion_heal_action_hero)
-									hero.hero_potion_heal -= 1
-								elif hero_choice =="3" and hero.hero_scroll_of_sparks > 0:
-									use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр",hero.hero_scroll_of_sparks_action_hero)
-									hero.hero_scroll_of_sparks -= 1
-								elif hero_choice =="4" and hero_potion_of_regen_hp> 0:
-									use_item("зелье регенерации здоровья", hero_potion_of_regen_hp, "Вы использовали зелье регенерации здоровья",hero_potion_of_regen_hp_action_hero)
-									hero_potion_of_regen_hp -= 1
-								else:
-										print("Нет такого предмета или он закончился.")
-
-							except:
-								print("Возникла какая-то ошибка")
+		inventory_system.open_backpack(hero)
 
 #(4)Команда "п"
 	elif action_hero == "п":
@@ -1275,362 +1121,246 @@ while sub.health not in split_health:
 else:
 		count_search = 0
 		print(f"{F(1)}(🦠) \u001b[32;1mСубстанция раздвоилась после вашей атаки.Теперь перед вами две субстанции поменьше.\u001b[0m{F(2)}")
-#(4)Вторая фаза сражения
-sub_mini_init = 0# очки подготовки ударов субстанций
-if flag_anti_mitoz == True:
-		sub_mini1.health = 8
-		sub_mini2.health = 10
+# (4) Вторая фаза сражения
+sub_mini_init = 0  # очки подготовки ударов субстанций
+if flag_anti_mitoz:
+    sub_mini1.health = 8
+    sub_mini2.health = 10
 else:
-		sub_mini1.health = 9
-		sub_mini2.health = 11
+    sub_mini1.health = 9
+    sub_mini2.health = 11
 
 while sub_mini1.health > 0 or sub_mini2.health > 0:
-	process_regen()
-	if pass_four_room_phase_two == True:
-		break
-	#(4)Подсказки соратника
-	hp.reset_all_help()#сброс всех значений на False
-	hp.help_states["help_fourth_room_phase_two"] = True #Включаем подсказки четвертой комнаты(вторая фаза)
-#(4)hero.count_crit_attack
-	crit()
-	if count_dash == 3: #не стандартный выход из комнаты
-		break
-	if sub.health <= 0:
-		break
-	elif hero.hero_health < 0:
-		print(f"{F(1)}☠️Вас поглотили.Вы погибли.{F(2)}")
-	action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
-	print("\n\n\n\n\n\n")
-#(4)Команда "а"(вторая фаза)
-	if action_hero == "а":
-		target = input(f"{F(1)}Выберите кого вы будете атаковать мечом(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{F(2)}").lower()
-		if target == "1" and sub_mini1.health <= 0:
-			print(f"{F(1)}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{F(2)}")
+    if pass_four_room_phase_two:
+        break
 
-		elif target == "1" and sub_mini1.distance != 1 and sub_mini2.distance ==1:
-			if hero.count_crit_attack > 0:
-				hero.hero_health -= sub_mini2.attack
-				sub_mini1.distance -= 1
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы попытались нанести удар заряженным мечом по мерзкой субстанции, но не достали до нее.Заряд на мече пропал.\u001b[0mСклизкая субстанция бьет вас.Мерзкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
-			else:
-				hero.hero_health -= sub_mini2.attack
-				sub_mini1.distance -= 1
-				print(f"{F(1)}Вы попытались нанести удар мечом по мерзкой субстанции, но не достали до нее.Склизкая субстанция бьет вас.Мерзкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
+    # (4) Подсказки соратника
+    hp.reset_all_help()
+    hp.help_states["help_fourth_room_phase_two"] = True
 
-		elif target == "2" and sub_mini2.distance != 1 and sub_mini1.distance ==1:
-			if hero.count_crit_attack > 0:
-				hero.hero_health -= sub_mini1.attack
-				sub_mini2.distance -= 1
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы попытались нанести удар заряженным мечом по склизкой субстанции, но не достали до нее.Заряд на мече пропал.\u001b[0m.Мерзкая субстанция бьет вас.Склизкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
-			else:
-				hero.hero_health -= sub_mini1.attack
-				sub_mini2.distance -= 1
-				print(f"{F(1)}Вы попытались нанести удар мечом по склизкой субстанции, но не достали до нее.Мерзкая субстанция бьет вас.Склизкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
+    # (4) Обработка критического удара
+    crit()
 
-		elif target == "2" and sub_mini2.health <= 0:
-			print(f"{F(1)}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{F(2)}")
+    if count_dash == 3:  # нестандартный выход
+        break
+    if sub.health <= 0:
+        break
+    if hero.hero_health <= 0:
+        print(f"{F(1)}☠️Вас поглотили.Вы погибли.{F(2)}")
+        break
 
-		elif target == "1" and sub_mini1.distance > 1 and sub_mini2.distance > 1:
-			if hero.count_crit_attack > 0:
-				sub_mini1.distance -= 1
-				sub_mini2.distance -= 1
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы рассекаете воздух заряженным мечом.Заряд на мече пропал.\u001b[0mОбе субстанции подползают ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini1.distance -= 1
-				sub_mini2.distance -= 1
-				print(f"{F(1)}Вы рассекаете воздух мечом.Обе субстанции подползают ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
+    print("\n\n\n\n\n\n")
 
-		elif target == "2" and sub_mini1.distance > 1 and sub_mini2.distance > 1:
-			if hero.count_crit_attack > 0:
-				sub_mini1.distance -= 1
-				sub_mini2.distance -= 1
-				hero.count_crit_attack -=1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы рассекаете воздух заряженным мечом.Заряд на мече пропал.\u001b[0mОбе субстанции подползают ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini1.distance -= 1
-				sub_mini2.distance -= 1
-				print(f"{F(1)}Вы рассекаете воздух мечом.Обе субстанции подползают ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Команда "а" (атака мечом)
+    if action_hero == "а":
+        target = input(f"{F(1)}Выберите кого вы будете атаковать мечом(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{F(2)}").lower()
+        if target == "1" and sub_mini1.health <= 0:
+            print(f"{F(1)}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{F(2)}")
+        elif target == "2" and sub_mini2.health <= 0:
+            print(f"{F(1)}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{F(2)}")
+        elif target == "1" and sub_mini1.distance != 1 and sub_mini2.distance == 1:
+            if hero.count_crit_attack > 0:
+                hero.hero_health -= sub_mini2.attack
+                sub_mini1.distance -= 1
+                hero.count_crit_attack -= 1
+                print(f"{F(1)}(🗡️)  \u001b[36;1mВы попытались нанести удар заряженным мечом по мерзкой субстанции, но не достали до нее.Заряд на мече пропал.\u001b[0mСклизкая субстанция бьет вас.Мерзкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
+            else:
+                hero.hero_health -= sub_mini2.attack
+                sub_mini1.distance -= 1
+                print(f"{F(1)}Вы попытались нанести удар мечом по мерзкой субстанции, но не достали до нее.Склизкая субстанция бьет вас.Мерзкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
+        elif target == "2" and sub_mini2.distance != 1 and sub_mini1.distance == 1:
+            if hero.count_crit_attack > 0:
+                hero.hero_health -= sub_mini1.attack
+                sub_mini2.distance -= 1
+                hero.count_crit_attack -= 1
+                print(f"{F(1)}(🗡️)  \u001b[36;1mВы попытались нанести удар заряженным мечом по склизкой субстанции, но не достали до нее.Заряд на мече пропал.\u001b[0m.Мерзкая субстанция бьет вас.Склизкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
+            else:
+                hero.hero_health -= sub_mini1.attack
+                sub_mini2.distance -= 1
+                print(f"{F(1)}Вы попытались нанести удар мечом по склизкой субстанции, но не достали до нее.Мерзкая субстанция бьет вас.Склизкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{F(2)}")
+        elif target in ("1", "2") and sub_mini1.distance > 1 and sub_mini2.distance > 1:
+            if hero.count_crit_attack > 0:
+                sub_mini1.distance -= 1
+                sub_mini2.distance -= 1
+                hero.count_crit_attack -= 1
+                print(f"{F(1)}(🗡️)  \u001b[36;1mВы рассекаете воздух заряженным мечом.Заряд на мече пропал.\u001b[0mОбе субстанции подползают ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            else:
+                sub_mini1.distance -= 1
+                sub_mini2.distance -= 1
+                print(f"{F(1)}Вы рассекаете воздух мечом.Обе субстанции подползают ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+        elif target == "1" and sub_mini1.distance == 1:
+            damage_mult = 3 if sub_mini2.health <= 0 and sub_mini_init == 1 else 2
+            sub_mini1.health -= hero.hero_attack * damage_mult
+            if sub_mini2.health > 0 and sub_mini2.distance == 1:
+                hero.hero_health -= sub_mini2.attack
+            elif sub_mini2.health <= 0:
+                hero.hero_health -= sub_mini1.attack
+            sub_mini_init = 1
+            if hero.count_crit_attack > 0:
+                hero.count_crit_attack -= 1
+            print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон мерзкой субстанции ударом {'заряженного' if hero.count_crit_attack < 1 else 'мечом'}.\u001b[0m{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+        elif target == "2" and sub_mini2.distance == 1:
+            damage_mult = 3 if sub_mini1.health <= 0 and sub_mini_init == 1 else 2
+            sub_mini2.health -= hero.hero_attack * damage_mult
+            if sub_mini1.health > 0 and sub_mini1.distance == 1:
+                hero.hero_health -= sub_mini1.attack
+            elif sub_mini1.health <= 0:
+                hero.hero_health -= sub_mini2.attack
+            sub_mini_init = 1
+            if hero.count_crit_attack > 0:
+                hero.count_crit_attack -= 1
+            print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон склизкой субстанции ударом {'заряженного' if hero.count_crit_attack < 1 else 'мечом'}.\u001b[0m{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
 
-		elif target == "1" and sub_mini1.distance == 1 and sub_mini_init == 1 and sub_mini2.health <= 0:
-			if hero.count_crit_attack > 0:
-				sub_mini1.health -= (hero.hero_attack*3)
-				hero.hero_health -= sub_mini1.attack
-				sub_mini_init = 0
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон мерзкой субстанции ударом заряженного меча, но она наносит удар в ответ.\u001b[0m{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini1.health -= hero.hero_attack
-				hero.hero_health -= sub_mini1.attack
-				print(f"{F(1)}Вы наносите урон мерзкой субстанции ударом меча, но она наносит удар в ответ.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Команда "с" с использованием свитка искр
+    elif action_hero == "с" and hero.bullet_of_sparks >= 1:
+        sparks_four_room_sub_mini1()
+        sparks_four_room_sub_mini2()
+        print(f"{F(1)}{part_1 + part_2}{F(2)}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub_mini1, sub_mini2])}")
+        continue
 
-		elif target == "2" and sub_mini2.distance == 1 and sub_mini1.health <= 0 and sub_mini_init == 1:
-			if hero.count_crit_attack >= 1:
-				sub_mini2.health -= (hero.hero_attack*2)
-				hero.hero_health -= sub_mini2.attack
-				sub_mini_init = 0
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон склизкой субстанции ударом заряженного меча, но она наносит удар в ответ.\u001b[0m{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini2.health -= hero.hero_attack
-				hero.hero_health -= sub_mini2.attack
-				sub_mini_init = 0
-				print(f"{F(1)}Вы наносите урон склизкой субстанции ударом меча, но она наносит удар в ответ.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Команда "с" (обычная стрельба)
+    elif action_hero == "с":
+        if hero.hero_bullet <= 0:
+            print(f"{F(1)}У вас кончились патроны.{F(2)}")
+        else:
+            range_target = input(f"{F(1)}Выберите в кого вы будете стрелять(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{F(2)}").lower()
+            if range_target == "1" and sub_mini1.health <= 0:
+                print(f"{F(1)}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{F(2)}")
+            elif range_target == "2" and sub_mini2.health <= 0:
+                print(f"{F(1)}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{F(2)}")
+            elif range_target == "1" and sub_mini1.distance < 3:
+                print(f"{F(1)}Слишком близкое расстояние для выстрела.{F(2)}")
+            elif range_target == "2" and sub_mini2.distance < 3:
+                print(f"{F(1)}Слишком близкое расстояние для выстрела.{F(2)}")
+            elif range_target == "1" and sub_mini1.distance > 2:
+                sub_mini1.health -= hero.hero_range_attack
+                hero.hero_bullet -= 1
+                if sub_mini2.distance == 1 and sub_mini2.health > 0:
+                    hero.hero_health -= sub_mini2.attack
+                sub_mini1.distance -= 1
+                sub_mini2.distance = max(1, sub_mini2.distance - 1) if sub_mini2.health > 0 else sub_mini2.distance
+                print(f"{F(1)}Своим выстрелом вы попадаете в мерзкую субстанцию и она подползает ближе к вам. Вторая субстанция {'наносит вам урон.' if sub_mini2.distance == 1 else 'тоже подползает ближе к вам.'}{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            elif range_target == "2" and sub_mini2.distance > 2:
+                sub_mini2.health -= hero.hero_range_attack
+                hero.hero_bullet -= 1
+                if sub_mini1.distance == 1 and sub_mini1.health > 0:
+                    hero.hero_health -= sub_mini1.attack
+                sub_mini2.distance -= 1
+                sub_mini1.distance = max(1, sub_mini1.distance - 1) if sub_mini1.health > 0 else sub_mini1.distance
+                print(f"{F(1)}Своим выстрелом вы попадаете в склизкую субстанцию и она подползает к вам ближе. Вторая субстанция {'наносит вам урон.' if sub_mini1.distance == 1 else 'тоже подползает ближе к вам.'}{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
 
-		elif target == "1" and sub_mini1.distance == 1 and sub_mini2.distance > 1 and sub_mini1.health > 0 and sub_mini2.health > 0:
-			if hero.count_crit_attack >= 1:
-				sub_mini1.health -= (hero.hero_attack*2)
-				sub_mini_init = 1
-				sub_mini2.distance -= 1
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон мерзкой субстанции ударом заряженного меча.\u001b[0mСклизкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini1.health -= hero.hero_attack
-				sub_mini2.distance -= 1
-				sub_mini_init= 1
-				print(f"{F(1)}Вы наносите урон мерзкой субстанции ударом меча.Склизкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Команда "в" (вперёд)
+    elif action_hero == "в":
+        if sub_mini1.health <= 0 and sub_mini2.health <= 0:
+            pass
+        elif sub_mini1.health <= 0:
+            if sub_mini2.distance == 1:
+                hero.hero_health -= sub_mini2.attack
+                print(f"{F(1)}Вы просто обходите по кругу склизкую субстанцию, и то, что осталось от второй субстанции.Склизкой субстанции удается вас ударить.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            else:
+                sub_mini2.distance -= 1
+                print(f"{F(1)}Вы подходите ближе к склизкой субстанции, обходя то, что осталось от второй субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+        elif sub_mini2.health <= 0:
+            if sub_mini1.distance == 1:
+                hero.hero_health -= sub_mini1.attack
+                print(f"{F(1)}Вы просто обходите по кругу мерзкую субстанцию, и то, что осталось от второй субстанции.Мерзкой субстанции удается вас ударить.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            else:
+                sub_mini1.distance -= 1
+                print(f"{F(1)}Вы подходите ближе к мерзкой субстанции, обходя то, что осталось от второй субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+        else:
+            if sub_mini1.distance == 1 and sub_mini2.distance == 1:
+                hero.hero_health -= (sub_mini1.attack + sub_mini2.attack)
+                print(f"{F(1)}Обходя тварей по кругу, вы получаете урон от обеих субстанций.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            elif sub_mini1.distance > 1 and sub_mini2.distance == 1:
+                hero.hero_health -= sub_mini2.attack
+                sub_mini1.distance -= 1
+                print(f"{F(1)}Пытаясь обойти по кругу склизкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            elif sub_mini1.distance == 1 and sub_mini2.distance > 1:
+                hero.hero_health -= sub_mini1.attack
+                sub_mini2.distance -= 1
+                print(f"{F(1)}Пытаясь обойти по кругу мерзкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            else:
+                sub_mini1.distance -= 1
+                sub_mini2.distance -= 1
+                print(f"{F(1)}Вы двигаетесь навстречу двум субстанциям.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
 
-		elif target == "2" and sub_mini1.distance > 1 and sub_mini2.distance == 1 and sub_mini2.health > 0 and sub_mini2.health > 0:
-			if hero.count_crit_attack >= 1:
-				sub_mini2.health -= (hero.hero_attack*2)
-				sub_mini1.distance -= 1
-				sub_mini_init = 1
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон склизкой субстанции ударом заряженного меча.\u001b[0mМерзкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini2.health -= hero.hero_attack
-				sub_mini1.distance -= 1
-				sub_mini_init = 1
-				print(f"{F(1)}Вы наносите урон склизкой субстанции ударом меча.Мерзкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Команда "н" (назад)
+    elif action_hero == "н":
+        if sub_mini1.distance <= 0:
+            sub_mini1.distance = 1
+        if sub_mini2.distance <= 0:
+            sub_mini2.distance = 1
+        if sub_mini1.health <= 0 and sub_mini2.health <= 0:
+            pass
+        elif sub_mini1.health <= 0:
+            if sub_mini2.distance == 1:
+                sub_mini2.distance += 1
+            elif sub_mini2.distance == 4:
+                sub_mini2.distance -= 1
+                print(f"{F(1)}Похоже вы уперлись в стену,вы пытаетесь двигаться вдоль стены.Склизкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            else:
+                sub_mini2.distance += 1
+            sub_mini_init = 0
+            print(f"{F(1)}Вы делаете шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+        elif sub_mini2.health <= 0:
+            if sub_mini1.distance == 1:
+                sub_mini1.distance += 1
+            elif sub_mini1.distance == 4:
+                sub_mini1.distance -= 1
+                print(f"{F(1)}Похоже вы уперлись в стену, вы пытаетесь двигаться вдоль стены.Мерзкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            else:
+                sub_mini1.distance += 1
+            sub_mini_init = 0
+            print(f"{F(1)}Вы делаете шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+        else:
+            if sub_mini1.distance == 1 and sub_mini2.distance == 1:
+                sub_mini1.distance += 1
+                sub_mini2.distance += 1
+                print(f"{F(1)}Вы уворачиваетесь от удара обоих субстанций сделав шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            elif sub_mini1.distance == 4 and sub_mini2.distance == 4:
+                sub_mini1.distance -= 1
+                sub_mini2.distance -= 1
+                print(f"{F(1)}Вы достигли максимальной дистанции. Обе субстанции подползают ближе.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            elif sub_mini1.distance == 1:
+                sub_mini1.distance += 1
+                sub_mini2.distance = max(1, sub_mini2.distance - 1)
+                print(f"{F(1)}Вы делаете шаг назад и уворачиваетесь от удара мерзкой субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            elif sub_mini2.distance == 1:
+                sub_mini2.distance += 1
+                sub_mini1.distance = max(1, sub_mini1.distance - 1)
+                print(f"{F(1)}Вы делаете шаг назад и уворачиваетесь от удара склизкой субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            else:
+                sub_mini1.distance += 1
+                sub_mini2.distance += 1
+                print(f"{F(1)}Вы делаете шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+            sub_mini_init = 0
 
-		elif target == "1" and sub_mini1.distance == 1 and sub_mini2.health <= 0:
-			if hero.count_crit_attack >= 1:
-				sub_mini1.health -= (hero.hero_attack*2)
-				sub_mini_init = 1
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон мерзкой субстанции ударом меча.\u001b[0m{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini1.health -= hero.hero_attack
-				sub_mini_init = 1
-				print(f"{F(1)}Вы наносите урон мерзкой субстанции ударом меча.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Рюкзак
+    elif action_hero == "р":
+        inventory_system.open_backpack(hero)
 
-		elif target == "2" and sub_mini2.distance == 1 and sub_mini1.health <= 0:
-			if hero.count_crit_attack >= 1:
-				sub_mini2.health -= (hero.hero_attack*2)
-				sub_mini_init = 1
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон склизкой субстанции ударом меча.\u001b[0m{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini2.health -= hero.hero_attack
-				sub_mini_init = 1
-				print(f"{F(1)}Вы наносите урон склизкой субстанции ударом меча.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Осмотр
+    elif action_hero == "о":
+        print(f"{F(1)}Ничего примечательного вы не нашли.{F(2)}")
 
-		elif target == "1" and sub_mini1.distance == 1 and sub_mini2.distance == 1 and sub_mini1.health > 0:
-			if hero.count_crit_attack >= 1:
-				sub_mini1.health -= (hero.hero_attack*2)
-				hero.hero_health -= sub_mini2.attack
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон мерзкой субстанции ударом заряженного меча\u001b[0m, но вторая наносит удар по вам, оставляя на вас куски склизкой массы.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini1.health -= hero.hero_attack
-				hero.hero_health -= sub_mini2.attack
-				print(f"{F(1)}Вы наносите урон мерзкой субстанции ударом меча, но вторая наносит удар по вам, оставляя на вас куски склизкой массы.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    # (4) Помощь
+    elif action_hero == "п":
+        hp.show_full_help(hero)
 
-		elif target == "2" and sub_mini1.distance == 1 and sub_mini2.distance == 1 and sub_mini2.health > 0:
-			if hero.count_crit_attack >= 1:
-				sub_mini2.health -= (hero.hero_attack*2)
-				hero.hero_health -= sub_mini1.attack
-				hero.count_crit_attack -= 1
-				print(f"{F(1)}(🗡️)  \u001b[36;1mВы наносите урон склизкой субстанции ударом заряженного меча\u001b[0m, но вторая наносит удар по вам, оставляя на вас куски склизкой массы.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			else:
-				sub_mini2.health -= hero.hero_attack
-				hero.hero_health -= sub_mini1.attack
-				print(f"{F(1)}Вы наносите урон склизкой субстанции ударом меча, но вторая наносит удар по вам, оставляя на вас куски склизкой массы.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-#(4)Команда "с" с использованием свитка искр(вторая фаза)
-	elif action_hero == "с" and hero.bullet_of_sparks >= 1:
-			 sparks_four_room_sub_mini1()
-			 sparks_four_room_sub_mini2()
-			 print(f"{F(1)}{part_1+part_2}{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-			 continue
-#(4)Команда "с"(вторая фаза)
-	if action_hero == "с" and hero.bullet_of_sparks <= 0:
-		range_target = input(f"{F(1)}Выберите в кого вы будете стрелять(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{F(2)}").lower()
-		if range_target == "1" and sub_mini1.health <= 0:
-			print(f"{F(1)}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{F(2)}")
-		elif range_target == "2" and sub_mini2.health <= 0:
-			print(f"{F(1)}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{F(2)}")
-		elif range_target == "1" and hero.hero_bullet <= 0:
-			print(f"{F(1)}У вас кончились патроны.{F(2)}")
-		elif range_target == "2" and hero.hero_bullet <= 0:
-			print(f"{F(1)}У вас кончились патроны.{F(2)}")
-		elif range_target == "1" and sub_mini1.distance > 2  and sub_mini2.distance == 1 and sub_mini1.health > 0:
-			sub_mini1.health -= hero.hero_range_attack
-			hero.hero_bullet -= 1
-			hero.hero_health -= sub_mini2.attack
-			sub_mini1.distance -= 1
-			print(f"{F(1)}Своим выстрелом вы попадаете в мерзкую субстанцию и она подползает ближе к вам. Вторая субстанция наносит вам урон.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-		elif range_target == "2" and sub_mini1.distance == 1 and sub_mini2.distance > 2 and sub_mini2.health > 0:
-			sub_mini2.health -= hero.hero_range_attack
-			hero.hero_bullet -= 1
-			hero.hero_health -= sub_mini1.attack
-			sub_mini2.distance -= 1
-			print(f"{F(1)}Своим выстрелом вы попадаете в склизкую субстанцию и она подползает к вам ближе. Вторая субстанция наносит вам урон.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-		elif range_target == "1" and sub_mini1.distance > 2  and sub_mini2.distance > 2 and sub_mini1.health > 0:
-			sub_mini1.health -= hero.hero_range_attack
-			hero.hero_bullet -= 1
-			sub_mini1.distance -= 1
-			sub_mini2.distance -= 1
-			print(f"{F(1)}Своим выстрелом вы попадаете в мерзкую субстанцию и она подползает ближе к вам. Вторая субстанция тоже подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-		elif range_target == "2" and sub_mini1.distance > 2  and sub_mini2.distance > 2 and sub_mini1.health > 0:
-			sub_mini2.health -= hero.hero_range_attack
-			hero.hero_bullet -= 1
-			sub_mini1.distance -= 1
-			sub_mini2.distance -= 1
-			print(f"{F(1)}Своим выстрелом вы попадаете в склизкую субстанцию и она подползает ближе к вам. Вторая субстанция тоже подпалзает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-		elif range_target == "1" and sub_mini1.distance < 3:
-			print(f"{F(1)}Слишком близкое расстояние для выстрела.{F(2)}")
-		elif range_target == "2" and sub_mini2.distance < 3:
-			print(f"{F(1)}Слишком близкое расстояние для выстрела.{F(2)}")
-#(4)Команда"в"(вторая фаза)
-#(4.1)Если одна субстанция погибла
-	elif action_hero == "в" and sub_mini1.distance == 1 and sub_mini2.health <= 0:
-		hero.hero_health -= sub_mini1.attack
-		print(f"{F(1)}Вы просто обходите по кругу мерзкую субстанцию, и то, что осталось от второй субстанции.Мерзкой субстанции удается вас ударить.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "в" and sub_mini2.distance == 1 and sub_mini1.health <= 0:
-		hero.hero_health -= sub_mini2.attack
-		print(f"{F(1)}Вы просто обходите по кругу склизкую субстанцию, и то, что осталось от второй субстанции.Склизкой субстанции удается вас ударить.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "в" and sub_mini1.distance != 1 and sub_mini2.health <= 0:
-		sub_mini1.distance -= 1
-		print(f"{F(1)}Вы подходите ближе к мерзкой субстанции, обходя то, что осталось от второй субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "в" and sub_mini2.distance != 1 and sub_mini1.health <= 0:
-		sub_mini2.distance -= 1
-		print(f"{F(1)}Вы подходите ближе к склизкой субстанции, обходя то, что осталось от второй субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-#(4.2)Если обе субстанции живы
-	elif action_hero == "в" and sub_mini1.distance == 1 and sub_mini1.health > 0 and sub_mini2.distance == 1 and sub_mini2.health > 0:
-		hero.hero_health -= (sub_mini1.attack + sub_mini2.attack)
-		print(f"{F(1)}Обходя тварей по кругу, вы получаете урон от обеих субстанций.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "в" and sub_mini1.distance > 1 and sub_mini1.health > 0 and sub_mini2.distance == 1 and sub_mini2.health > 0:
-		hero.hero_health -= sub_mini2.attack
-		sub_mini1.distance -= 1
-		print(f"{F(1)}Пытаясь обойти по кругу склизкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "в" and sub_mini1.distance == 1 and sub_mini1.health > 0 and sub_mini2.distance > 1 and sub_mini2.health > 0:
-		hero.hero_health -= sub_mini1.attack
-		sub_mini2.distance -= 1
-		print(f"{F(1)}Пытаясь обойти по кругу мерзкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "в" and sub_mini1.distance > 1 and sub_mini1.health > 0 and sub_mini2.distance > 1 and sub_mini2.health > 0:
-		sub_mini1.distance -= 1
-		sub_mini2.distance -= 1
-		print(f"{F(1)}Вы двигаетесь навстречу двум субстанциям.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-#(4)Команда"н"(вторая фаза)
-#(4.1)Если одна субстанция погибла
-	elif action_hero == "н" and sub_mini1.distance == 1 and sub_mini2.health <= 0:
-		sub_mini1.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы делаете шаг назад.Мерзкой субстанции не удается вас ударить.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini2.distance == 1 and sub_mini1.health <= 0:
-		sub_mini2.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы делаете шаг назад.Склизкой субстанции не удается вас ударить.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance == 4 and sub_mini2.health <= 0:
-		sub_mini1.distance -= 1
-		sub_mini_init = 0
-		print(f"{F(1)}Похоже вы уперлись в стену, вы пытаетесь двигаться вдоль стены.Мерзкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini2.distance == 4 and sub_mini1.health <= 0:
-		sub_mini2.distance -= 1
-		sub_mini_init = 0
-		print(f"{F(1)}Похоже вы уперлись в стену,вы пытаетесь двигаться вдоль стены.Склизкая субстанция подползает ближе к вам.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance != 1 and sub_mini2.health <= 0:
-		sub_mini1.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы делаете шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini2.distance != 1 and sub_mini1.health <= 0:
-		sub_mini2.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы делаете шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-#(4.2)Если обе субстанции живы
-	elif sub_mini1.distance <= 0:
-		sub_mini1.distance = 1
-	elif sub_mini2.distance <= 0:
-		sub_mini2.distance = 1
-	elif action_hero == "н" and sub_mini1.distance == 1 and sub_mini2.distance == 1 and sub_mini1.health > 0 and sub_mini2.health > 0:
-		sub_mini1.distance += 1
-		sub_mini2.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы уворачиваетесь от удара обоих субстанций сделав шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance == 4 and sub_mini2.distance == 4 and sub_mini1.health > 0 and sub_mini2.health > 0:
-		sub_mini1.distance -= 1
-		sub_mini2.distance -= 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы достигли максимальной дистанции. Обе субстанции подползают ближе.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance != 4 and sub_mini2.distance == 4 and sub_mini1.health > 0 and sub_mini2.health > 0:
-		sub_mini1.distance -= 1
-		sub_mini2.distance -= 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы достигли максимальной дистанции. Обе субстанции подползают ближе.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance == 4 and sub_mini2.distance != 4 and sub_mini1.health > 0 and sub_mini2.health > 0:
-		sub_mini1.distance -= 1
-		sub_mini2.distance -= 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы достигли максимальной дистанции. Обе субстанции подползают ближе.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance == 1 and sub_mini2.distance != 4 and sub_mini1.health > 0 and sub_mini2.health > 0:
-		sub_mini1.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы делаете шаг назад и уворачиваетесь от удара мерзкой субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance != 4 and sub_mini2.distance == 1 and sub_mini1.health > 0 and sub_mini2.health > 0:
-		sub_mini2.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы делаете шаг назад и уворачиваетесь от удара склизкой субстанции.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero == "н" and sub_mini1.distance > 1 and sub_mini2.distance > 1 and sub_mini1.health > 0 and sub_mini2.health > 0:
-		sub_mini1.distance += 1
-		sub_mini2.distance += 1
-		sub_mini_init = 0
-		print(f"{F(1)}Вы делаете шаг назад.{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-#(4)Здесь прописан рюкзак для 4-ой комнаты(вторая фаза)
-	elif action_hero == "р":
-						hero_choice = ""
-						while hero_choice != "0":
-							try:
-								hero_choice = input(f"{P(1)}Какой предмет вам нужен?\nВведите цифру соответствующую предмету:\n (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n (3) свиток искр\n (4) зелье регенерации здоровья{P(2)}").lower()
-								if hero_choice == "0":
-									break
-								elif hero_choice == "1" and hero.hero_potion_strength > 0:
-									use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы", hero.hero_potion_strength_action_hero)
-									hero.hero_potion_strength -= 1
-								elif hero_choice == "2" and hero.hero_potion_heal > 0:
-									use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения", hero.hero_potion_heal_action_hero)
-									hero.hero_potion_heal -= 1
-								elif hero_choice =="3" and hero.hero_scroll_of_sparks > 0:
-									use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр",hero.hero_scroll_of_sparks_action_hero)
-									hero.hero_scroll_of_sparks -= 1
-								elif hero_choice =="4" and hero_potion_of_regen_hp> 0:
-									use_item("зелье регенерации здоровья", hero_potion_of_regen_hp, "Вы использовали зелье регенерации здоровья",hero_potion_of_regen_hp_action_hero)
-									hero_potion_of_regen_hp -= 1
-								else:
-										print("Нет такого предмета или он закончился.")
+    # (4) Увернуться
+    elif action_hero == "у":
+        dodge_sub_mini1()
+        dodge_sub_mini2()
+        print(f"{F(1)}{part_1 + part_2}{F(2)}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub_mini1, sub_mini2])}")
 
-							except:
-								print("Возникла какая-то ошибка")
-
-#(4)Команда-заглушка "о"(вторая фаза)
-	elif action_hero == "о":
-			print(f"{F(1)}Ничего примечательного вы не нашли.{F(2)}")
-#(4)Команда "п"(вторая фаза)
-	elif action_hero == "п":
-		hp.show_full_help(hero)
-#(4)Команда"у"(вторая фаза)
-	elif action_hero == "у":
-			dodge_sub_mini1()
-			dodge_sub_mini2()
-			print(f"{F(1)}{part_1+part_2}{F(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-	elif action_hero not in list_of_command:
-			print(f"{F(1)}Неизвестная команда.{F(2)}")
+    # Неизвестная команда
+    elif action_hero not in list_of_command:
+        print(f"{F(1)}Неизвестная команда.{F(2)}")
 
 else:
-	print(f"{F(1)}\u001b[32m(*) Вы одолели две субстанции.\u001b[0m\n{P(1)} + 2 Пули{P(2)}{F(2)}")
-	hero.hero_bullet += 2
-
+    print(f"{F(1)}\u001b[32m(*) Вы одолели две субстанции.\u001b[0m\n{P(1)} + 2 Пули{P(2)}{F(2)}")
+    hero.hero_bullet += 2
 """Комната 5: Некромант"""
 
 #Первая фаза боя с Некромантом
@@ -1720,7 +1450,7 @@ def timeout_message():
 #(5.1)Основной игровой цикл 1-ой фазы боя
 input_active = False
 while hero.hero_health > 0:
-    process_regen()
+    
     price()
     #(5)Подсказки соратника
     hp.reset_all_help()#сброс всех значений на False
@@ -1910,28 +1640,8 @@ while hero.hero_health > 0:
             	  	   print(f"{F(1)}Вы двигаетесь назад{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{F(2)}")
 #(5.1)Команда "р"
         elif action_hero == "р":
-        	hero_choice = ""
-        	while hero_choice != "0":
-        		try:
-        			hero_choice = input(f"{P(1)}Какой предмет вам нужен?\nВведите цифру соответствующую предмету:\n (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n (3) свиток искр\n (4) зелье регенерации здоровья{P(2)}").lower()
-        			if hero_choice == "0":
-        				break
-        			elif hero_choice == "1" and hero.hero_potion_strength > 0:
-        				use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы", hero.hero_potion_strength_action_hero)
-        				hero.hero_potion_strength -= 1
-        			elif hero_choice == "2" and hero.hero_potion_heal > 0:
-        				use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения", hero.hero_potion_heal_action_hero)
-        				hero.hero_potion_heal -= 1
-        			elif hero_choice =="3" and hero.hero_scroll_of_sparks > 0:
-        				use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр",hero.hero_scroll_of_sparks_action_hero)
-        				hero.hero_scroll_of_sparks -= 1
-        			elif hero_choice =="4" and hero_potion_of_regen_hp> 0:
-        				use_item("зелье регенерации здоровья", hero_potion_of_regen_hp, "Вы использовали зелье регенерации здоровья",hero_potion_of_regen_hp_action_hero)
-        				hero_potion_of_regen_hp -= 1
-        			else:
-        				print("Нет такого предмета или он закончился.")
-        		except:
-        			print("Возникла какая-то ошибка")
+            inventory_system.open_backpack(hero)
+
 #(5.1)Команда "п".
         elif action_hero == "п":
             	 	hp.show_full_help(hero)
@@ -1998,7 +1708,7 @@ while hero.hero_health > 0:
     #(5)Подсказки соратника
     hp.reset_all_help()#сброс всех значений на False
     hp.help_states["help_five_room_phase_two"] = True #Включаем подсказки пятой комнаты(первая фаза)
-    process_regen()
+    
     price()
     try:
         if pass_five_room_phase_two == True:
@@ -2021,7 +1731,7 @@ while hero.hero_health > 0:
             necromancer.health = 30
             necromancer.distance += 1
             hero.hero_bullet += 2
-            hero_potion_of_regen_hp += 1
+            hero.hero_potion_of_regen_hp += 1
             print(f"{F(1)}\u001b[35m(*) Изувеченный Некромант еле отходит от вас.Куски плоти свисают с его лица оголяя череп. Глаза его горят синим пламенем.\nНекромант - 'Ты достойный противник, но ты все равно пополнишь мою армию.Готовься к смерти жалкий человечишка!'\u001b[0m\n{P(1)} + 2 Пули\n + 1 Зелье регенерации здоровья{P(2)}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{F(2)}")
             break
 
@@ -2230,28 +1940,8 @@ while hero.hero_health > 0:
             	 elif range_target == "2" and skull_distance < 3:
             	 	print(f"{F(1)}Не получится выстрелить с такого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{F(2)}")			                    #(5.2)Команда "р"
         elif action_hero == "р":
-        	hero_choice = ""
-        	while hero_choice != "0":
-        		try:
-        			hero_choice = input(f"{P(1)}Какой предмет вам нужен?\nВведите цифру соответствующую предмету:\n (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n (3) свиток искр\n (4) зелье регенерации здоровья{P(2)}").lower()
-        			if hero_choice == "0":
-        				break
-        			elif hero_choice == "1" and hero.hero_potion_strength > 0:
-        				use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы", hero.hero_potion_strength_action_hero)
-        				hero.hero_potion_strength -= 1
-        			elif hero_choice == "2" and hero.hero_potion_heal > 0:
-        				use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения", hero.hero_potion_heal_action_hero)
-        				hero.hero_potion_heal -= 1
-        			elif hero_choice =="3" and hero.hero_scroll_of_sparks > 0:
-        				use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр",hero.hero_scroll_of_sparks_action_hero)
-        				hero.hero_scroll_of_sparks -= 1
-        			elif hero_choice =="4" and hero_potion_of_regen_hp> 0:
-        				use_item("зелье регенерации здоровья", hero_potion_of_regen_hp, "Вы использовали зелье регенерации здоровья",hero_potion_of_regen_hp_action_hero)
-        				hero_potion_of_regen_hp -= 1
-        			else:
-        				print("Нет такого предмета или он закончился.")
-        		except:
-        			print("Возникла какая-то ошибка")
+            inventory_system.open_backpack(hero)
+
 #(5.2)Команда "п".
         elif action_hero == "п":
             	 	hp.show_full_help(hero)
@@ -2661,7 +2351,7 @@ undead_disarm:"Некромант с помощью заклинания, нед
 undead_func = list(undead_list.keys())
 
 while hero.hero_health > 0:
-    process_regen()
+    
     price()
     #(5)Подсказки соратника
     hp.reset_all_help()#сброс всех значений на False
@@ -2729,28 +2419,8 @@ while hero.hero_health > 0:
         	print(f"{F(1)}Лучше не отвлекаться от сражения.{F(2)}")  
  #(5.3)Команда "р"
         elif action_hero == "р":
-        	hero_choice = ""
-        	while hero_choice != "0":
-        		try:
-        			hero_choice = input(f"{P(1)}Какой предмет вам нужен?\nВведите цифру соответствующую предмету:\n (0) закрыть рюкзак\n (1) зелье силы\n (2) зелье лечения\n (3) свиток искр\n (4) зелье регенерации здоровья{P(2)}").lower()
-        			if hero_choice == "0":
-        				break
-        			elif hero_choice == "1" and hero.hero_potion_strength > 0:
-        				use_item("зелье силы", hero.hero_potion_strength, "Вы выпили зелье силы", hero.hero_potion_strength_action_hero)
-        				hero.hero_potion_strength -= 1
-        			elif hero_choice == "2" and hero.hero_potion_heal > 0:
-        				use_item("зелье лечения", hero.hero_potion_heal, "Вы выпили зелье лечения", hero.hero_potion_heal_action_hero)
-        				hero.hero_potion_heal -= 1
-        			elif hero_choice =="3" and hero.hero_scroll_of_sparks > 0:
-        				use_item("свиток искр", hero.hero_scroll_of_sparks, "Вы использовали свиток искр",hero.hero_scroll_of_sparks_action_hero)
-        				hero.hero_scroll_of_sparks -= 1
-        			elif hero_choice =="4" and hero_potion_of_regen_hp> 0:
-        				use_item("зелье регенерации здоровья", hero_potion_of_regen_hp, "Вы использовали зелье регенерации здоровья",hero_potion_of_regen_hp_action_hero)
-        				hero_potion_of_regen_hp -= 1
-        			else:
-        				print("Нет такого предмета или он закончился.")
-        		except:
-        			print("Возникла какая-то ошибка")
+            inventory_system.open_backpack(hero)
+
 #(5.3)Команда "п".
         elif action_hero == "п":
             	 	hp.show_full_help(hero)	      
