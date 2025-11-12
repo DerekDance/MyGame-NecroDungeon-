@@ -2,16 +2,27 @@ import json
 import random
 
 class HelpSystem:
-    CYAN_BOLD = "\u001b[36;1m"
     YELLOW = "\u001b[33m"
+    YELLOW_BOLD = "\u001b[33;1m"
+    GREEN = "\u001b[32m"
+    GREEN_BOLD = "\u001b[32;1m"
+    PURPLE = "\u001b[35m"
+    PURPLE_BOLD = "\u001b[35;1m"
+    BLUE = "\u001b[36m"
+    RED = "\u001b[31m"
+    RED_BOLD = "\u001b[31;1m"
+    CYAN = "\u001b[36m"
+    CYAN_BOLD = "\u001b[36;1m"
     RESET = "\u001b[0m"
-    YELLOW_STAR_START = "\u001b[33m\n***************\n"
-    YELLOW_STAR_END = "\n***************\033[0m"
 
-    #(1.1) Подсказки Ричарда __init__()
+    #(1.1) Подсказки Ричарда __init__() и форматы строк
     def __init__(self):
         with open("system\\help_messages.json","r",encoding = 'utf-8') as file:
             self.help_messages = json.load(file)
+            self.YELLOW_STAR_START = f"{self.YELLOW}\n***************{self.RESET}\n"
+            self.YELLOW_STAR_END = f"{self.YELLOW}\n***************{self.RESET}"
+            self.START_TIRE = f"\n{self.CYAN}--------------------------------------{self.RESET}\n"
+            self.END_TIRE = f"\n{self.CYAN}----------------------------------------{self.RESET}\n"
 
     # Советы из всех комнат в виде словаря.help_first_room должен быть всегда True в начале игры.
         self.help_states = {
