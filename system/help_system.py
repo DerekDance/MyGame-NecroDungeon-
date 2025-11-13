@@ -17,7 +17,7 @@ class HelpSystem:
 
     #(1.1) Подсказки Ричарда __init__() и форматы строк
     def __init__(self):
-        with open("system\\help_messages.json","r",encoding = 'utf-8') as file:
+        with open("data/help_messages.json","r",encoding = 'utf-8') as file:
             self.help_messages = json.load(file)
             self.YELLOW_STAR_START = f"{self.YELLOW}\n***************{self.RESET}\n"
             self.YELLOW_STAR_END = f"{self.YELLOW}\n***************{self.RESET}"
@@ -85,16 +85,16 @@ class HelpSystem:
         print(
             f"{self.YELLOW_STAR_START}"
             f"Информация о герое на данный момент:\n"
-            f"Здоровье: {hero.hero_health}|{hero.hero_max_health}\n"
-            f"Атака мечом: {hero.hero_attack}\n"
-            f"Атака из ружья: {hero.hero_range_attack}\n"
-            f"Количество пуль: {hero.hero_bullet}\n"
-            f"Золото:{hero.hero_gold}\n"
-            f"Зелье силы:{hero.hero_potion_strength}\n"
-            f"Зелье здоровья:{hero.hero_potion_heal}\n"
-            f"Свитки искр: {hero.hero_scroll_of_sparks}")
+            f"Здоровье: {self.CYAN}{hero.hero_health}|{hero.hero_max_health}{self.RESET}\n"
+            f"Атака мечом: {self.CYAN}{hero.hero_attack}{self.RESET}\n"
+            f"Атака из ружья: {self.CYAN}{hero.hero_range_attack}{self.RESET}\n"
+            f"Количество пуль: {self.CYAN}{hero.hero_bullet}{self.RESET}\n"
+            f"Золото: {self.CYAN}{hero.hero_gold}{self.RESET}\n"
+            f"Зелье силы: {self.CYAN}{hero.hero_potion_strength}{self.RESET}\n"
+            f"Зелье здоровья: {self.CYAN}{hero.hero_potion_heal}{self.RESET}\n"
+            f"Свитки искр: {self.CYAN}{hero.hero_scroll_of_sparks}{self.RESET}")
         print(
-            f"В игре есть восемь активных действий.Вводить нужно только первую букву команды:\n"
+            f"{self.YELLOW}В игре есть восемь активных действий.Вводить нужно только первую букву команды:\n"
             f"- в (вперед)\n"
             f"- н (назад)\n"
             f"- у (увернуться)\n"
@@ -102,7 +102,7 @@ class HelpSystem:
             f"- с (стрельба из ружья)\n"
             f"- о (осмотр-поиск)\n"
             f"- п (помощь-справка)\n"
-            f"- р (рюкзак)"
+            f"- р (рюкзак){self.RESET}"
             f"{self.YELLOW_STAR_END}")
 
 

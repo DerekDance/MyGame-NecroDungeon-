@@ -1,5 +1,5 @@
 from creatures import Hero,Dummy,Acolyte,NecroStudent,MainSubstance,SubMini1,SubMini2,Necromancer
-from system import HelpSystem, InventorySystem
+from system import HelpSystem, InventorySystem, AchievementsSystem
 import sys
 import threading
 import random
@@ -22,6 +22,12 @@ hp = HelpSystem()
 
 # Создание обьекта класса InventorySystem
 inventory_system = InventorySystem()
+
+# Создание обьекта класса InventorySystem
+achievements_system = AchievementsSystem()
+
+# Вызов ГЛАВНОГО МЕНЮ
+achievements_system.main_menu()
 
 part_1 =""
 part_2 =""
@@ -1782,7 +1788,7 @@ while hero.hero_health > 0:
         		hero.hero_health -= necromancer.attack
 	        	cast_spell_mimic_backpack = 0
 	        	mimic_backpack_spell_time = 0
-	        	print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Диетическая проблема'{hp.RESET}\n\n(🎒) Попытавшись открыть рюкзак вы получаете летальный урон от {hp.PURPLE} укуса острых зубов рюкзака-мимика. Некромант{hp.RESET} насмехается над вами.Вас одолел {hp.PURPLE}'Рюкзак-мимик'{hp.RESET}.\n(🎁) Введите слово {hp.CYAN}'голод'{hp.RESET} для получения подарка за такое достижение в новой игре.({hp.END_TIRE}")
+	        	print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Не открывай рюкзак'{hp.RESET}\n\n(🎒) Попытавшись открыть рюкзак вы получаете летальный урон от {hp.PURPLE} укуса острых зубов рюкзака-мимика. Некромант{hp.RESET} насмехается над вами.Вас одолел {hp.PURPLE}'Рюкзак-мимик'{hp.RESET}.\n(🎁) Введите слово {hp.CYAN}'голод'{hp.RESET} для получения подарка за такое достижение в новой игре.({hp.END_TIRE}")
 	        elif hero.hero_health < 4 and eat_for_mimic_backpack == True:
         		hero.hero_health += 2
         		eat_for_mimic_backpack = False

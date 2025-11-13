@@ -107,7 +107,7 @@ class InventorySystem:
 
 
             except Exception as e:
-                print(f"Ошибка при использовании предмета: {e}")
+                print(f"Ошибка при использовании предмета: {hp.RED}{e}{hp.RESET}")
                 return False
 
         print(f"{hp.END_TIRE}")
