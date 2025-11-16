@@ -5,10 +5,10 @@
       "kill_monsters": 2,
       "completed_locations": 4,
       "completed_locations_list": [
-        "Комната 0",
-        "Комната 1",
-        "Комната 2",
-        "Комната 3"
+        "(0) Привал у подземелья",
+        "(1) Темный коридор",
+        "(2) Комната с наспех брошенными вещами",
+        "(3) Помещение с зеркалом"
       ],
       "games_played": 4,
       "all_score": 12,
@@ -18,13 +18,30 @@
       ]
     },
     {
+      "name": "Nik",
+      "kill_monsters": 2,
+      "completed_locations": 3,
+      "completed_locations_list": [
+        "(0) Привал у подземелья",
+        "(1) Темный коридор",
+        "(2) Комната с наспех брошенными вещами"
+      ],
+      "games_played": 14,
+      "all_score": 10,
+      "password": "123",
+      "achievements": [
+        "BYPASSING",
+        "SUICIDE"
+      ]
+    },
+    {
       "name": "Mike",
       "kill_monsters": 0,
       "completed_locations": 3,
       "completed_locations_list": [
-        "Комната 0",
-        "Комната 1",
-        "Комната 2"
+        "(0) Привал у подземелья",
+        "(1) Темный коридор",
+        "(2) Комната с наспех брошенными вещами"
       ],
       "games_played": 3,
       "all_score": 6,
@@ -34,26 +51,11 @@
       ]
     },
     {
-      "name": "Nik",
-      "kill_monsters": 0,
-      "completed_locations": 2,
-      "completed_locations_list": [
-        "Комната 0",
-        "Комната 1"
-      ],
-      "games_played": 10,
-      "all_score": 3,
-      "password": "123",
-      "achievements": [
-        "BYPASSING"
-      ]
-    },
-    {
       "name": "Sam",
       "kill_monsters": 0,
       "completed_locations": 1,
       "completed_locations_list": [
-        "Комната 0"
+        "(0) Привал у подземелья"
       ],
       "games_played": 3,
       "all_score": 1,

@@ -22,7 +22,7 @@ class HelpSystem:
             self.YELLOW_STAR_START = f"{self.YELLOW}\n***************{self.RESET}\n"
             self.YELLOW_STAR_END = f"{self.YELLOW}\n***************{self.RESET}"
             self.START_TIRE = f"\n{self.CYAN}--------------------------------------{self.RESET}\n"
-            self.END_TIRE = f"\n{self.CYAN}----------------------------------------{self.RESET}\n"
+            self.END_TIRE = f"\n{self.CYAN}--------------------------------------{self.RESET}\n"
 
     # Советы из всех комнат в виде словаря.help_first_room должен быть всегда True в начале игры.
         self.help_states = {

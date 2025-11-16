@@ -1,5 +1,6 @@
 from system import HelpSystem
 import json
+import sys
 
 # Для использования форматирования строк
 hp = HelpSystem()
@@ -77,16 +78,16 @@ class AchievementsSystem:
     # (4) Функция показа рейтинга игроков
     def show_rating(self):
         if not self.players:
-            print("Список игроков пуст!")
+            print(f"{hp.RED}Список игроков пуст!{hp.RESET}")
         else:
-            print("-----------Рейтинг Игроков----------")
+            print(f"{hp.START_TIRE}Рейтинг Игроков{hp.END_TIRE}")
             # Сортировка игроков по убыванию
             self.players.sort(key=lambda p: p.get("all_score", 0), reverse=True)
             self.players = self.players[:16]
             for i, player in enumerate(self.players):
                 # ✅ Проверяем, что player — словарь
                 if not isinstance(player, dict):
-                    print(f"[DEBUG] Некорректный игрок: {player}")
+                    print(f"[DEBUG] Некорректный игрок: {hp.RED}{player}{hp.RESET}")
                     continue
 
                 completed_locations_list = player.get("completed_locations_list", [])
@@ -108,7 +109,7 @@ class AchievementsSystem:
                     f"Общее количество очков : {hp.CYAN}{all_score}{hp.RESET}")
 
                 if achievements:
-                    print("-------Достижения-------")
+                    print(f"{hp.CYAN}-------Достижения-------{hp.RESET}")
                     for achievement_key in achievements:
                         achievement_data = self.ACHIEVEMENTS.get(achievement_key)
                         if achievement_data:
@@ -116,13 +117,13 @@ class AchievementsSystem:
                         else:
                             print(f" {achievement_key}")
                 else:
-                    print(f"🎖️ Достижения: \u001b[90mпока нет{hp.RESET}")
+                    print(f"🎖️ Достижения: пока нет")
                 print("─" * 50)
 
     # (5) Добавляем пройденную локацию
     def add_completed_location(self, location_name, all_score):
         if not self.character_data:
-            print("❌ Нет активного игрока.")
+            print(f"{hp.RED}❌ Нет активного игрока.{hp.RESET}")
             return
 
         completed_list = self.character_data.get("completed_locations_list", [])
@@ -142,7 +143,7 @@ class AchievementsSystem:
     # (5) Добавляем поверженных противников
     def add_killed_monster(self, monster_name, all_score,):
         if not self.character_data:
-            print("❌ Нет активного игрока.")
+            print(f"{hp.RED}❌ Нет активного игрока.{hp.RESET}")
             return
 
         # Просто увеличиваем счётчик
@@ -150,9 +151,9 @@ class AchievementsSystem:
         self.character_data["all_score"] = self.character_data.get("all_score", 0) + all_score
 
         if monster_name:
-            print(f"💀 Повержен: {monster_name}")
+            print(f"(💀) Повержен: {monster_name}")
         else:
-            print("💀 Повержен один противник.")
+            print("(💀) Повержен один противник.")
 
         # Сохраняем данные
         self.players_data["players"] = self.players
@@ -163,23 +164,23 @@ class AchievementsSystem:
         character_data = None
         menu_choice = ""
         while True:
-            menu_choice = input("Введите цифру:\n(1) Начать игру\n(2) Рейтинг игроков\n(3) Выход\n>")
+            menu_choice = input(f"{hp.CYAN}Введите цифру:\n(1) Начать игру\n(2) Рейтинг игроков\n(3) Выход\n>{hp.RESET}")
             if menu_choice == "3":
                 print("Пока!")
                 sys.exit()
             elif menu_choice == "2":
                 self.show_rating()
             elif menu_choice == "1":
-                name_hero = input("Введите имя героя:\n>").strip()
+                name_hero = input(f"{hp.CYAN}Введите имя героя:\n>{hp.RESET}").strip()
 
                 if not name_hero:
-                    print("Имя героя не может быть пустым!")
+                    print(f"Имя героя не может быть {hp.RED}пустым!{hp.RESET}")
                     continue
                 elif len(name_hero) < 3:
-                    print("Слишком короткое имя! Имя должно быть больше двух символов")
+                    print(f"Слишком {hp.RED}короткое имя!{hp.RESET} Имя должно быть больше двух символов")
                     continue
                 elif len(name_hero) > 20:
-                    print("Слишком длинное имя! Имя должно быть не больше двадцати символов")
+                    print(f"Слишком {hp.RED}длинное имя!{hp.RESET} Имя должно быть не больше двадцати символов")
                     continue
 
                 player_in_the_rating_table = None
@@ -189,16 +190,16 @@ class AchievementsSystem:
                         break
 
                 if player_in_the_rating_table:
-                    print(f"Такой игрок уже существует\nИгрок находится на {i + 1} месте в рейтинговой таблице")
-                    password = input("Введите код доступа:\n>")
+                    print(f"Такой игрок уже существует\nИгрок находится на {hp.RED}{i + 1}{hp.RESET} месте в рейтинговой таблице")
+                    password = input(f"{hp.CYAN}Введите код доступа:\n>{hp.RESET}")
                     if password == player_in_the_rating_table.get("password", ""):
-                        print("Код доступа верный! Загружаем существующие данные")
+                        print(f"{hp.CYAN}Код доступа верный! Загружаем существующие данные{hp.RESET}")
                         self.character_data = player_in_the_rating_table
                     else:
-                        print("(Х) Код доступа неправильный!")
+                        print(f"{hp.RED}(Х) Код доступа неправильный!{hp.RESET}")
                         continue
                 else:
-                    password = input("Придумайте код доступа\n>")
+                    password = input(f"Придумайте {hp.CYAN}код доступа{hp.RESET}\n>")
                     self.character_data = {
                         "name": name_hero,
                         "kill_monsters": 0,
@@ -219,6 +220,6 @@ class AchievementsSystem:
                 # Сохранение данных
                 self.players_data["players"] = self.players
                 self.save_data()
-                print("💾 Данные сохранены!")
+                print("Данные сохранены!")
                 break  # выйти из цикла меню
 
