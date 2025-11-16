@@ -25,7 +25,6 @@ inventory_system = InventorySystem()
 
 # Создание обьекта класса InventorySystem
 achievements_system = AchievementsSystem()
-
 # Вызов ГЛАВНОГО МЕНЮ
 achievements_system.main_menu()
 
@@ -219,6 +218,7 @@ while hero.hero_health > 0:
 
     if action_hero == "выход":
         fast_as_hermes += 1
+        achievements_system.add_completed_location("Комната 0", 1)
         print(f"{hp.START_TIRE}(⚡) {hp.YELLOW_BOLD} Вы стремительно вышли из обучения.{hp.RESET}{hp.END_TIRE}")
         break
 
@@ -281,6 +281,8 @@ while hero.hero_health > 0:
             print(f"{hp.START_TIRE}(🔮) {hp.CYAN} Ричард - 'Ты готов! Ты сможешь одолеть Некроманта!'.{hp.RESET}Ричард вернулся в небольшой магический шар в вашей руке, так как он заточен Некромантом в этом артефакте.{hp.END_TIRE}")
             hero.hero_gold += 1
             hero.hero_max_health += 1
+            achievements_system.add_completed_location("Комната 0", 1)
+            achievements_system.add_achievement(achievements_system.character_data, "TRAINED", 1)
             cast_spell = 2  # для совместимости (чтобы Аколит сразу целился)
             print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Я прочитал инструкцию!'{hp.RESET}\n\n(🎁) Поздравляю вы прошли обучение и знаете основы игры.\n(🎁) За прохождение обучения вы получаете небольшой подарок:\n{hp.YELLOW_STAR_START} + 1 к Максимальному здоровью.\n + 1 Золотую монету{hp.YELLOW_STAR_END}\n(!) Чтобы в начале следующей игры получить сразу подарок(без обучения), напишите команду {hp.CYAN_BOLD}'обучен'{hp.RESET}.{hp.END_TIRE}")
 
@@ -315,10 +317,6 @@ while hero.hero_health > 0:
         if pass_first_room:
             break
 
-        if hero.hero_health <= 0:
-            print(f"{hp.START_TIRE}(☠️) Похоже вы погибли от переизбытка арбалетных болтов в организме.{hp.END_TIRE}")
-            sys.exit()
-
         # Обновляем состояние Аколита каждый ход
         acolyte.update(3,1)
 
@@ -339,6 +337,8 @@ while hero.hero_health > 0:
             hp.reset_all_help()
             hero.hero_gold += 1
             hero.hero_scroll_of_sparks += 1
+            achievements_system.add_killed_monster("Аколит",2)
+            achievements_system.add_completed_location("Комната 1", 2)
             print(
                 f"{hp.GREEN}(*) С последним ударом Аколит упал замертво. Вы подняли золотую монету...\n"
                 f"(*) Вы одолели Аколита!{hp.YELLOW}\n{hp.YELLOW_STAR_START} + 1 Золотая монета.\n + 1 'Свиток Искр.'{hp.YELLOW_STAR_END}"
@@ -352,12 +352,13 @@ while hero.hero_health > 0:
         # Нестандартные выходы
         elif acolyte.distance < -1:
             fast_as_hermes += 1
+            achievements_system.add_completed_location("Комната 1", 2)
             print(f"{hp.START_TIRE}(⚡) {hp.YELLOW_BOLD}Захлопнув за собой металлическую дверь, вы просто сбежали от Аколита...{hp.RESET}{hp.END_TIRE}")
             break
 
         elif acolyte.distance > 8:
+            achievements_system.add_achievement(achievements_system.character_data, "BYPASSING", 2)
             print(
-                f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'В обход правил'{hp.RESET}\n\n"
                 f"{hp.GREEN}(*) Получив какое-то количество болтов в спину, вы вышли из подземелья, "
                 f"поняв, что быть искателем приключений вам не хочется.{hp.END_TIRE}\033[0m"
             )
@@ -446,6 +447,10 @@ while hero.hero_health > 0:
 
     except Exception as e:
         print(f"Возникла какая-то ошибка: {hp.RED_BOLD}{e}{hp.RESET}")
+else:
+    print(f"{hp.START_TIRE}(☠️) Похоже вы погибли от переизбытка арбалетных болтов в организме.{hp.END_TIRE}")
+    sys.exit()
+
 """Комната 2: Комната с наспех брошенными вещами"""
 
 #Счетчик для повторений команды "о".
@@ -516,6 +521,8 @@ while hero.hero_health > 0:
         count_dash = 0  # сброс count_dash для следующих комнат
         count_search = 0  # сброс count_search для следующих комнат
         hero.hero_potion_heal += 1
+        achievements_system.add_killed_monster("Ученик-некромант",2)
+        achievements_system.add_completed_location("Комната 2", 2)
         print(f"{hp.START_TIRE}{hp.GREEN}(*)С последним ударом вашего клинка тело Ученика-некроманта обмякло на полу подземелья, обыскав труп вы нашли зелье лечения.\n(*)Вы одолели Ученика-некроманта !\033[0m\n{hp.YELLOW}*********\nЗелье лечения +1\n**********\033[0m{hp.END_TIRE}")
         break
     ###########
@@ -526,6 +533,7 @@ while hero.hero_health > 0:
         count_search = 0#сброс count_search для следующих комнат
         hero.hero_potion_heal += 1
         fast_as_hermes += 1
+        achievements_system.add_completed_location("Комната 2", 2)
         print(f"{hp.START_TIRE}(⚡) {hp.YELLOW_BOLD} Плечом вы выбиваете дверь, как раз припечатав к стенке, затаившегося Ученика-некроманта.Он отключился. Вы обыскали его и пошли дальше...{hp.RESET}\n{hp.YELLOW}*********\nЗелье лечения +1\n**********{hp.RESET}{hp.END_TIRE}")
         break
     #(2)Работа заклинания "Могильный хват"
@@ -805,6 +813,7 @@ while hero.hero_health > 0:
             count_search = 0  # сброс count_search
             count_dash = 0
             count_dodge = 0
+            achievements_system.add_completed_location("Комната 3", 1)
             print(f"{hp.START_TIRE}{hp.GREEN}(*) Сделав рывок вы прошли сквозь зеркало и как-то оказались в другой комнате.{hp.RESET}{hp.END_TIRE}")
             break
 
@@ -856,6 +865,7 @@ while hero.hero_health > 0:
         inventory_system.open_backpack(hero)
 
 else:
+    achievements_system.add_achievement(achievements_system.character_data, "SUICIDE", 1)
     print(f"{hp.START_TIRE}(☠️) Вы мертвы. Вы забили себя своим же мечом досмерти или застрелили себя.{hp.END_TIRE}")
     print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Самоубийство из вредности'{hp.RESET}\n\n Введите в следующей игре {hp.CYAN}'абсурд'{hp.RESET},чтобы получить утешительный приз.{hp.END_TIRE}")
     sys.exit()
@@ -875,239 +885,255 @@ if flag_anti_mitoz == True:
 else:
 		sub.health = 30
 
-#(4)Бой с единственной субстанцией
+# (4) Бой с единственной субстанцией
 while sub.health not in split_health:
-	
-	if pass_four_room_phase_one == True:
-		break
-#(4)Подсказки соратника
-	hp.reset_all_help()#сброс всех значений на False
-	hp.help_states["help_fourth_room_phase_one"] = True #Включаем подсказки четвертой комнаты(первая фаза)
-	action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
-	print("\n\n\n\n\n\n")
-#########
-#(4.1)Для меча дебафф
-	if cast_spell == 1 and time_action_hero_spell == 0:
-		time_action_hero_spell = 3 #Время действия дебаффа "Скользкий клинок"
-		cast_spell = 2
-		print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После удара вас заляпало слизью субстанции.Ваш клинок стал скользким от налипшей массы на него. Следующие {time_action_hero_spell} хода вы будете наносить урон со штрафом.{hp.RESET}{hp.END_TIRE}")
-	elif cast_spell == 2 and time_action_hero_spell == 0:
-		cast_spell = 0
-		lock_backpack = True
-		print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Действие дебаффа 'Скользкий клинок' закончилось.{hp.RESET}{hp.END_TIRE}")
-	elif cast_spell == 2 and time_action_hero_spell != 0:
-		time_action_hero_spell -= 1 #Отнимаем по единице пока не достигнем нуля
 
-#(4.1)Для ружья дебафф
-	elif cast_spell == 4 and time_action_hero_spell == 0:
-		hero.hero_range_attack += 5
-		cast_spell = 0
-		print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Действие дебаффа 'Загрязнение ствола' закончилось.{hp.RESET}{hp.END_TIRE}")
-	elif cast_spell == 3 and time_action_hero_spell == 0 :
-		time_action_hero_spell = 3 #Время действия дебаффа "Загрязнение ствола"
-		cast_spell = 4
-		lock_backpack = True
-		print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После вашего выстрела субстанция плюнула в вашу сторону сгустком массы. Вы увернулись, но ваше ружье задело.Дуло ружья загрязнено налипшей слизью. Следующие {time_action_hero_spell} хода вы будете наносить урон со штрафом.{hp.RESET}{hp.END_TIRE}")
-	elif cast_spell == 4  and time_action_hero_spell != 0:
-		time_action_hero_spell -= 1 #Отнимаем по единице пока не достигнем нуля
-########
-#(4)hero.count_crit_attack
-	crit()
-	if count_dash == 3:
-		count_search = 0
-		fast_as_hermes += 1#не стандартный выход из комнаты
-		print(f"{hp.START_TIRE}(⚡) {hp.YELLOW_BOLD} Вам удалось пройти через арку в следующее помещение.{hp.RESET}{hp.END_TIRE}")
-		break
-	if sub.health <= 0:
-		defeat_of_sub += 1
-		count_search = 0
-		hero.hero_bullet += 2
-		print(f"{hp.START_TIRE}{hp.GREEN}(*) Субстанция на ваших глазах распадается и исчезает вместе с темной магией.\n{hp.RESET}\n(🎖) Получено достижение {hp.CYAN}'Анти-митоз'{hp.RESET}.Введите в следующей игре {hp.CYAN}'антиделение'{hp.RESET},чтобы получить награду.\n{hp.YELLOW_STAR_START} + 2 Пули{hp.YELLOW_STAR_END}{hp.END_TIRE}")
-		break
-	elif hero.hero_health <= 0:
-		print(f"{hp.START_TIRE}☠️Вы погибли.Вас поглотила субстанция.{hp.END_TIRE}")
-		sys.exit()
-#(4)Предупреждение о скором разделении
-	elif sub.health < 16 and split_msg == 0:
-		split_msg += 1
-		print(f"{hp.START_TIRE}Создается впечатление, что субстанция хочет разделиться...{hp.END_TIRE}")
+    if pass_four_room_phase_one:
+        break
 
-#(4)Команда "а"
-	elif action_hero == "а" and cast_spell == 2 and sub.distance == 1 and sub_init == False: #команда "а" с действующим дебаффом.
-		if hero.count_crit_attack > 0:
-			sub_init = not sub_init
-			sub.health -= (hero.hero_attack * 2) - sword_debuff
-			hero.count_crit_attack -= 1
-			print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию заряженным мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона и скорей всего зря потратили зелье силы.Субстанция задрожала от недовольства.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-		else:
-			sub_init = not sub_init
-			sub.health -= (hero.hero_attack - sword_debuff)
-			hero.hero_health -= sub.attack
-			print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-#если инициатива у Субстанции
-	elif action_hero == "а" and cast_spell == 2 and sub.distance == 1 and sub_init == True: #команда "а" с действующим дебаффом.
-		count_dash = 0
-		if hero.count_crit_attack > 0:
-			sub.health -= (hero.hero_attack * 2) - sword_debuff
-			hero.hero_health -= sub.attack
-			hero.count_crit_attack -= 1
-			print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию заряженным мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона и скорей всего зря потратили зелье силы.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-		else:
-			sub.health -= (hero.hero_attack - sword_debuff)
-			hero.hero_health -= sub.attack
-			print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-#инициатива героя
-	elif action_hero == "а" and sub.distance == 1 and sub_init == False:
-		count_dash = 0
-		if hero.count_crit_attack > 0:
-			sub_init = not sub_init
-			cast_spell = 1 #Начало действия дебаффа "Скользкий клинок"
-			sub.health -= hero.hero_attack * 2
-			hero.count_crit_attack -= 1
-			print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы поражаете субстанцию заряженным мечом, из нее выпадают куски массы в разные стороны.Субстанция задрожала от недовольства.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}\n{hp.PURPLE_BOLD}{hp.RESET}")
-		else:
-			sub_init = not sub_init
-			cast_spell = 1 #Начало действия дебаффа "Скользкий клинок"
-			sub.health -= hero.hero_attack
-			print(f"{hp.START_TIRE} Вы поражаете субстанцию мечом, из нее выпадают куски массы во все стороны.Субстанция задрожала от недовольства.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.RESET}")
-	elif action_hero == "а" and sub.distance != 1:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			sub.distance -= 1
-			print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы взмахнули заряженным мечом.Заряд на мече пропал.Субстанция подползает ближе.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.RESET}")
-		else:
-			sub.distance -= 1
-			print(f"{hp.START_TIRE}Вы взмахнули мечом.Субстанция подползает ближе.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    # (4) Подсказки соратника
+    hp.reset_all_help()  # сброс всех значений на False
+    hp.help_states["help_fourth_room_phase_one"] = True  # Включаем подсказки четвертой комнаты (первая фаза)
 
-#(4)Команда "с" с использованием свитка искр
-	elif action_hero == "с" and hero.bullet_of_sparks >= 1:
-			if sub.distance == 1 and cast_spell == 4:
-				sub.health -= (damage_hero.bullet_of_sparks - 5)
-				hero.bullet_of_sparks -= 1
-				print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести максимальный урон .Сноп искр озаряет помещение.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-			elif sub.distance == 2 and cast_spell == 4:
-				sub.health -= (damage_hero.bullet_of_sparks // 2) - 5
-				hero.bullet_of_sparks -= 1
-				print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести минимальный урон .Сноп искр немного осветил помещение.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-			elif sub.distance > 2  and cast_spell == 4:
-				hero.bullet_of_sparks -= 1
-				print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести хоть какой-то урон .{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-			elif sub.distance == 1:
-				cast_spell = 3#Начало действия дебаффа "Загрязнение ствола"
-				sub.health -= damage_hero.bullet_of_sparks
-				hero.bullet_of_sparks -= 1
-				print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Своим выстрелом вы сделали огромную дыру в теле субстанции.Сноп искр озаряеет помещение.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-			elif sub.distance == 2:
-				cast_spell = 3#Начало действия дебаффа "Загрязнение ствола"
-				sub.health -= damage_hero.bullet_of_sparks // 2
-				hero.bullet_of_sparks -= 1
-				print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Сделав выстрел почти в упор вы наносите урон субстанции. Сноп искр озаряет помещение.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-			elif sub.distance > 2:
-				cast_spell = 3#Начало действия дебаффа "Загрязнение ствола"
-				sub.health -= damage_hero.bullet_of_sparks // 4
-				hero.bullet_of_sparks -= 1
-				print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Большое расстояние не позволяет вам нанести значительный урон субстанции, сноп искр озарил помещение ярким светом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-#(4)Команда "с"
-	elif action_hero == "с" and cast_spell != 4 and hero.hero_bullet > 0 and sub.distance > 2:
-		cast_spell = 3#Начало действия дебаффа "Загрязнение ствола"
-		sub.health -= hero.hero_range_attack
-		hero.hero_bullet -= 1
-		sub.distance -= 1
-		print(f"{hp.START_TIRE}Сделав выстрел из ружья вы попадаете по субстанции.Она движется вам навстречу.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-	elif action_hero == "с" and cast_spell == 4 and hero.hero_bullet > 0 and sub.distance > 2:
-		sub.health -= (hero.hero_range_attack - rifle_debuff)
-		hero.hero_bullet -= 1
-		sub.distance -= 1
-		print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Сделав выстрел из ружья вы попадаете по субстанции, но из-за загрязненного ствола наносите ей минимальный урон.Она движется вам навстречу.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-	elif action_hero == "с" and hero.hero_bullet > 0 and sub.distance == 2:
-		sub.distance -= 1
-		print(f"{hp.START_TIRE}Не получится выстрелить с такой дистанции.Субстанция движется вам навстречу.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-	elif action_hero == "с" and hero.hero_bullet > 0 and sub.distance == 1:
-		hero.hero_health -= sub.attack
-		print(f"{hp.START_TIRE} Выстрелить не получилось.Субстанция бьет вас.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-	elif action_hero == "с" and hero.hero_bullet <= 0:
-		print(f"{hp.START_TIRE}Похоже у вас закончились пули.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+    action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
+    print("\n\n\n\n\n\n")
 
-#(4)Команда "в"
-	elif action_hero == "в" and sub.distance > 1:
-		sub.distance -= 1
-		print(f"{hp.START_TIRE}Вы делаете шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-	elif action_hero == "в" and sub.distance == 1:
-		hero.hero_health -= sub.attack
-		sub.distance += 1
-		print(f"{hp.START_TIRE}Пытаясь обойти субстанцию,она бьет вас, отталкивая от себя.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    # #########
+    # (4.1) Для меча дебафф
+    if cast_spell == 1 and time_action_hero_spell == 0:
+        time_action_hero_spell = 3  # Время действия дебаффа "Скользкий клинок"
+        cast_spell = 2
+        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После удара вас заляпало слизью субстанции.Ваш клинок стал скользким от налипшей массы на него. Следующие {time_action_hero_spell} хода вы будете наносить урон со штрафом.{hp.RESET}{hp.END_TIRE}")
+    elif cast_spell == 2 and time_action_hero_spell == 0:
+        cast_spell = 0
+        lock_backpack = True
+        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Действие дебаффа 'Скользкий клинок' закончилось.{hp.RESET}{hp.END_TIRE}")
+    elif cast_spell == 2 and time_action_hero_spell != 0:
+        time_action_hero_spell -= 1  # Отнимаем по единице пока не достигнем нуля
 
-#(4)Команда "н"
-	elif action_hero == "н" and sub.distance == 1:
-		if sub_init == True:
-			sub_init = False #сброс инициативы субстанции
-			sub.distance += 1
-			print(f"{hp.START_TIRE} Вы увернулись от удара субстанции сделав шаг назад.Субстанция перестала дрожать.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-		elif sub_init == False:
-			sub.distance += 1
-			print(f"{hp.START_TIRE} Вы увернулись от удара субстанции сделав шаг назад.Субстанция перестала дрожать.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-#########
-#(4.1)Не стандартное прохождение
-	elif action_hero != "н" and count_dash > 0:
-		count_dash = 0#сброс count_dash, если не двигаться все время назад
-	elif action_hero == "н" and sub.distance > 3:
-		if count_dash == 0:
-			count_dash = 1
-			print(f"{hp.START_TIRE}Вы отходите назад, но опираетесь на стену, вы движетесь вдоль стены.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-		elif count_dash == 1:
-			count_dash = 2
-			print(f"{hp.START_TIRE}Вы двигаетесь аккуратно вдоль стены, субстанция очень медленно движется к вам отодвигаясь от  прохода, которвй ведет дальше в подземелье.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-		elif count_dash == 2:
-			count_dash = 3
-			print(f"{hp.START_TIRE}Вы продолжаете двигаться вдоль стены.Выход уже совсем рядом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-########
-	elif action_hero == "н" and sub.distance > 1:
-			sub.distance += 1
-			print(f"{hp.START_TIRE} Вы двигаетесь назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    # (4.1) Для ружья дебафф
+    elif cast_spell == 4 and time_action_hero_spell == 0:
+        hero.hero_range_attack += 5
+        cast_spell = 0
+        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Действие дебаффа 'Загрязнение ствола' закончилось.{hp.RESET}{hp.END_TIRE}")
+    elif cast_spell == 3 and time_action_hero_spell == 0:
+        time_action_hero_spell = 3  # Время действия дебаффа "Загрязнение ствола"
+        cast_spell = 4
+        lock_backpack = True
+        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После вашего выстрела субстанция плюнула в вашу сторону сгустком массы. Вы увернулись, но ваше ружье задело.Дуло ружья загрязнено налипшей слизью. Следующие {time_action_hero_spell} хода вы будете наносить урон со штрафом.{hp.RESET}{hp.END_TIRE}")
+    elif cast_spell == 4 and time_action_hero_spell != 0:
+        time_action_hero_spell -= 1  # Отнимаем по единице пока не достигнем нуля
 
-#(4)Команда "у"
-	elif action_hero == "у" and sub.distance == 1:
-		hero.hero_health -= sub.attack
-		sub.distance += 1
-		print(f"{hp.START_TIRE}Вы пытаетесь увернуться от удара субстанции, но она всегда бьет непредсказуемо.Вы получаете урон и вас немного откидывает.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-	elif action_hero == "у" and sub.distance > 1:
-		print(f"{hp.START_TIRE}Вы просто уворачиваетесь на месте.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    # ########
+    # (4) hero.count_crit_attack
+    crit()
+    if count_dash == 3:
+        count_search = 0
+        fast_as_hermes += 1  # не стандартный выход из комнаты
+        achievements_system.add_completed_location("Комната 4", 2)
+        print(f"{hp.START_TIRE}(⚡) {hp.YELLOW_BOLD} Вам удалось пройти через арку в следующее помещение.{hp.RESET}{hp.END_TIRE}")
+        break
+    if sub.health <= 0:
+        defeat_of_sub += 1
+        count_search = 0
+        hero.hero_bullet += 2
+        achievements_system.add_killed_monster("Субстанция",2)
+        achievements_system.add_completed_location("Комната 4", 2)
+        achievements_system.add_achievement(achievements_system.character_data, "ANTI_MITOZ", 3)
+        print(f"{hp.START_TIRE}{hp.GREEN}(*) Субстанция на ваших глазах распадается и исчезает вместе с темной магией.\n{hp.RESET}\n(🎖) Получено достижение {hp.CYAN}'Анти-митоз'{hp.RESET}.Введите в следующей игре {hp.CYAN}'антиделение'{hp.RESET},чтобы получить награду.\n{hp.YELLOW_STAR_START} + 2 Пули{hp.YELLOW_STAR_END}{hp.END_TIRE}")
+        break
+    elif hero.hero_health <= 0:
+        print(f"{hp.START_TIRE}☠️Вы погибли.Вас поглотила субстанция.{hp.END_TIRE}")
+        sys.exit()
 
-#(4)Команда-заглушка "о"
-	elif action_hero == "о":
-		if count_search == 0:
-			count_search += 1
-			print(f"{hp.START_TIRE}Ничего примечательного вы не видете. Только очень медленно двигающуюся субстанцию.{hp.END_TIRE}")
-		elif count_search == 1:
-			count_search += 1
-			hero.hero_bullet += 2
-			print(f"{hp.START_TIRE}Вы обнаружили в углу комнаты ружье, рядом с которым лежали патроны.\n{hp.YELLOW_STAR_START}{hp.YELLOW} +2 Пули\nКоличество пуль: {hero.hero_bullet}{hp.RESET}{hp.YELLOW_STAR_END}{hp.END_TIRE}")
-		elif count_search == 2:
-			print(f"{hp.START_TIRE} Больше вы ничего не обнаружили.{hp.END_TIRE}")
+    # (4) Предупреждение о скором разделении
+    elif sub.health < 16 and split_msg == 0:
+        split_msg += 1
+        print(f"{hp.START_TIRE}Создается впечатление, что субстанция хочет разделиться...{hp.END_TIRE}")
 
-#(4)Здесь прописан рюкзак для 4-ой комнаты
-	elif action_hero == "р" and lock_backpack == True:
-		if sub.distance > 1:
-			lock_backpack = not lock_backpack
-			sub.distance -= 1
-			print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Ненадолго отвернувшись, вы попытались вскрыть сумку, но слизь намертво склеила её. Пришлось забыть о снаряжении и вернуться к бою.Субстанция подползает ближе.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-		elif sub.distance == 1:
-			hero.hero_health -= sub.attack
-			sub.distance += 2
-			print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Пока вы пытались открыть сумку, субстанция наносит вам урон и отбрасывет вас от себя.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-	elif action_hero == "р" and lock_backpack == False:
-		inventory_system.open_backpack(hero)
+    # (4) Команда "а"
+    elif action_hero == "а" and cast_spell == 2 and sub.distance == 1 and sub_init == False:  # команда "а" с действующим дебаффом.
+        if hero.count_crit_attack > 0:
+            sub_init = not sub_init
+            sub.health -= (hero.hero_attack * 2) - sword_debuff
+            hero.count_crit_attack -= 1
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию заряженным мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона и скорей всего зря потратили зелье силы.Субстанция задрожала от недовольства.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        else:
+            sub_init = not sub_init
+            sub.health -= (hero.hero_attack - sword_debuff)
+            hero.hero_health -= sub.attack
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
 
-#(4)Команда "п"
-	elif action_hero == "п":
-		hp.show_full_help(hero)
-	else:
-			print(f"{hp.START_TIRE}Неизвестная команда.{hp.END_TIRE}")
+    # если инициатива у Субстанции
+    elif action_hero == "а" and cast_spell == 2 and sub.distance == 1 and sub_init == True:  # команда "а" с действующим дебаффом.
+        count_dash = 0
+        if hero.count_crit_attack > 0:
+            sub.health -= (hero.hero_attack * 2) - sword_debuff
+            hero.hero_health -= sub.attack
+            hero.count_crit_attack -= 1
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию заряженным мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона и скорей всего зря потратили зелье силы.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        else:
+            sub.health -= (hero.hero_attack - sword_debuff)
+            hero.hero_health -= sub.attack
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+
+    # инициатива героя
+    elif action_hero == "а" and sub.distance == 1 and sub_init == False:
+        count_dash = 0
+        if hero.count_crit_attack > 0:
+            sub_init = not sub_init
+            cast_spell = 1  # Начало действия дебаффа "Скользкий клинок"
+            sub.health -= hero.hero_attack * 2
+            hero.count_crit_attack -= 1
+            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы поражаете субстанцию заряженным мечом, из нее выпадают куски массы в разные стороны.Субстанция задрожала от недовольства.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}\n{hp.PURPLE_BOLD}{hp.RESET}")
+        else:
+            sub_init = not sub_init
+            cast_spell = 1  # Начало действия дебаффа "Скользкий клинок"
+            sub.health -= hero.hero_attack
+            print(f"{hp.START_TIRE} Вы поражаете субстанцию мечом, из нее выпадают куски массы во все стороны.Субстанция задрожала от недовольства.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.RESET}")
+    elif action_hero == "а" and sub.distance != 1:
+        if hero.count_crit_attack > 0:
+            hero.count_crit_attack -= 1
+            sub.distance -= 1
+            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы взмахнули заряженным мечом.Заряд на мече пропал.Субстанция подползает ближе.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.RESET}")
+        else:
+            sub.distance -= 1
+            print(f"{hp.START_TIRE}Вы взмахнули мечом.Субстанция подползает ближе.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
+    # (4) Команда "с" с использованием свитка искр
+    elif action_hero == "с" and hero.bullet_of_sparks >= 1:
+        if sub.distance == 1 and cast_spell == 4:
+            sub.health -= (damage_hero.bullet_of_sparks - 5)
+            hero.bullet_of_sparks -= 1
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести максимальный урон .Сноп искр озаряет помещение.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+        elif sub.distance == 2 and cast_spell == 4:
+            sub.health -= (damage_hero.bullet_of_sparks // 2) - 5
+            hero.bullet_of_sparks -= 1
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести минимальный урон .Сноп искр немного осветил помещение.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        elif sub.distance > 2 and cast_spell == 4:
+            hero.bullet_of_sparks -= 1
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести хоть какой-то урон .{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        elif sub.distance == 1:
+            cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
+            sub.health -= damage_hero.bullet_of_sparks
+            hero.bullet_of_sparks -= 1
+            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Своим выстрелом вы сделали огромную дыру в теле субстанции.Сноп искр озаряеет помещение.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+        elif sub.distance == 2:
+            cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
+            sub.health -= damage_hero.bullet_of_sparks // 2
+            hero.bullet_of_sparks -= 1
+            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Сделав выстрел почти в упор вы наносите урон субстанции. Сноп искр озаряет помещение.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+        elif sub.distance > 2:
+            cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
+            sub.health -= damage_hero.bullet_of_sparks // 4
+            hero.bullet_of_sparks -= 1
+            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Большое расстояние не позволяет вам нанести значительный урон субстанции, сноп искр озарил помещение ярким светом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+
+    # (4) Команда "с"
+    elif action_hero == "с" and cast_spell != 4 and hero.hero_bullet > 0 and sub.distance > 2:
+        cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
+        sub.health -= hero.hero_range_attack
+        hero.hero_bullet -= 1
+        sub.distance -= 1
+        print(f"{hp.START_TIRE}Сделав выстрел из ружья вы попадаете по субстанции.Она движется вам навстречу.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "с" and cast_spell == 4 and hero.hero_bullet > 0 and sub.distance > 2:
+        sub.health -= (hero.hero_range_attack - rifle_debuff)
+        hero.hero_bullet -= 1
+        sub.distance -= 1
+        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Сделав выстрел из ружья вы попадаете по субстанции, но из-за загрязненного ствола наносите ей минимальный урон.Она движется вам навстречу.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "с" and hero.hero_bullet > 0 and sub.distance == 2:
+        sub.distance -= 1
+        print(f"{hp.START_TIRE}Не получится выстрелить с такой дистанции.Субстанция движется вам навстречу.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "с" and hero.hero_bullet > 0 and sub.distance == 1:
+        hero.hero_health -= sub.attack
+        print(f"{hp.START_TIRE} Выстрелить не получилось.Субстанция бьет вас.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "с" and hero.hero_bullet <= 0:
+        print(f"{hp.START_TIRE}Похоже у вас закончились пули.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+
+    # (4) Команда "в"
+    elif action_hero == "в" and sub.distance > 1:
+        sub.distance -= 1
+        print(f"{hp.START_TIRE}Вы делаете шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "в" and sub.distance == 1:
+        hero.hero_health -= sub.attack
+        sub.distance += 1
+        print(f"{hp.START_TIRE}Пытаясь обойти субстанцию,она бьет вас, отталкивая от себя.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
+    # (4) Команда "н"
+    elif action_hero == "н" and sub.distance == 1:
+        if sub_init == True:
+            sub_init = False  # сброс инициативы субстанции
+            sub.distance += 1
+            print(f"{hp.START_TIRE} Вы увернулись от удара субстанции сделав шаг назад.Субстанция перестала дрожать.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        elif sub_init == False:
+            sub.distance += 1
+            print(f"{hp.START_TIRE} Вы увернулись от удара субстанции сделав шаг назад.Субстанция перестала дрожать.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
+    # #########
+    # (4.1) Не стандартное прохождение
+    elif action_hero != "н" and count_dash > 0:
+        count_dash = 0  # сброс count_dash, если не двигаться все время назад
+    elif action_hero == "н" and sub.distance > 3:
+        if count_dash == 0:
+            count_dash = 1
+            print(f"{hp.START_TIRE}Вы отходите назад, но опираетесь на стену, вы движетесь вдоль стены.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+        elif count_dash == 1:
+            count_dash = 2
+            print(f"{hp.START_TIRE}Вы двигаетесь аккуратно вдоль стены, субстанция очень медленно движется к вам отодвигаясь от  прохода, которвй ведет дальше в подземелье.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+        elif count_dash == 2:
+            count_dash = 3
+            print(f"{hp.START_TIRE}Вы продолжаете двигаться вдоль стены.Выход уже совсем рядом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+
+    # ########
+    elif action_hero == "н" and sub.distance > 1:
+        sub.distance += 1
+        print(f"{hp.START_TIRE} Вы двигаетесь назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
+    # (4) Команда "у"
+    elif action_hero == "у" and sub.distance == 1:
+        hero.hero_health -= sub.attack
+        sub.distance += 1
+        print(f"{hp.START_TIRE}Вы пытаетесь увернуться от удара субстанции, но она всегда бьет непредсказуемо.Вы получаете урон и вас немного откидывает.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "у" and sub.distance > 1:
+        print(f"{hp.START_TIRE}Вы просто уворачиваетесь на месте.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
+    # (4) Команда-заглушка "о"
+    elif action_hero == "о":
+        if count_search == 0:
+            count_search += 1
+            print(f"{hp.START_TIRE}Ничего примечательного вы не видете. Только очень медленно двигающуюся субстанцию.{hp.END_TIRE}")
+        elif count_search == 1:
+            count_search += 1
+            hero.hero_bullet += 2
+            print(f"{hp.START_TIRE}Вы обнаружили в углу комнаты ружье, рядом с которым лежали патроны.\n{hp.YELLOW_STAR_START}{hp.YELLOW} +2 Пули\nКоличество пуль: {hero.hero_bullet}{hp.RESET}{hp.YELLOW_STAR_END}{hp.END_TIRE}")
+        elif count_search == 2:
+            print(f"{hp.START_TIRE} Больше вы ничего не обнаружили.{hp.END_TIRE}")
+
+    # (4) Здесь прописан рюкзак для 4-ой комнаты
+    elif action_hero == "р" and lock_backpack == True:
+        if sub.distance > 1:
+            lock_backpack = not lock_backpack
+            sub.distance -= 1
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Ненадолго отвернувшись, вы попытались вскрыть сумку, но слизь намертво склеила её. Пришлось забыть о снаряжении и вернуться к бою.Субстанция подползает ближе.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        elif sub.distance == 1:
+            hero.hero_health -= sub.attack
+            sub.distance += 2
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Пока вы пытались открыть сумку, субстанция наносит вам урон и отбрасывет вас от себя.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "р" and lock_backpack == False:
+        inventory_system.open_backpack(hero)
+
+    # (4) Команда "п"
+    elif action_hero == "п":
+        hp.show_full_help(hero)
+    else:
+        print(f"{hp.START_TIRE}Неизвестная команда.{hp.END_TIRE}")
 
 else:
-		count_search = 0
-		print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Субстанция раздвоилась после вашей атаки.Теперь перед вами две субстанции поменьше.{hp.RESET}{hp.END_TIRE}")
+    count_search = 0
+    print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Субстанция раздвоилась после вашей атаки.Теперь перед вами две субстанции поменьше.{hp.RESET}{hp.END_TIRE}")
+
 # (4) Вторая фаза сражения
+# [Здесь будет код второй фазы]
 sub_mini_init = 0  # очки подготовки ударов субстанций
 if flag_anti_mitoz:
     sub_mini1.health = 8
@@ -1347,45 +1373,58 @@ while sub_mini1.health > 0 or sub_mini2.health > 0:
 else:
     print(f"{hp.START_TIRE}{hp.GREEN}(*) Вы одолели две субстанции.{hp.RESET}\n{hp.YELLOW_STAR_START} + 2 Пули{hp.YELLOW_STAR_END}{hp.END_TIRE}")
     hero.hero_bullet += 2
+    achievements_system.add_killed_monster("2-Субстанции", 2)
+    achievements_system.add_completed_location("Комната 4", 2)
+
+
 """Комната 5: Некромант"""
 
-#Первая фаза боя с Некромантом
+# Первая фаза боя с Некромантом
 
-#(5)Счетчики способностей Некроманта:
+# (5) Счетчики способностей Некроманта:
 
-#Первая фаза
+# Первая фаза
 flag_winner = False
-#Вызов снаряда и его характеристики
-summon_projectile = 0#для корректной работы прописываем число 0
+# Вызов снаряда и его характеристики
+summon_projectile = 0  # для корректной работы прописываем число 0
 ##############
-#Для работы награды'отстрел'
-if flag_skull_shoot == True:
-	summon_distance = range(3,8)
-	summon_attack = range(2,3)
-if flag_skull_shoot == False:
-	summon_distance = range(3,7)
-	summon_attack = range(2,4)
+# Для работы награды 'отстрел'
+if flag_skull_shoot:
+    summon_distance = range(3, 8)
+    summon_attack = range(2, 3)
+else:
+    summon_distance = range(3, 7)
+    summon_attack = range(2, 4)
 ###############
 skull_attack = 0
 skull_distance = 0
 skull_fly = 0
-#Подготовка отталкивающего удара
-cast_punch = 0#для корректной работы прописываем число 0
+# Подготовка отталкивающего удара
+cast_punch = 0  # для корректной работы прописываем число 0
 ready_punch = 0
-change_of_skulls = False #Переменная для смены снарядов во второй фазе боя.
-change_of_attacks = False #Переменная для смены вида специальной атаки Некроманта во второй фазе
-cast_special_attack = 0 #Подготовка спец удара Некроманта
-special_attack_distance = 1 #Дистанция специальной атаки Некроманта до героя по умолчанию равна 1
+change_of_skulls = False  # Переменная для смены снарядов во второй фазе боя.
+change_of_attacks = False  # Переменная для смены вида специальной атаки Некроманта во второй фазе
+cast_special_attack = 0  # Подготовка спец удара Некроманта
+special_attack_distance = 1  # Дистанция специальной атаки Некроманта до героя по умолчанию равна 1
 ready_special_attack = 0
-cast_spell_mimic_backpack = 0#Подготовка призыва заклинания 'Голодный рюкзак' во второй фазе
-mimic_backpack_spell_time = 0#Время действия заклинания 'Голодный рюкзак' во второй фазе
-magic_field_var  = 0#переменная сообщающая о безопасности поля Некроманта
+cast_spell_mimic_backpack = 0  # Подготовка призыва заклинания 'Голодный рюкзак' во второй фазе
+mimic_backpack_spell_time = 0  # Время действия заклинания 'Голодный рюкзак' во второй фазе
+magic_field_var = 0  # переменная сообщающая о безопасности поля Некроманта
+
 print(f"{hp.START_TIRE}Вы двигаетесь по небольшому коридору, стены и потолок, которого украшены вырезанными неизвестными символами. Чем дальше вы проходите тем ярче они светятся фиолетовым светом.\nДойдя до конца вы оказываетесь в пыльном помещении в центре которого левитирует в воздухе тот ради которого вы проделали весь этот путь.Судя по всему {hp.PURPLE}Некромант{hp.RESET} снимает силовое поле, которое огораживает \u001b[30;1mтаинственную статую в черных доспехах{hp.RESET}. Он оборачивается на вас и приземляется на землю.Пора выполнить контракт, расправившись с {hp.PURPLE}Некромантом{hp.RESET}.{hp.END_TIRE}")
-necromancer_taunts_after_push = ["Как далеко ты отлетел? Достаточно, чтобы понять своё ничтожество?","Ха! Ты даже не устоял перед лёгким взмахом моей руки!","Падаешь так изящно... Может, сразу ляжешь в могилу?","Разве это не унизительно? Тебя отшвырнуло, как щепку!"]
-#(5)Функция с таймером 50 секунд.
+
+necromancer_taunts_after_push = [
+    "Как далеко ты отлетел? Достаточно, чтобы понять своё ничтожество?",
+    "Ха! Ты даже не устоял перед лёгким взмахом моей руки!",
+    "Падаешь так изящно... Может, сразу ляжешь в могилу?",
+    "Разве это не унизительно? Тебя отшвырнуло, как щепку!"
+]
+
+# (5) Функция с таймером 50 секунд.
 def ask_for_action_hero():
     global timer, input_active
     input_active = True
+
     # Создаем поток для ввода
     def input_thread():
         global user_input
@@ -1394,16 +1433,19 @@ def ask_for_action_hero():
             user_input = sys.stdin.readline().strip().lower()
         except:
             user_input = None
+
     # Запускаем поток ввода
-    input_thread = threading.Thread(target=input_thread)
-    input_thread.daemon = True
-    input_thread.start()
+    input_thread_obj = threading.Thread(target=input_thread)
+    input_thread_obj.daemon = True
+    input_thread_obj.start()
+
     # Таймер на 50 секунд
     timer = threading.Timer(50.0, timeout_message)
     timer.start()
+
     # Ждем завершения ввода или таймера
-    input_thread.join(50.0)
-    if input_thread.is_alive():
+    input_thread_obj.join(50.0)
+    if input_thread_obj.is_alive():
         # Время вышло, прерываем ввод
         timer.cancel()
         input_active = False
@@ -1413,272 +1455,300 @@ def ask_for_action_hero():
         timer.cancel()
         input_active = False
         return user_input
+
+
 # Функция timeout_message().
 def timeout_message():
     global input_active
     if not input_active:
         return
     necromancer_phrases = [
-    "Мёртвые не раздумывают - они повинуются!",
-    "Твоя нерешительность - лучший союзник моей армии теней!",
-    "Каждая упущенная секунда - ещё один глоток твоей жизненной силы!",
-    "В моём царстве время течёт иначе... прямо как кровь из твоих ран!",
-    "Ты замер, словно труп на виселице...",
-    "Время кончилось... как и твои шансы!",
-    "Ты что, надеялся, что смерть будет ждать?",
-    "Упущенное время не вернуть...",
-]
+        "Мёртвые не раздумывают - они повинуются!",
+        "Твоя нерешительность - лучший союзник моей армии теней!",
+        "Каждая упущенная секунда - ещё один глоток твоей жизненной силы!",
+        "В моём царстве время течёт иначе... прямо как кровь из твоих ран!",
+        "Ты замер, словно труп на виселице...",
+        "Время кончилось... как и твои шансы!",
+        "Ты что, надеялся, что смерть будет ждать?",
+        "Упущенное время не вернуть...",
+    ]
     hero.hero_health -= necromancer.attack
     chosen_phrase = random.choice(necromancer_phrases)
     print(f"\n{hp.START_TIRE}{hp.PURPLE}Некромант - '{chosen_phrase}'{hp.RESET}\nНекромант атакует первым!\n{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
- # Автоматически запрашиваем новое действие
+    # Автоматически запрашиваем новое действие
     print(f"\n{hp.START_TIRE}У вас есть 50 секунд для следующего действия...{hp.END_TIRE}")
-#(5.1)Основной игровой цикл 1-ой фазы боя
+
+
+# (5.1) Основной игровой цикл 1-ой фазы боя
 input_active = False
+
 while hero.hero_health > 0:
-    
+
     price()
-    #(5)Подсказки соратника
-    hp.reset_all_help()#сброс всех значений на False
-    hp.help_states["help_five_room_phase_one"] = True #Включаем подсказки пятой комнаты(первая фаза)
+    # (5) Подсказки соратника
+    hp.reset_all_help()  # сброс всех значений на False
+    hp.help_states["help_five_room_phase_one"] = True  # Включаем подсказки пятой комнаты(первая фаза)
+
     try:
-        if pass_five_room_phase_one == True:
-        	break
+        if pass_five_room_phase_one:
+            break
         action_hero = ask_for_action_hero()
         if action_hero is None:
             continue
         if skull_shoot == 2:
-        	skull_shoot += 1
-        	hero.hero_bullet += 1
-        	flag_skull_shoot = True
-        	print(f"{hp.START_TIRE}(🎁) Вы получаете преимущество за отстрел черепов.\n{hp.YELLOW_STAR_START} -1 от максимальной атаки всех летающих черепов\n +1 к максимальной дистанции черепов до вас\n + 1 Пуля{hp.YELLOW_STAR_END}\n(🎁) Чтобы получить награду в следующей игре введите {hp.CYAN}'отстрел'{hp.RESET}.{hp.END_TIRE}")
+            skull_shoot += 1
+            hero.hero_bullet += 1
+            flag_skull_shoot = True
+            achievements_system.add_achievement(achievements_system.character_data, "SKULLS_HUNTER", 2)
+            print(f"{START_TIRE}(🎖) Получено достижение {hp.CYAN}'Охотник за черепами'{hp.RESET}\n"
+                  f"(🎁) Вы получаете преимущество за отстрел черепов.\n"
+                  f"{hp.YELLOW_STAR_START} -1 от максимальной атаки всех летающих черепов\n"
+                  f" +1 к максимальной дистанции черепов до вас\n + 1 Пуля{hp.YELLOW_STAR_END}\n"
+                  f"(🎁) Чтобы получить награду в следующей игре введите {hp.CYAN}'отстрел'{hp.RESET}.{hp.END_TIRE}")
 
-#(5.1)hero.count_crit_attack
+        # (5.1) hero.count_crit_attack
         crit()
         if necromancer.health <= 0:
+            achievements_system.add_killed_monster("Некромант 1-ая фаза", 2)
+            achievements_system.add_completed_location("Комната 5, 1-ая фаза", 2)
             necromancer.health = 30
-            #######Сброс переменных####
+            ####### Сброс переменных ####
             skull_fly = 0
             summon_projectile = 0
             skull_distance = 0
             summon_projectile = 0
             cast_spell = 0
             time_action_hero_spell = 0
-        	#########
+            #########
             necromancer.distance += 3
             hero.hero_potion_heal += 1
             hero.hero_bullet += 2
             print(f"{hp.START_TIRE}{hp.PURPLE}(*) После нанесенного урона Некромант телепортировался подальше от вас.\nНекромант - 'Ты думал это все? Я уже умер тысячу раз... и тысячу раз восставал!'{hp.RESET}\n{hp.YELLOW_STAR_START} + 2 Пули\n + 1 Зелье лечения{hp.YELLOW_STAR_END}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-
             break
-#(5.1)Код отвечающий за работу снаряда Некроманта в 1-ой фазе:
-        elif summon_projectile != 5:
-         	summon_projectile += 1
-        elif summon_projectile == 5 and skull_fly == 0:#Если summon_projectile равен 5, то будет призван череп.
-	        	skull_distance = random.choice(summon_distance)
-	        	skull_attack = random.choice(summon_attack)
-	        	skull_fly = 1
-	        	print(f"{hp.START_TIRE}(💀) Позади вас в одной из многочисленных открытых гробниц вылетает призванный {hp.PURPLE}Некромантом{hp.RESET}, пылающий огнем, череп.Череп летит в вашу сторону.{hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
-        elif skull_distance != 1 and skull_fly == 1:
-        	skull_distance -= 1#Полет снаряда до героя
-#-------------------------------------
-#(5.1)Команда "у" от снаряда
-        elif action_hero == "у" and skull_distance == 1 and skull_fly == 1:
-        	skull_fly = 0
-        	summon_projectile = 0
-        	print(f"{hp.START_TIRE}(💀) Череп пролетев мимо вас разбивается об землю.Вам удалось увернуться.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#-------------------------------------------------
-        elif skull_distance == 1 and skull_fly == 1:
-        	hero.hero_health -= skull_attack
-        	skull_fly = 0
-        	summon_projectile = 0
-        	skull_distance = 0
-        	print(f"{hp.START_TIRE}(💀) Максимально приблизившись к вам, череп открыв пасть устремился в вашу спину и разбившись о нее наносит вам урон темной магией {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.1)Код описывающий действие заклинания "Реверс-поступь" в 1-ой фазе
-        if cast_spell != 10:
-        	cast_spell += 1#Прибавляем cast_spell для начала работы заклинания
-        elif cast_spell == 10 and time_action_hero_spell == 0:
-        	time_action_hero_spell = -1#Значение -1 нужно для того, чтобы нижнее условие сработало.
-        	print(f"{hp.START_TIRE}(🦶) Направив руку на вас,{hp.PURPLE}, Некромант{hp.RESET} вызвал заклинание {hp.PURPLE}'Реверс-поступь'{hp.RESET}{hp.END_TIRE}")
-        elif cast_spell == 10 and time_action_hero_spell == -1:
-        	time_action_hero_spell = 5#Начало действия заклинания "Реверс-поступь"
-        elif time_action_hero_spell != 1:
-        	time_action_hero_spell -= 1#Действие заклинания, пока time_action_hero_spell не равно нулю.
-#(5.1)Код описывающий "Отталкивающий удар" Некроманта
-        if cast_punch < 7:
-        	cast_punch += 1#Перезарядка "Отталкивающего удара"
-        elif cast_punch  < 8:
-        	cast_punch += 1
-        	necromancer.distance += 3
-        	print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}Некромант \u001b[0 переместился подальше от вас с помощью темной магии, заряжает свободной рукой {hp.PURPLE}'Отталкивающий удар'{hp.RESET}.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        elif cast_punch < 14:
-        	cast_punch += 1
-        	print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}Некромант{hp.RESET} продолжает заряжать свободной рукой {hp.PURPLE}'Отталкивающий удар'{hp.RESET}.{hp.END_TIRE}")
-        elif cast_punch == 14 and ready_punch == 0:
-        	ready_punch = 1
-        	print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}'Отталкивающий удар' Некроманта готов.{hp.RESET}{hp.END_TIRE}")
-        elif ready_punch == 1:
-        	ready_punch = 2#Чтобы сообщение о готовности удара больше не появлялось
-#(5.1)Команда "а" и 'Отталкивающий удар некроманта'
-        if  action_hero == "а" and necromancer.distance == 1 and cast_punch < 9:
-         	if hero.count_crit_attack > 0:
-         		necromancer.health -= (hero.hero_attack*2)
-         		necromancer.distance += 1
-         		hero.count_crit_attack -= 1
-         		print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Ударом,заряженного меча, вы наносите значительный урон Некроманту. Он делает шаг назад и готовится сделать удар с выпадом.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-         	elif hero.count_crit_attack <= 0:
-	         	necromancer.health -= hero.hero_attack
-	         	necromancer.distance += 1
-	         	print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад и готовится сделать удар с выпадом.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")#удар с выпадом
-        elif  action_hero == "а" and necromancer.distance == 2:
-         	hero.hero_health -= necromancer.attack
-         	print(f"{hp.START_TIRE}Сделав удар мечом вы рассекаете воздух.Некромант делает удар с выпадом и отходит назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")#удар с выпадом
-        elif action_hero == "а" and necromancer.distance == 1 and cast_punch != 14 and  ready_punch == 0:
-            	if hero.count_crit_attack > 0:
-            		necromancer.health -= hero.hero_attack * 2
-            		necromancer.distance += 1
-            		hero.count_crit_attack -= 1
-            		cast_punch = 0#сброс подготовки удара Некроманта
-            		ready_punch = 0#сброс подготовки удара Некроманта
-            		print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Заряженным мечом вы поражаете {hp.PURPLE}Некроманта{hp.RESET} и он перестал заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	else:
-            		necromancer.health -= hero.hero_attack
-            		necromancer.distance += 1
-            		cast_punch = 0#сброс подготовки удара Некроманта
-            		ready_punch = 0#сброс подготовки удара Некроманта
-            		print(f"{hp.START_TIRE}Мечом вы поражаете {hp.PURPLE}Некроманта{hp.RESET} и он перестал заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        elif action_hero == "а" and necromancer.distance == 1 and ready_punch == 2:
-            	necromancer.distance += 3
-            	hero.hero_health -= 2
-            	if skull_distance < 3:
-            		skull_distance = 1
-            		ready_punch = 0
-            		cast_punch = 0
-            	elif skull_distance > 3:
-            		skull_distance -= 3
-            		ready_punch = 0
-            		cast_punch = 0
-            	print(f"{hp.START_TIRE}(👊) Своим мечом вы пытаетесь нанести урон, но {hp.PURPLE} Некромант{hp.RESET} быстрым движением руки бьет вас {hp.PURPLE}'Отталкивающим ударом'{hp.RESET}.\nВы пролетев приличное расстояние получаете урон при падении.\n{hp.PURPLE}Некромант - '{random.choice(necromancer_taunts_after_push)}'{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#######################
-#(5.1)Секретный способ пройти игру#
-        elif action_hero == "а" and necromancer.distance < 1 and ready_punch == 2:
-            	necromancer.distance += 3
-            	flag_winner = True
-            	fast_as_hermes += 1
-            	print(f"{hp.START_TIRE}(⚡) Своим мечом вы пытаетесь нанести урон, но {hp.PURPLE}Некромант{hp.RESET} быстрым движением руки бьет вас {hp.PURPLE}'Отталкивающим ударом'{hp.RESET}.\nВы пролетев приличное расстояние оказываетесь у подножия той самой статуи.Вы касаетесь пальцами постамента.В глазах засияло, а потом все погрузилось в мрак...{hp.END_TIRE}")
-        elif flag_winner == True:
-            	print(f"{hp.START_TIRE}(🎉) Поздравляем! Вы прошли босса игры {hp.CYAN_BOLD} не стандартным способом.{hp.RESET}\nВведите в начале новой игры два слова с пробелом посередине: {hp.CYAN_BOLD}\"time loop\"{hp.RESET}, чтобы пройти игру на более высокой сложности.{hp.END_TIRE}")
-            	if fast_as_hermes == 5:
-            		print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Пацифист'{hp.RESET} за прохождение игры нестандартным способом без убийств.\n\nВведите {hp.CYAN}'гермес' {hp.RESET}для получения награды в новой игре.{hp.END_TIRE}")
-            	sys.exit()
-        elif necromancer.distance < 1:
-            	necromancer.distance += 3
-            	hero.hero_health -= 2
-            	if skull_distance < 3:
-            		skull_distance = 1
-            	elif skull_distance > 3:
-            		skull_distance -= 3
-            	print(f"{hp.START_TIRE}\n{hp.PURPLE}Некромант - 'Встречай свою смерть лицом к лицу жалкий человечишка!{hp.RESET}\nС помощью темной магии {hp.PURPLE}Некромант{hp.RESET} отталкивает вас так, чтобы вы были перед ним, а не за спиной.Вы отлетели на значительное расстояние и получили небольшой урон при падении. {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 
-        elif action_hero == "в" and necromancer.distance == 1 and time_action_hero_spell ==0 and cast_spell != 10:
-            	  	 necromancer.distance -= 1
-            	  	 print(f"{hp.START_TIRE}{hp.PURPLE}Некромант - 'Надумал обойти меня негодяй?!'{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#######################
+        # (5.1) Код отвечающий за работу снаряда Некроманта в 1-ой фазе:
+        if summon_projectile != 5:
+            summon_projectile += 1
+        elif summon_projectile == 5 and skull_fly == 0:  # Если summon_projectile равен 5, то будет призван череп.
+            skull_distance = random.choice(summon_distance)
+            skull_attack = random.choice(summon_attack)
+            skull_fly = 1
+            print(f"{hp.START_TIRE}(💀) Позади вас в одной из многочисленных открытых гробниц вылетает призванный {hp.PURPLE}Некромантом{hp.RESET}, пылающий огнем, череп.Череп летит в вашу сторону.{hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
+        elif skull_distance != 1 and skull_fly == 1:
+            skull_distance -= 1  # Полет снаряда до героя
+        # -------------------------------------
+        # (5.1) Команда "у" от снаряда
+        elif action_hero == "у" and skull_distance == 1 and skull_fly == 1:
+            skull_fly = 0
+            summon_projectile = 0
+            print(f"{hp.START_TIRE}(💀) Череп пролетев мимо вас разбивается об землю.Вам удалось увернуться.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+        # -------------------------------------------------
+        elif skull_distance == 1 and skull_fly == 1:
+            hero.hero_health -= skull_attack
+            skull_fly = 0
+            summon_projectile = 0
+            skull_distance = 0
+            print(f"{hp.START_TIRE}(💀) Максимально приблизившись к вам, череп открыв пасть устремился в вашу спину и разбившись о нее наносит вам урон темной магией {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.1) Код описывающий действие заклинания "Реверс-поступь" в 1-ой фазе
+        if cast_spell != 10:
+            cast_spell += 1  # Прибавляем cast_spell для начала работы заклинания
+        elif cast_spell == 10 and time_action_hero_spell == 0:
+            time_action_hero_spell = -1  # Значение -1 нужно для того, чтобы нижнее условие сработало.
+            print(f"{hp.START_TIRE}(🦶) Направив руку на вас,{hp.PURPLE}, Некромант{hp.RESET} вызвал заклинание {hp.PURPLE}'Реверс-поступь'{hp.RESET}{hp.END_TIRE}")
+        elif cast_spell == 10 and time_action_hero_spell == -1:
+            time_action_hero_spell = 5  # Начало действия заклинания "Реверс-поступь"
+        elif time_action_hero_spell != 1:
+            time_action_hero_spell -= 1  # Действие заклинания, пока time_action_hero_spell не равно нулю.
+
+        # (5.1) Код описывающий "Отталкивающий удар" Некроманта
+        if cast_punch < 7:
+            cast_punch += 1  # Перезарядка "Отталкивающего удара"
+        elif cast_punch < 8:
+            cast_punch += 1
+            necromancer.distance += 3
+            print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}Некромант \u001b[0 переместился подальше от вас с помощью темной магии, заряжает свободной рукой {hp.PURPLE}'Отталкивающий удар'{hp.RESET}.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+        elif cast_punch < 14:
+            cast_punch += 1
+            print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}Некромант{hp.RESET} продолжает заряжать свободной рукой {hp.PURPLE}'Отталкивающий удар'{hp.RESET}.{hp.END_TIRE}")
+        elif cast_punch == 14 and ready_punch == 0:
+            ready_punch = 1
+            print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}'Отталкивающий удар' Некроманта готов.{hp.RESET}{hp.END_TIRE}")
+        elif ready_punch == 1:
+            ready_punch = 2  # Чтобы сообщение о готовности удара больше не появлялось
+
+        # (5.1) Команда "а" и 'Отталкивающий удар некроманта'
+        if action_hero == "а" and necromancer.distance == 1 and cast_punch < 9:
+            if hero.count_crit_attack > 0:
+                necromancer.health -= (hero.hero_attack * 2)
+                necromancer.distance += 1
+                hero.count_crit_attack -= 1
+                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Ударом,заряженного меча, вы наносите значительный урон Некроманту. Он делает шаг назад и готовится сделать удар с выпадом.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif hero.count_crit_attack <= 0:
+                necromancer.health -= hero.hero_attack
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад и готовится сделать удар с выпадом.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")  # удар с выпадом
+        elif action_hero == "а" and necromancer.distance == 2:
+            hero.hero_health -= necromancer.attack
+            print(f"{hp.START_TIRE}Сделав удар мечом вы рассекаете воздух.Некромант делает удар с выпадом и отходит назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")  # удар с выпадом
+        elif action_hero == "а" and necromancer.distance == 1 and cast_punch != 14 and ready_punch == 0:
+            if hero.count_crit_attack > 0:
+                necromancer.health -= hero.hero_attack * 2
+                necromancer.distance += 1
+                hero.count_crit_attack -= 1
+                cast_punch = 0  # сброс подготовки удара Некроманта
+                ready_punch = 0  # сброс подготовки удара Некроманта
+                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Заряженным мечом вы поражаете {hp.PURPLE}Некроманта{hp.RESET} и он перестал заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            else:
+                necromancer.health -= hero.hero_attack
+                necromancer.distance += 1
+                cast_punch = 0  # сброс подготовки удара Некроманта
+                ready_punch = 0  # сброс подготовки удара Некроманта
+                print(f"{hp.START_TIRE}Мечом вы поражаете {hp.PURPLE}Некроманта{hp.RESET} и он перестал заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+        elif action_hero == "а" and necromancer.distance == 1 and ready_punch == 2:
+            necromancer.distance += 3
+            hero.hero_health -= 2
+            if skull_distance < 3:
+                skull_distance = 1
+                ready_punch = 0
+                cast_punch = 0
+            elif skull_distance > 3:
+                skull_distance -= 3
+                ready_punch = 0
+                cast_punch = 0
+            print(f"{hp.START_TIRE}(👊) Своим мечом вы пытаетесь нанести урон, но {hp.PURPLE} Некромант{hp.RESET} быстрым движением руки бьет вас {hp.PURPLE}'Отталкивающим ударом'{hp.RESET}.\nВы пролетев приличное расстояние получаете урон при падении.\n{hp.PURPLE}Некромант - '{random.choice(necromancer_taunts_after_push)}'{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        #######################
+        # (5.1) Секретный способ пройти игру #
+        elif action_hero == "а" and necromancer.distance < 1 and ready_punch == 2:
+            necromancer.distance += 3
+            flag_winner = True
+            fast_as_hermes += 1
+            achievements_system.add_completed_location("Комната 5, 1-ая фаза", 2)
+            achievements_system.add_completed_location("Комната 5, 2-ая фаза", 2)
+            achievements_system.add_completed_location("Комната 5, 3-ая фаза", 2)
+            print(f"{hp.START_TIRE}(⚡) Своим мечом вы пытаетесь нанести урон, но {hp.PURPLE}Некромант{hp.RESET} быстрым движением руки бьет вас {hp.PURPLE}'Отталкивающим ударом'{hp.RESET}.\nВы пролетев приличное расстояние оказываетесь у подножия той самой статуи.Вы касаетесь пальцами постамента.В глазах засияло, а потом все погрузилось в мрак...{hp.END_TIRE}")
+        elif flag_winner:
+            print(f"{hp.START_TIRE}(🎉) Поздравляем! Вы прошли босса игры {hp.CYAN_BOLD} не стандартным способом.{hp.RESET}\nВведите в начале новой игры два слова с пробелом посередине: {hp.CYAN_BOLD}\"time loop\"{hp.RESET}, чтобы пройти игру на более высокой сложности.{hp.END_TIRE}")
+            if fast_as_hermes == 5:
+                achievements_system.add_achievement(achievements_system.character_data, "PACIFIST", 4)
+                print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Пацифист'{hp.RESET} за прохождение игры нестандартным способом без убийств.\n\nВведите {hp.CYAN}'гермес' {hp.RESET}для получения награды в новой игре.{hp.END_TIRE}")
+            sys.exit()
+        elif necromancer.distance < 1:
+            necromancer.distance += 3
+            hero.hero_health -= 2
+            if skull_distance < 3:
+                skull_distance = 1
+            elif skull_distance > 3:
+                skull_distance -= 3
+            print(f"{hp.START_TIRE}\n{hp.PURPLE}Некромант - 'Встречай свою смерть лицом к лицу жалкий человечишка!{hp.RESET}\nС помощью темной магии {hp.PURPLE}Некромант{hp.RESET} отталкивает вас так, чтобы вы были перед ним, а не за спиной.Вы отлетели на значительное расстояние и получили небольшой урон при падении. {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        elif action_hero == "в" and necromancer.distance == 1 and time_action_hero_spell == 0 and cast_spell != 10:
+            necromancer.distance -= 1
+            print(f"{hp.START_TIRE}{hp.PURPLE}Некромант - 'Надумал обойти меня негодяй?!'{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        #######################
         elif time_action_hero_spell == 1 and cast_spell == 10:
-        	print(f"{hp.START_TIRE}(🦶) Магия заклинания {hp.PURPLE}'Реверс - поступь'{hp.RESET} рассеялась...{hp.END_TIRE}")
-        	cast_spell = 0
-        	time_action_hero_spell = 0
-########################
-#(5.1)Команда "в"
+            print(f"{hp.START_TIRE}(🦶) Магия заклинания {hp.PURPLE}'Реверс - поступь'{hp.RESET} рассеялась...{hp.END_TIRE}")
+            cast_spell = 0
+            time_action_hero_spell = 0
+        #######################
+
+        # (5.1) Команда "в"
         elif action_hero == "в" and necromancer.distance == 1:
-            	  	 if time_action_hero_spell !=0 and cast_spell == 10:
-            	  	  necromancer.distance += 1
-            	  	  print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Хочешь идти 'вперёд'? Как насчёт ШАГА НАЗАД?!{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
+            if time_action_hero_spell != 0 and cast_spell == 10:
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Хочешь идти 'вперёд'? Как насчёт ШАГА НАЗАД?!{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
         elif action_hero == "в" and necromancer.distance == 2:
-          	print(f"{hp.START_TIRE}Вы двигаетесь навстречу, а он в свою очередь, усмехаясь делает шаг назад, с кинжалом наготове.Так долго с ним можно кружить по комнате.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}Вы двигаетесь навстречу, а он в свою очередь, усмехаясь делает шаг назад, с кинжалом наготове.Так долго с ним можно кружить по комнате.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "в" and necromancer.distance != 1:
-            	  if time_action_hero_spell !=0 and cast_spell == 10:
-            	  	 necromancer.distance += 1
-            	  	 print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Хочешь идти 'вперёд'? Как насчёт ШАГА НАЗАД?!{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
-            	  else:
-            	  	   necromancer.distance -= 1
-            	  	   print(f"{hp.START_TIRE}Вы двигаетесь вперед{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.1)Команда "у"
+            if time_action_hero_spell != 0 and cast_spell == 10:
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Хочешь идти 'вперёд'? Как насчёт ШАГА НАЗАД?!{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
+            else:
+                necromancer.distance -= 1
+                print(f"{hp.START_TIRE}Вы двигаетесь вперед{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.1) Команда "у"
         elif action_hero == "у" and necromancer.distance == 1:
-        	necromancer.distance += 1
-        	print(f"{hp.START_TIRE}Вы уворачиваетесь на месте. {hp.PURPLE}Некромант{hp.RESET} просто сделал шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            necromancer.distance += 1
+            print(f"{hp.START_TIRE}Вы уворачиваетесь на месте. {hp.PURPLE}Некромант{hp.RESET} просто сделал шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "у" and necromancer.distance == 2:
-        	necromancer.distance -= 1
-        	print(f"{hp.START_TIRE}{hp.PURPLE}Некромант{hp.RESET} сделав выпад с кинжалом, промахивается по вам. Дистанция между вами уменьшилась.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.1)Команда "н"
+            necromancer.distance -= 1
+            print(f"{hp.START_TIRE}{hp.PURPLE}Некромант{hp.RESET} сделав выпад с кинжалом, промахивается по вам. Дистанция между вами уменьшилась.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.1) Команда "н"
         elif action_hero == "н" and necromancer.distance != 1:
-            	  if time_action_hero_spell !=0 and cast_spell == 10:
-            	  	 necromancer.distance -= 1
-            	  	 print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Ты сказал 'назад'? Отлично... ИДЁМ ВПЕРЁД!{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
-            	  else:
-            	  	   necromancer.distance += 1
-            	  	   print(f"{hp.START_TIRE}Вы двигаетесь назад{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            if time_action_hero_spell != 0 and cast_spell == 10:
+                necromancer.distance -= 1
+                print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Ты сказал 'назад'? Отлично... ИДЁМ ВПЕРЁД!{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
+            else:
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}Вы двигаетесь назад{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "н" and necromancer.distance == 1:
-            	  	 if time_action_hero_spell !=0 and cast_spell == 10:
-            	  	 	print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Просто постой на месте!{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
-            	  	 else:
-            	  	   necromancer.distance += 1
-            	  	   print(f"{hp.START_TIRE}Вы двигаетесь назад{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.1)Команда "р"
+            if time_action_hero_spell != 0 and cast_spell == 10:
+                print(f"{hp.START_TIRE}{hp.PURPLE}Некромант -*зловещая усмешка* Просто постой на месте!{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
+            else:
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}Вы двигаетесь назад{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.1) Команда "р"
         elif action_hero == "р":
             inventory_system.open_backpack(hero)
 
-#(5.1)Команда "п".
+        # (5.1) Команда "п".
         elif action_hero == "п":
-            	 	hp.show_full_help(hero)
-#(5.1)Команда "с" с использованием свитка искр.
-        elif action_hero == "с" and hero.bullet_of_sparks >= 1:
-         	if cast_punch >= 8 and ready_punch != 1:
-         		sparks_five_room()
-         		print(f" {hp.YELLOW_BOLD}Некромант перестает заряжать 'Отталкивающий удар'{hp.RESET}.{hp.END_TIRE}")
-         		cast_punch = 0
-         		ready_punch = 0
-         	else:
-         		 sparks_five_room()
-#(5.1)Команда "о"
-        elif action_hero == "о" and skull_distance > 1:
-        	print(f"{hp.START_TIRE}Быстро оглядевшись, вы замечаете летящий Череп.\nЕго дистанция примерно: {random.randint(skull_distance-1,skull_distance+1)} или {random.randint(skull_distance-1,skull_distance+1)}{hp.END_TIRE}")
-        elif action_hero == "о":
-        	print(f"{hp.START_TIRE}Быстро оглядевшись, угрозу для себя вы не обнаружили кроме {hp.PURPLE}Некроманта{hp.RESET} напротив.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.1)Команда "с"
-        elif action_hero == "с" and hero.hero_bullet <= 0:
-        	hero.hero_bullet = 0
-        	print(f"{hp.START_TIRE}Похоже у вас кончились патроны.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        elif action_hero == "с" and necromancer.distance != 1:
-            	 range_target = input(f"{hp.START_TIRE}Выберите в кого вы будете стрелять(введите цифру):\n(1){hp.PURPLE}Некромант{hp.RESET}\n(2)летающий Череп{hp.END_TIRE}").lower()
-            	 if range_target not in ("1","2"):
-            	 	print(f"{hp.START_TIRE}Не решившись выбрать цель для выстрела, вы опускаете ружье.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "1" and necromancer.distance >= 3 and cast_punch != 14 and ready_punch != 1:
-            	 	necromancer.health -= hero.hero_range_attack
-            	 	cast_punch = 0
-            	 	ready_punch = 0
-            	 	hero.hero_bullet -= 1
-            	 	necromancer.distance -= 1
-            	 	print(f"{hp.START_TIRE}Вы попадаете по {hp.PURPLE}Некроманту{hp.RESET} и он перестает заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "1" and necromancer.distance >= 3:
-            	 	hero.hero_bullet -= 1
-            	 	necromancer.health -= hero.hero_range_attack
-            	 	necromancer.distance -= 1
-            	 	print(f"{hp.START_TIRE}Вы попадаете по {hp.PURPLE}Некроманту{hp.RESET}.Он делает шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "1" and necromancer.distance < 3:
-            	 	print(f"{hp.START_TIRE}Нельзя выстрелить по {hp.PURPLE}Некроманту{hp.RESET} с такого близкого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "2" and skull_distance == 0:
-            	 	print(f"{hp.START_TIRE}В воздухе нет летающего Черепа.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "2" and skull_distance >= 3:
-            	 	skull_fly = 0
-            	 	summon_projectile = 0
-            	 	skull_distance = 0
-            	 	hero.hero_bullet -= 1
-            	 	skull_shoot += 1 #очки для сбития черепов выстрелами
-            	 	print(f"{hp.START_TIRE}(💀) Своим выстрелом вы разбили вдребезги, летящий к вам, Череп.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "2" and skull_distance < 3:
-            	 	print(f"{hp.START_TIRE}Не получится выстрелить с такого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            hp.show_full_help(hero)
 
+        # (5.1) Команда "с" с использованием свитка искр.
+        elif action_hero == "с" and hero.bullet_of_sparks >= 1:
+            if cast_punch >= 8 and ready_punch != 1:
+                sparks_five_room()
+                print(f" {hp.YELLOW_BOLD}Некромант перестает заряжать 'Отталкивающий удар'{hp.RESET}.{hp.END_TIRE}")
+                cast_punch = 0
+                ready_punch = 0
+            else:
+                sparks_five_room()
+
+        # (5.1) Команда "о"
+        elif action_hero == "о" and skull_distance > 1:
+            print(f"{hp.START_TIRE}Быстро оглядевшись, вы замечаете летящий Череп.\nЕго дистанция примерно: {random.randint(skull_distance-1,skull_distance+1)} или {random.randint(skull_distance-1,skull_distance+1)}{hp.END_TIRE}")
+        elif action_hero == "о":
+            print(f"{hp.START_TIRE}Быстро оглядевшись, угрозу для себя вы не обнаружили кроме {hp.PURPLE}Некроманта{hp.RESET} напротив.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.1) Команда "с"
+        elif action_hero == "с" and hero.hero_bullet <= 0:
+            hero.hero_bullet = 0
+            print(f"{hp.START_TIRE}Похоже у вас кончились патроны.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+        elif action_hero == "с" and necromancer.distance != 1:
+            range_target = input(f"{hp.START_TIRE}Выберите в кого вы будете стрелять(введите цифру):\n(1){hp.PURPLE}Некромант{hp.RESET}\n(2)летающий Череп{hp.END_TIRE}").lower()
+            if range_target not in ("1", "2"):
+                print(f"{hp.START_TIRE}Не решившись выбрать цель для выстрела, вы опускаете ружье.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "1" and necromancer.distance >= 3 and cast_punch != 14 and ready_punch != 1:
+                necromancer.health -= hero.hero_range_attack
+                cast_punch = 0
+                ready_punch = 0
+                hero.hero_bullet -= 1
+                necromancer.distance -= 1
+                print(f"{hp.START_TIRE}Вы попадаете по {hp.PURPLE}Некроманту{hp.RESET} и он перестает заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "1" and necromancer.distance >= 3:
+                hero.hero_bullet -= 1
+                necromancer.health -= hero.hero_range_attack
+                necromancer.distance -= 1
+                print(f"{hp.START_TIRE}Вы попадаете по {hp.PURPLE}Некроманту{hp.RESET}.Он делает шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "1" and necromancer.distance < 3:
+                print(f"{hp.START_TIRE}Нельзя выстрелить по {hp.PURPLE}Некроманту{hp.RESET} с такого близкого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "2" and skull_distance == 0:
+                print(f"{hp.START_TIRE}В воздухе нет летающего Черепа.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "2" and skull_distance >= 3:
+                skull_fly = 0
+                summon_projectile = 0
+                skull_distance = 0
+                hero.hero_bullet -= 1
+                skull_shoot += 1  # очки для сбития черепов выстрелами
+                print(f"{hp.START_TIRE}(💀) Своим выстрелом вы разбили вдребезги, летящий к вам, Череп.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "2" and skull_distance < 3:
+                print(f"{hp.START_TIRE}Не получится выстрелить с такого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 
     except Exception as e:
         print(f"{hp.START_TIRE}Произошла ошибка: {hp.RED_BOLD}{e}{hp.RESET}{hp.END_TIRE}")
@@ -1686,27 +1756,30 @@ while hero.hero_health > 0:
             timer.cancel()
             input_active = False
 
-#Вторая фаза боя с Некромантом
+# Вторая фаза боя с Некромантом
 
-#(5.2)Основной игровой цикл 2-ой фазы боя
+# (5.2) Основной игровой цикл 2-ой фазы боя
 input_active = False
+
 while hero.hero_health > 0:
-    #(5)Подсказки соратника
-    hp.reset_all_help()#сброс всех значений на False
-    hp.help_states["help_five_room_phase_two"] = True #Включаем подсказки пятой комнаты(первая фаза)
-    
+    # (5) Подсказки соратника
+    hp.reset_all_help()  # сброс всех значений на False
+    hp.help_states["help_five_room_phase_two"] = True  # Включаем подсказки пятой комнаты(первая фаза)
+
     price()
     try:
-        if pass_five_room_phase_two == True:
-        		break
-        #(5.2)hero.count_crit_attack
+        if pass_five_room_phase_two:
+            break
+        # (5.2) hero.count_crit_attack
         crit()
         action_hero = ask_for_action_hero()
         timeout_message()
         if action_hero is None:
             continue
         if necromancer.health <= 0:
-            #Сброс переменных#
+            achievements_system.add_killed_monster("Некромант 2-ая фаза", 2)
+            achievements_system.add_completed_location("Комната 5, 2-ая фаза", 2)
+            # Сброс переменных#
             skull_fly = 0
             summon_projectile = 0
             skull_distance = 0
@@ -1721,223 +1794,235 @@ while hero.hero_health > 0:
             print(f"{hp.START_TIRE}{hp.PURPLE}(*) Изувеченный Некромант еле отходит от вас.Куски плоти свисают с его лица оголяя череп. Глаза его горят синим пламенем.\nНекромант - 'Ты достойный противник, но ты все равно пополнишь мою армию.Готовься к смерти жалкий человечишка!'{hp.RESET}\n{hp.YELLOW_STAR_START} + 2 Пули\n + 1 Зелье регенерации здоровья{hp.YELLOW_STAR_END}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
             break
 
-#(5.2)Код отвечающий за работу снаряда Некроманта в 2-ой фазе:
+        # (5.2) Код отвечающий за работу снаряда Некроманта в 2-ой фазе:
 
         elif summon_projectile != 5:
-         	summon_projectile += 1
+            summon_projectile += 1
         elif summon_projectile == 5 and skull_fly == 0:
-        	skull_distance = random.choice(summon_distance)
-	        skull_attack = random.choice(summon_attack)
-	        skull_fly = 1
-        	if change_of_skulls == False:#Синий череп со стандартной скоростью полета.
-        		print(f"{hp.START_TIRE}(\u001b[44m💀){hp.RESET})Позади вас в одной из многочисленных открытых гробниц вылетает призванный {hp.PURPLE}Некромантом{hp.RESET}, \u001b[34;1mпылающий синим огнем 'Череп-призрак'{hp.RESET}.Череп летит в вашу сторону.{hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
-        	elif change_of_skulls == True:#Красный череп с удвоенной скоростью полета
-        		print(f"{hp.START_TIRE}(\u001b[41m💀){hp.RESET}) Позади вас в одной из многочисленных открытых гробниц быстро вылетает призванный {hp.PURPLE}Некромантом{hp.RESET},{hp.RED_BOLD} пылающий ярко-красным огнем, 'Череп-призрак'{hp.RESET}.{hp.RED_BOLD} Череп{hp.RESET} стремительно летит в вашу сторону. {hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
+            skull_distance = random.choice(summon_distance)
+            skull_attack = random.choice(summon_attack)
+            skull_fly = 1
+            if change_of_skulls == False:  # Синий череп со стандартной скоростью полета.
+                print(f"{hp.START_TIRE}(\u001b[44m💀){hp.RESET})Позади вас в одной из многочисленных открытых гробниц вылетает призванный {hp.PURPLE}Некромантом{hp.RESET}, \u001b[34;1mпылающий синим огнем 'Череп-призрак'{hp.RESET}.Череп летит в вашу сторону.{hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
+            elif change_of_skulls == True:  # Красный череп с удвоенной скоростью полета
+                print(f"{hp.START_TIRE}(\u001b[41m💀){hp.RESET}) Позади вас в одной из многочисленных открытых гробниц быстро вылетает призванный {hp.PURPLE}Некромантом{hp.RESET},{hp.RED_BOLD} пылающий ярко-красным огнем, 'Череп-призрак'{hp.RESET}.{hp.RED_BOLD} Череп{hp.RESET} стремительно летит в вашу сторону. {hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
 
         elif skull_distance > 1 and skull_fly == 1:
-        	if change_of_skulls == False:
-        		skull_distance -= 1#Полет синего 'Черепа-призрака' до героя
-        	elif change_of_skulls == True:
-        		skull_distance -= 2#Полет красного быстрого 'Черепа-призрака' до героя
-        elif action_hero == "у"and skull_fly != 1:
-        	print(f"{hp.START_TIRE}Вы просто уворачиваетесь на месте.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#-----------Черепа-снаряды---------#
+            if change_of_skulls == False:
+                skull_distance -= 1  # Полет синего 'Черепа-призрака' до героя
+            elif change_of_skulls == True:
+                skull_distance -= 2  # Полет красного быстрого 'Черепа-призрака' до героя
+        elif action_hero == "у" and skull_fly != 1:
+            print(f"{hp.START_TIRE}Вы просто уворачиваетесь на месте.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+        # -----------Черепа-снаряды---------#
         elif action_hero == "у" and skull_fly == 1:
-        	if (skull_distance == 1 and not change_of_skulls) or (skull_distance < 3 and change_of_skulls):
-        		skull_fly = 0
-        		summon_projectile = 0
-        		skull_distance = 0
-        		skull_color = "(\u001b[44m💀 {hp.RESET}) \u001b[34;1mСиний{hp.RESET}" if not change_of_skulls else "(\u001b[41m💀 {hp.RESET}) {hp.RED_BOLD} Красный{hp.RESET}"
-        		change_of_skulls = not change_of_skulls
-        		print(f"{hp.START_TIRE}{skull_color} Череп-призрак пролетев мимо вас рассеивается в воздухе. Вам удалось увернуться.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#---------------------------------------#
+            if (skull_distance == 1 and not change_of_skulls) or (skull_distance < 3 and change_of_skulls):
+                skull_fly = 0
+                summon_projectile = 0
+                skull_distance = 0
+                skull_color = "(\u001b[44m💀 {hp.RESET}) \u001b[34;1mСиний{hp.RESET}" if not change_of_skulls else "(\u001b[41m💀 {hp.RESET}) {hp.RED_BOLD} Красный{hp.RESET}"
+                change_of_skulls = not change_of_skulls
+                print(f"{hp.START_TIRE}{skull_color} Череп-призрак пролетев мимо вас рассеивается в воздухе. Вам удалось увернуться.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+        # ---------------------------------------#
         elif skull_distance <= 1 and skull_distance >= 0 and skull_fly == 1:
-        	hero.hero_health -= skull_attack
-        	skull_fly = 0
-        	summon_projectile = 0
-        	skull_distance = 0
-        	change_of_skulls = not change_of_skulls#Смена снарядов
-        	print(f"{hp.START_TIRE}(💀) Максимально приблизившись к вам, 'Череп-призрак' открыв пасть устремился в вашу спину. Он наносит вам урон. {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.2)Работа заклинания "Щит от выстрелов".
+            hero.hero_health -= skull_attack
+            skull_fly = 0
+            summon_projectile = 0
+            skull_distance = 0
+            change_of_skulls = not change_of_skulls  # Смена снарядов
+            print(f"{hp.START_TIRE}(💀) Максимально приблизившись к вам, 'Череп-призрак' открыв пасть устремился в вашу спину. Он наносит вам урон. {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.2) Работа заклинания "Щит от выстрелов".
         if cast_spell < 3:
-        	cast_spell += 1
+            cast_spell += 1
         elif cast_spell == 3 and time_action_hero_spell == 1:
-        	time_action_hero_spell = 0
-        	cast_spell = 0
-        	print(f"{hp.START_TIRE}(🛡️) Действие заклинания {hp.PURPLE}'Купол Лича'{hp.RESET} закончилось...{hp.END_TIRE}")
+            time_action_hero_spell = 0
+            cast_spell = 0
+            print(f"{hp.START_TIRE}(🛡️) Действие заклинания {hp.PURPLE}'Купол Лича'{hp.RESET} закончилось...{hp.END_TIRE}")
         elif cast_spell == 3 and time_action_hero_spell == 0:
-        	time_action_hero_spell = 4
-        	print(f"{hp.START_TIRE}(🛡️)  {hp.PURPLE}Некромант{hp.RESET} вызвал заклинание {hp.PURPLE}'Купол Лича'{hp.RESET}.Вокруг него создается магическое поле{hp.END_TIRE}")
+            time_action_hero_spell = 4
+            print(f"{hp.START_TIRE}(🛡️)  {hp.PURPLE}Некромант{hp.RESET} вызвал заклинание {hp.PURPLE}'Купол Лича'{hp.RESET}.Вокруг него создается магическое поле{hp.END_TIRE}")
         elif cast_spell == 3 and time_action_hero_spell != 1:
-        	time_action_hero_spell -= 1#Действие заклинания пока time_action_hero_spell не равно единицы.
-#(5.2)Работа заклинания "Голодный рюкзак"
+            time_action_hero_spell -= 1  # Действие заклинания пока time_action_hero_spell не равно единицы.
+
+        # (5.2) Работа заклинания "Голодный рюкзак"
         if mimic_backpack_spell_time == 1 and cast_spell_mimic_backpack == 1:
-        	cast_spell_mimic_backpack = 0
-        	mimic_backpack_spell_time = 0
-        	print(f"{hp.START_TIRE}(🎒) Действие заклинания {hp.PURPLE}'Голодный рюкзак'{hp.RESET}закончилось...{hp.END_TIRE}")
+            cast_spell_mimic_backpack = 0
+            mimic_backpack_spell_time = 0
+            print(f"{hp.START_TIRE}(🎒) Действие заклинания {hp.PURPLE}'Голодный рюкзак'{hp.RESET}закончилось...{hp.END_TIRE}")
         elif cast_spell_mimic_backpack < 10 and mimic_backpack_spell_time == 0:
-	        	cast_spell_mimic_backpack += 1#Прибавляем по единице пока не достигнем 10.
+            cast_spell_mimic_backpack += 1  # Прибавляем по единице пока не достигнем 10.
         elif cast_spell_mimic_backpack == 10 and mimic_backpack_spell_time == 0:
-        	mimic_backpack_spell_time = 6
-        	cast_spell_mimic_backpack = 1
-        	print(f"{hp.START_TIRE}(🎒) Вытянув руки вперед {hp.PURPLE} Некромант{hp.RESET} вызывает неизвестное заклинание. За вашей спиной что-то заурчало.{hp.END_TIRE}")
+            mimic_backpack_spell_time = 6
+            cast_spell_mimic_backpack = 1
+            print(f"{hp.START_TIRE}(🎒) Вытянув руки вперед {hp.PURPLE} Некромант{hp.RESET} вызывает неизвестное заклинание. За вашей спиной что-то заурчало.{hp.END_TIRE}")
         elif mimic_backpack_spell_time != 0 and action_hero != "р":
-        	mimic_backpack_spell_time -= 1#Время действия заклинания "Голодный рюкзак" уменьшаем на 1 за каждый ход.
+            mimic_backpack_spell_time -= 1  # Время действия заклинания "Голодный рюкзак" уменьшаем на 1 за каждый ход.
         elif action_hero == "р" and mimic_backpack_spell_time != 0 and cast_spell_mimic_backpack == 1:
-        	if hero.hero_health < 4 and eat_for_mimic_backpack == False:
-        		hero.hero_health -= necromancer.attack
-	        	cast_spell_mimic_backpack = 0
-	        	mimic_backpack_spell_time = 0
-	        	print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Не открывай рюкзак'{hp.RESET}\n\n(🎒) Попытавшись открыть рюкзак вы получаете летальный урон от {hp.PURPLE} укуса острых зубов рюкзака-мимика. Некромант{hp.RESET} насмехается над вами.Вас одолел {hp.PURPLE}'Рюкзак-мимик'{hp.RESET}.\n(🎁) Введите слово {hp.CYAN}'голод'{hp.RESET} для получения подарка за такое достижение в новой игре.({hp.END_TIRE}")
-	        elif hero.hero_health < 4 and eat_for_mimic_backpack == True:
-        		hero.hero_health += 2
-        		eat_for_mimic_backpack = False
-	        	cast_spell_mimic_backpack = 0
-	        	mimic_backpack_spell_time = 0
-	        	print(f"{hp.START_TIRE}(🍖) Вам удалось подкормить {hp.PURPLE}'рюкзак-мимика{hp.RESET}, да и сами вы немного перекусили.Рюкзак стал прежним.Еды у вас больше нет.\n{hp.YELLOW_STAR_START} + 2 к здоровью{hp.YELLOW_STAR_END}{hp.END_TIRE}")
-        	else:
-	        	hero.hero_health -= necromancer.attack
-	        	cast_spell_mimic_backpack = 0
-	        	mimic_backpack_spell_time = 0
-	        	print(f"{hp.START_TIRE}(🎒) Попытавшись открыть рюкзак вы получаете урон от {hp.PURPLE} укуса острых зубов рюкзака-мимика. Некромант{hp.RESET} насмехается над вами. Рюкзак стал прежним.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.2)Работа специальной атаки некроманта.
+            if hero.hero_health < 4 and eat_for_mimic_backpack == False:
+                hero.hero_health -= necromancer.attack
+                cast_spell_mimic_backpack = 0
+                mimic_backpack_spell_time = 0
+                achievements_system.add_achievement(achievements_system.character_data, "DONT_OPEN", 1)
+                print(f"{hp.START_TIRE}(🎖) Получено достижение {hp.CYAN}'Не открывай рюкзак'{hp.RESET}\n\n(🎒) Попытавшись открыть рюкзак вы получаете летальный урон от {hp.PURPLE} укуса острых зубов рюкзака-мимика. Некромант{hp.RESET} насмехается над вами.Вас одолел {hp.PURPLE}'Рюкзак-мимик'{hp.RESET}.\n(🎁) Введите слово {hp.CYAN}'голод'{hp.RESET} для получения подарка за такое достижение в новой игре.({hp.END_TIRE}")
+            elif hero.hero_health < 4 and eat_for_mimic_backpack == True:
+                hero.hero_health += 2
+                eat_for_mimic_backpack = False
+                cast_spell_mimic_backpack = 0
+                mimic_backpack_spell_time = 0
+                print(f"{hp.START_TIRE}(🍖) Вам удалось подкормить {hp.PURPLE}'рюкзак-мимика{hp.RESET}, да и сами вы немного перекусили.Рюкзак стал прежним.Еды у вас больше нет.\n{hp.YELLOW_STAR_START} + 2 к здоровью{hp.YELLOW_STAR_END}{hp.END_TIRE}")
+            else:
+                hero.hero_health -= necromancer.attack
+                cast_spell_mimic_backpack = 0
+                mimic_backpack_spell_time = 0
+                print(f"{hp.START_TIRE}(🎒) Попытавшись открыть рюкзак вы получаете урон от {hp.PURPLE} укуса острых зубов рюкзака-мимика. Некромант{hp.RESET} насмехается над вами. Рюкзак стал прежним.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.2) Работа специальной атаки некроманта.
         if cast_special_attack != 5:
-        	cast_special_attack += 1#Подготовка специального удара Некроманта.
-        elif cast_special_attack == 5 and ready_special_attack == 1 and 	special_attack_distance != 0:
-         	special_attack_distance -= 1#Уменьшаем пока не станет равной 0
+            cast_special_attack += 1  # Подготовка специального удара Некроманта.
+        elif cast_special_attack == 5 and ready_special_attack == 1 and special_attack_distance != 0:
+            special_attack_distance -= 1  # Уменьшаем пока не станет равной 0
         elif cast_special_attack == 5 and ready_special_attack == 0:
-         	ready_special_attack = 1 #для работы следующего условия
-         	necromancer.distance += 2
-         	if change_of_attacks == False:
-         			special_attack_distance = (necromancer.distance -1)
-         			print(f"{hp.START_TIRE}(🧟) Некромант отскочив от вас, призывает перед собой нечто, движущееся под землей. Вы видете траекторию движения по слегка приподнимающейся плитке в зале.{hp.YELLOW}\n***************\nДистанция чего-то движущегося под землей до вас: {special_attack_distance}\n***************\n{hp.END_TIRE}")
-         	elif change_of_attacks == True:
-         				special_attack_distance = (necromancer.distance + 1)
-         				print(f"{hp.START_TIRE}(🧟) Некромант отскочив от вас, призывает за вашей спиной нечто, движущееся под землей. Вы видете траекторию движения по слегка приподнимающейся плитке в зале.{hp.YELLOW}\n***************\nДистанция чего-то движущегося под землей до вас: {special_attack_distance}\n***************\n{hp.END_TIRE}")
-#(5.2)Команда "а".
-        if  action_hero == "а" and necromancer.distance == 1:#Если дистанция 1
-         	if hero.count_crit_attack > 0:
-         		necromancer.health -= (hero.hero_attack*2)
-         		necromancer.distance += 1
-         		hero.count_crit_attack -= 1
-         		print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Ударом,заряженного меча, вы наносите значительный урон Некроманту. Он делает шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-         	elif hero.count_crit_attack <= 0:
-	         	necromancer.health -= hero.hero_attack
-	         	necromancer.distance += 1
-	         	print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        elif action_hero == "а" and necromancer.distance > 1:#Если дистанция больше 1
-            	if hero.count_crit_attack > 0:
-            		necromancer.distance += 1
-            		hero.count_crit_attack -= 1
-            		print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Заряженным мечом вы промахиваетесь по {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	else:
-            		necromancer.health -= hero.hero_attack
-            		necromancer.distance += 1
-            		print(f"{hp.START_TIRE}Мечом вы промахиваетесь по {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.2)Команда "н" и специальная атака
-        elif cast_special_attack == 5 and ready_special_attack == 1  and special_attack_distance == 0 and change_of_attacks == False:
-        			if action_hero == "н":
-        				necromancer.distance += 1
-        				cast_special_attack = 0
-        				ready_special_attack = 0
-        				change_of_attacks = not change_of_attacks
-        				print(f"{hp.START_TIRE}(🧟) Сделав шаг назад вы уворачиваетесь от рук мертвецов, вырвавшихся из под земли.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        			else:
-        				hero.hero_health -= necromancer.attack
-        				cast_special_attack = 0
-        				ready_special_attack = 0
-        				change_of_attacks = not change_of_attacks
-        				print(f"{hp.START_TIRE}(🧟) Из под земли под вами вырываются руки мертвецов. Своими острыми когтями они наносят вам урон и уходят снова под землю.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            ready_special_attack = 1  # для работы следующего условия
+            necromancer.distance += 2
+            if change_of_attacks == False:
+                special_attack_distance = (necromancer.distance - 1)
+                print(f"{hp.START_TIRE}(🧟) Некромант отскочив от вас, призывает перед собой нечто, движущееся под землей. Вы видете траекторию движения по слегка приподнимающейся плитке в зале.{hp.YELLOW}\n***************\nДистанция чего-то движущегося под землей до вас: {special_attack_distance}\n***************\n{hp.END_TIRE}")
+            elif change_of_attacks == True:
+                special_attack_distance = (necromancer.distance + 1)
+                print(f"{hp.START_TIRE}(🧟) Некромант отскочив от вас, призывает за вашей спиной нечто, движущееся под землей. Вы видете траекторию движения по слегка приподнимающейся плитке в зале.{hp.YELLOW}\n***************\nДистанция чего-то движущегося под землей до вас: {special_attack_distance}\n***************\n{hp.END_TIRE}")
+
+        # (5.2) Команда "а".
+        if action_hero == "а" and necromancer.distance == 1:  # Если дистанция 1
+            if hero.count_crit_attack > 0:
+                necromancer.health -= (hero.hero_attack * 2)
+                necromancer.distance += 1
+                hero.count_crit_attack -= 1
+                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Ударом,заряженного меча, вы наносите значительный урон Некроманту. Он делает шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif hero.count_crit_attack <= 0:
+                necromancer.health -= hero.hero_attack
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+        elif action_hero == "а" and necromancer.distance > 1:  # Если дистанция больше 1
+            if hero.count_crit_attack > 0:
+                necromancer.distance += 1
+                hero.count_crit_attack -= 1
+                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Заряженным мечом вы промахиваетесь по {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            else:
+                necromancer.health -= hero.hero_attack
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}Мечом вы промахиваетесь по {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.2) Команда "н" и специальная атака
+        elif cast_special_attack == 5 and ready_special_attack == 1 and special_attack_distance == 0 and change_of_attacks == False:
+            if action_hero == "н":
+                necromancer.distance += 1
+                cast_special_attack = 0
+                ready_special_attack = 0
+                change_of_attacks = not change_of_attacks
+                print(f"{hp.START_TIRE}(🧟) Сделав шаг назад вы уворачиваетесь от рук мертвецов, вырвавшихся из под земли.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            else:
+                hero.hero_health -= necromancer.attack
+                cast_special_attack = 0
+                ready_special_attack = 0
+                change_of_attacks = not change_of_attacks
+                print(f"{hp.START_TIRE}(🧟) Из под земли под вами вырываются руки мертвецов. Своими острыми когтями они наносят вам урон и уходят снова под землю.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "н":
-        	if necromancer.distance < 8:
-        		necromancer.distance += 1
-        		print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        	else:
-        		print(f"{hp.START_TIRE}Вы на максимальной дистанции.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.2)Команда "в" и специальная атака
+            if necromancer.distance < 8:
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            else:
+                print(f"{hp.START_TIRE}Вы на максимальной дистанции.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.2) Команда "в" и специальная атака
         elif cast_special_attack == 5 and ready_special_attack == 1 and special_attack_distance == 0 and change_of_attacks == True:
-        			if action_hero == "в" and necromancer.distance == 1:
-        				cast_special_attack = 0
-        				ready_special_attack = 0
-        				change_of_attacks = not change_of_attacks
-        				print(f"{hp.START_TIRE}(🧟) Сделав шаг вперед вы уворачиваетесь от рук мертвецов, вырвавшихся из под земли.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        			elif action_hero == "в" and necromancer.distance > 0:
-        				necromancer.distance -= 1
-        				cast_special_attack = 0
-        				ready_special_attack = 0
-        				change_of_attacks = not change_of_attacks
-        				print(f"{hp.START_TIRE}(🧟) Сделав шаг вперед вы уворачиваетесь от рук мертвецов, вырвавшихся из под земли.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        			else:
-        				hero.hero_health -= necromancer.attack
-        				cast_special_attack = 0
-        				ready_special_attack = 0
-        				change_of_attacks = not change_of_attacks
-        				print(f"{hp.START_TIRE}(🧟) Из под земли под вами вырываются руки мертвецов. Своими острыми когтями они наносят вам урон и уходят снова под землю.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            if action_hero == "в" and necromancer.distance == 1:
+                cast_special_attack = 0
+                ready_special_attack = 0
+                change_of_attacks = not change_of_attacks
+                print(f"{hp.START_TIRE}(🧟) Сделав шаг вперед вы уворачиваетесь от рук мертвецов, вырвавшихся из под земли.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif action_hero == "в" and necromancer.distance > 0:
+                necromancer.distance -= 1
+                cast_special_attack = 0
+                ready_special_attack = 0
+                change_of_attacks = not change_of_attacks
+                print(f"{hp.START_TIRE}(🧟) Сделав шаг вперед вы уворачиваетесь от рук мертвецов, вырвавшихся из под земли.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            else:
+                hero.hero_health -= necromancer.attack
+                cast_special_attack = 0
+                ready_special_attack = 0
+                change_of_attacks = not change_of_attacks
+                print(f"{hp.START_TIRE}(🧟) Из под земли под вами вырываются руки мертвецов. Своими острыми когтями они наносят вам урон и уходят снова под землю.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "в":
-        	if necromancer.distance > 1:
-        		necromancer.distance -= 1
-        		print(f"{hp.START_TIRE}Вы делаете шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        	else:
-        		print(f"{hp.START_TIRE}Вы обходите Некроманта по кругу.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-#(5.2)Команда "о"
+            if necromancer.distance > 1:
+                necromancer.distance -= 1
+                print(f"{hp.START_TIRE}Вы делаете шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            else:
+                print(f"{hp.START_TIRE}Вы обходите Некроманта по кругу.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.2) Команда "о"
         elif action_hero == "о":
-        	if skull_distance > 1:
-        		print(f"{hp.START_TIRE}Быстро оглядевшись, вы замечаете летящий Череп.\nЕго дистанция примерно: {random.randint(skull_distance-1,skull_distance+1)} или {random.randint(skull_distance-1,skull_distance+1)}{hp.END_TIRE}")
-        	elif ready_special_attack == 1 and change_of_attacks == False:
-        		print(f"{hp.START_TIRE}Вы видите как нечто движется под землей на дистанции : {special_attack_distance} {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
-        	elif ready_special_attack == 1 and change_of_attacks == True:
-        		print(f"{hp.START_TIRE}Быстро обернувшись вы видите как нечто движется под землей на дистанции : {special_attack_distance}")
-        	elif magic_field_var == 0 and time_action_hero_spell > 1:
-        		magic_field_var = 1
-        		print(f"{hp.START_TIRE}Вы провели мечом по краю магического поля Некроманта.Ничего не произошло. После вы схватили камень и бросили его. Камень, который вы бросили в магическое поле не прошел дальше.{hp.END_TIRE}")#Сообщение подсказка
-        	else:
-        		print(f"{hp.START_TIRE}У вас не получилось отвлечься от боя и понаблюдать за обстановкой вокруг.{hp.END_TIRE}")
-#(5.2)Команда "с" с использованием свитка искр.
+            if skull_distance > 1:
+                print(f"{hp.START_TIRE}Быстро оглядевшись, вы замечаете летящий Череп.\nЕго дистанция примерно: {random.randint(skull_distance-1,skull_distance+1)} или {random.randint(skull_distance-1,skull_distance+1)}{hp.END_TIRE}")
+            elif ready_special_attack == 1 and change_of_attacks == False:
+                print(f"{hp.START_TIRE}Вы видите как нечто движется под землей на дистанции : {special_attack_distance} {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}")
+            elif ready_special_attack == 1 and change_of_attacks == True:
+                print(f"{hp.START_TIRE}Быстро обернувшись вы видите как нечто движется под землей на дистанции : {special_attack_distance}")
+            elif magic_field_var == 0 and time_action_hero_spell > 1:
+                magic_field_var = 1
+                print(f"{hp.START_TIRE}Вы провели мечом по краю магического поля Некроманта.Ничего не произошло. После вы схватили камень и бросили его. Камень, который вы бросили в магическое поле не прошел дальше.{hp.END_TIRE}")  # Сообщение подсказка
+            else:
+                print(f"{hp.START_TIRE}У вас не получилось отвлечься от боя и понаблюдать за обстановкой вокруг.{hp.END_TIRE}")
+
+        # (5.2) Команда "с" с использованием свитка искр.
         elif action_hero == "с" and hero.bullet_of_sparks >= 1:
-         	if time_action_hero_spell != 0:
-         		hero.bullet_of_sparks -= 1
-         		print(f"{hp.START_TIRE}(🛡️) Магическое поле не дает пройти вашей пуле дальше. Вы не попадаете по {hp.PURPLE}Некроманту{hp.RESET}.{hp.END_TIRE}")
-         	else:
-         		sparks_five_room()
-#(5.2)Команда "с"
+            if time_action_hero_spell != 0:
+                hero.bullet_of_sparks -= 1
+                print(f"{hp.START_TIRE}(🛡️) Магическое поле не дает пройти вашей пуле дальше. Вы не попадаете по {hp.PURPLE}Некроманту{hp.RESET}.{hp.END_TIRE}")
+            else:
+                sparks_five_room()
+
+        # (5.2) Команда "с"
         elif action_hero == "с" and hero.hero_bullet <= 0:
-        	hero.hero_bullet = 0
-        	print(f"{hp.START_TIRE}Похоже у вас кончились патроны.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            hero.hero_bullet = 0
+            print(f"{hp.START_TIRE}Похоже у вас кончились патроны.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "с" and necromancer.distance != 1:
-            	 range_target = input(f"{hp.START_TIRE}Выберите в кого вы будете стрелять(введите цифру):\n(1){hp.PURPLE}Некромант{hp.RESET}\n(2)летающий Череп{hp.END_TIRE}").lower()
-            	 if range_target not in ("1","2"):
-            	 	print(f"{hp.START_TIRE}Не решившись выбрать цель для выстрела, вы опускаете ружье.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "1" and necromancer.distance >= 3 and time_action_hero_spell != 0:
-            	 	hero.hero_bullet -= 1
-            	 	necromancer.distance += 1
-            	 	print(f"{hp.START_TIRE}(🛡️) Магическое поле не дает пройти вашей пуле дальше. Вы не попадаете по {hp.PURPLE}Некроманту{hp.RESET}.Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "1" and necromancer.distance >= 3:
-            	 	hero.hero_bullet -= 1
-            	 	necromancer.health -= hero.hero_range_attack
-            	 	necromancer.distance -= 1
-            	 	print(f"{hp.START_TIRE}Вы попадаете по {hp.PURPLE}Некроманту{hp.RESET}.Он делает шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "1" and necromancer.distance < 3:
-            	 	print(f"{hp.START_TIRE}Нельзя выстрелить по {hp.PURPLE}Некроманту{hp.RESET} с такого близкого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "2" and skull_distance == 0:
-            	 	print(f"{hp.START_TIRE}В воздухе нет летающего Черепа.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "2" and skull_distance >= 3:
-            	 	hero.hero_bullet -= 1
-            	 	print(f"{hp.START_TIRE}(💀) Пуля прошла насквозь 'Черепа-призрака'и он продолжает лететь в вас.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            	 elif range_target == "2" and skull_distance < 3:
-            	 	print(f"{hp.START_TIRE}Не получится выстрелить с такого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")			                    #(5.2)Команда "р"
+            range_target = input(f"{hp.START_TIRE}Выберите в кого вы будете стрелять(введите цифру):\n(1){hp.PURPLE}Некромант{hp.RESET}\n(2)летающий Череп{hp.END_TIRE}").lower()
+            if range_target not in ("1", "2"):
+                print(f"{hp.START_TIRE}Не решившись выбрать цель для выстрела, вы опускаете ружье.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "1" and necromancer.distance >= 3 and time_action_hero_spell != 0:
+                hero.hero_bullet -= 1
+                necromancer.distance += 1
+                print(f"{hp.START_TIRE}(🛡️) Магическое поле не дает пройти вашей пуле дальше. Вы не попадаете по {hp.PURPLE}Некроманту{hp.RESET}.Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "1" and necromancer.distance >= 3:
+                hero.hero_bullet -= 1
+                necromancer.health -= hero.hero_range_attack
+                necromancer.distance -= 1
+                print(f"{hp.START_TIRE}Вы попадаете по {hp.PURPLE}Некроманту{hp.RESET}.Он делает шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "1" and necromancer.distance < 3:
+                print(f"{hp.START_TIRE}Нельзя выстрелить по {hp.PURPLE}Некроманту{hp.RESET} с такого близкого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "2" and skull_distance == 0:
+                print(f"{hp.START_TIRE}В воздухе нет летающего Черепа.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "2" and skull_distance >= 3:
+                hero.hero_bullet -= 1
+                print(f"{hp.START_TIRE}(💀) Пуля прошла насквозь 'Черепа-призрака'и он продолжает лететь в вас.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            elif range_target == "2" and skull_distance < 3:
+                print(f"{hp.START_TIRE}Не получится выстрелить с такого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # (5.2) Команда "р"
         elif action_hero == "р":
             inventory_system.open_backpack(hero)
 
-#(5.2)Команда "п".
+        # (5.2) Команда "п".
         elif action_hero == "п":
-            	 	hp.show_full_help(hero)
+            hp.show_full_help(hero)
     except Exception as e:
         print(f"{hp.START_TIRE}Произошла ошибка: {hp.RED_BOLD}{e}{hp.RESET}{hp.END_TIRE}")
         if 'timer' in globals():
             timer.cancel()
             input_active = False
 
-#Третья фаза боя с Некромантом
+# Третья фаза боя с Некромантом
 
 #(5.3)Переменные третьей фазы
 choise_weapon = ""#Выбранное оружие по умолчанию
@@ -2329,22 +2414,25 @@ def undead_disarm():
 		hero.hero_health -= necromancer.attack
 		print(f"{hp.START_TIRE}(🧟) Не успев быстро найти меч вы получаете урон от тихо подошедшего мертвеца. Найдя все-таки клинок вы поражаете мертвеца и он падает навзничь.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 
-#Список фраз и функций заклинания "Восставшие мертвецы"
-undead_list = {undead_shoot:"Из толпы мертвых Скелет-лучник целится в вас.",
-undead_hands:"Вы чувствуете как-будто, что-то шевелится под вашими ногами.",
-undead_life_drain:" В пылу битвы вы замечаете мертвеца, который идет четко к Некроманту не обращая на вас внимания.Он рядом с вами и в шаге от Некроманта",
-undead_disarm:"Некромант с помощью заклинания, недалеко откидывает ваш меч.Необходимо его найти."}
+# Список фраз и функций заклинания "Восставшие мертвецы"
+undead_list = {
+    undead_shoot: "Из толпы мертвых Скелет-лучник целится в вас.",
+    undead_hands: "Вы чувствуете как-будто, что-то шевелится под вашими ногами.",
+    undead_life_drain: " В пылу битвы вы замечаете мертвеца, который идет четко к Некроманту не обращая на вас внимания.Он рядом с вами и в шаге от Некроманта",
+    undead_disarm: "Некромант с помощью заклинания, недалеко откидывает ваш меч.Необходимо его найти."
+}
 undead_func = list(undead_list.keys())
 
 while hero.hero_health > 0:
-    
+
     price()
-    #(5)Подсказки соратника
-    hp.reset_all_help()#сброс всех значений на False
-    hp.help_states["help_five_room_phase_third"] = True #Включаем подсказки пятой комнаты(первая фаза)
+    # (5) Подсказки соратника
+    hp.reset_all_help()  # сброс всех значений на False
+    hp.help_states["help_five_room_phase_third"] = True  # Включаем подсказки пятой комнаты(первая фаза)
+
     try:
-        if pass_five_room_phase_three == True:
-        	break
+        if pass_five_room_phase_three:
+            break
         action_hero = ask_for_action_hero()
         timeout_message()
         if action_hero is None:
@@ -2352,72 +2440,79 @@ while hero.hero_health > 0:
         if necromancer.health <= 0:
             flag_winner = True
             print(f"{hp.START_TIRE}{hp.GREEN}(*) С последним ударом вашего клинка тело Некроманта обмякло на полу. С исчезновением тёмной магии, мертвецы вокруг рухнули на землю, обратившись в прах. Подойдя к статуи в темных доспехах вы касаетесь пальцами постамента. В глазах засияло, а потом все погрузилось в мрак...{hp.RESET}{hp.END_TIRE}")
-            if flag_winner == True:
-            	print(f"{hp.START_TIRE}(🎉) Поздравляем! Вы прошли игру.\nВведите в начале новой игры два слова с пробелом посередине: {hp.CYAN_BOLD}\"time loop\"{hp.RESET}, чтобы пройти игру на более высокой сложности.{hp.END_TIRE}")
-            	sys.exit()
+            if flag_winner:
+                achievements_system.add_killed_monster("Некромант 3-ая фаза", 2)
+                achievements_system.add_completed_location("Комната 5, 3-ая фаза", 2)
+                print(f"{hp.START_TIRE}(🎉) Поздравляем! Вы прошли игру.\nВведите в начале новой игры два слова с пробелом посередине: {hp.CYAN_BOLD}\"time loop\"{hp.RESET}, чтобы пройти игру на более высокой сложности.{hp.END_TIRE}")
+                sys.exit()
 
-#(5.3) Смена оружия Некроманта
+        # (5.3) Смена оружия Некроманта
         if cast_spell == 0:
-        	choise_weapon = random.choice(weapon_func)# Мгновенная смена оружия
-        	weapon_name = list_of_weapons[choise_weapon]
-        	print(f"{hp.START_TIRE}(🔄) Некромант мгновенно меняет оружие на {weapon_name}{hp.END_TIRE}")
-        	 # Устанавливаем параметры для нового цикла атаки
-        	cast_spell = 1
-        	time_action_hero_spell = 8  # Сколько ходов будет действовать это оружие
-        	special = False
-        	axe_swing = 0
+            choise_weapon = random.choice(weapon_func)  # Мгновенная смена оружия
+            weapon_name = list_of_weapons[choise_weapon]
+            print(f"{hp.START_TIRE}(🔄) Некромант мгновенно меняет оружие на {weapon_name}{hp.END_TIRE}")
+            # Устанавливаем параметры для нового цикла атаки
+            cast_spell = 1
+            time_action_hero_spell = 8  # Сколько ходов будет действовать это оружие
+            special = False
+            axe_swing = 0
         elif cast_spell == 1:
-        	if time_action_hero_spell > 0:
-        		choise_weapon()# Используем текущее выбранное оружие
-        		time_action_hero_spell -= 1
-        	else:
-        		cast_spell = 0 # Завершаем цикл атаки этим оружием
-        		time_action_hero_spell = 0
-        		special = False
-        		axe_swing = 0
-        		print(f"{hp.START_TIRE}(🔄) Некромант прекращает использовать текущее оружие.{hp.END_TIRE}")
-#Общий таймер для заклинания "Восставшие мертвецы"
+            if time_action_hero_spell > 0:
+                choise_weapon()  # Используем текущее выбранное оружие
+                time_action_hero_spell -= 1
+            else:
+                cast_spell = 0  # Завершаем цикл атаки этим оружием
+                time_action_hero_spell = 0
+                special = False
+                axe_swing = 0
+                print(f"{hp.START_TIRE}(🔄) Некромант прекращает использовать текущее оружие.{hp.END_TIRE}")
+
+        # Общий таймер для заклинания "Восставшие мертвецы"
         if undead_timer < 50:
-        	undead_timer += 1
-#Сообщения для заклинания "Восставшие мертвецы"
+            undead_timer += 1
+
+        # Сообщения для заклинания "Восставшие мертвецы"
         if undead_timer == 10:
-        	print(f"{hp.START_TIRE}(🧟) Воздух взорвался сухим перестуком костей и ледяным воем.За спиной Некроманта, в кромешной тьме зажглись десятки синих точек — словно созвездие из ненавидящих, немигающих глаз, впившихся в вас из вечности...{hp.PURPLE}Мертвецы встают из могил.{hp.RESET}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}(🧟) Воздух взорвался сухим перестуком костей и ледяным воем.За спиной Некроманта, в кромешной тьме зажглись десятки синих точек — словно созвездие из ненавидящих, немигающих глаз, впившихся в вас из вечности...{hp.PURPLE}Мертвецы встают из могил.{hp.RESET}{hp.END_TIRE}")
         elif undead_timer == 20:
-        	print(f"{hp.START_TIRE}(🧟) {hp.PURPLE} Количество мертвецов увеличивается. Они медленно двигаются к вам со всех сторон.{hp.RESET}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}(🧟) {hp.PURPLE} Количество мертвецов увеличивается. Они медленно двигаются к вам со всех сторон.{hp.RESET}{hp.END_TIRE}")
         elif undead_timer == 30:
-        	print(f"{hp.START_TIRE}(🧟) Вы видите как множество мертвецов создают вокруг вас кольцо.Нужно поскорее расправиться с Некромантом.{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}(🧟) Вы видите как множество мертвецов создают вокруг вас кольцо.Нужно поскорее расправиться с Некромантом.{hp.END_TIRE}")
         elif undead_timer == 40:
-        	hero.hero_health -= necromancer.attack
-        	print(f"{hp.START_TIRE}(🧟) Времени остается мало, количество мертвецов увеличивается. Кому-то из них удается вас ударить. Вы отталкиваете от себя мертвецов, попутно размахивая мечом. Некромант насмехается над вами.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            hero.hero_health -= necromancer.attack
+            print(f"{hp.START_TIRE}(🧟) Времени остается мало, количество мертвецов увеличивается. Кому-то из них удается вас ударить. Вы отталкиваете от себя мертвецов, попутно размахивая мечом. Некромант насмехается над вами.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif undead_timer == 50:
-           	hero.hero_health = 0
-           	print(f"{hp.START_TIRE}(☠️) Вас поглотила волна мертвой плоти. Сотни рук разрывали доспехи, десятки ртов впивались в плоть.")
-           	
-#Диапазон вызова сообщений и вызова самих функций заклинания "Восставшие мертвецы"
+            hero.hero_health = 0
+            print(f"{hp.START_TIRE}(☠️) Вас поглотила волна мертвой плоти. Сотни рук разрывали доспехи, десятки ртов впивались в плоть.")
+
+        # Диапазон вызова сообщений и вызова самих функций заклинания "Восставшие мертвецы"
         elif undead_timer in [15, 25, 35, 45]:
-        	choice_undead_func = random.choice(undead_func)
-        	name_undead_func = undead_list[choice_undead_func]
-        	print(f"{hp.START_TIRE}(🧟) {name_undead_func}{hp.END_TIRE}")
-        elif undead_timer in [16,26,36,46]:
-        	choice_undead_func()
-#(5.3)Команда-заглушка "о"
+            choice_undead_func = random.choice(undead_func)
+            name_undead_func = undead_list[choice_undead_func]
+            print(f"{hp.START_TIRE}(🧟) {name_undead_func}{hp.END_TIRE}")
+        elif undead_timer in [16, 26, 36, 46]:
+            choice_undead_func()
+
+        # (5.3) Команда-заглушка "о"
         elif action_hero == "о":
-        	print(f"{hp.START_TIRE}Лучше не отвлекаться от сражения.{hp.END_TIRE}")  
- #(5.3)Команда "р"
+            print(f"{hp.START_TIRE}Лучше не отвлекаться от сражения.{hp.END_TIRE}")
+
+        # (5.3) Команда "р"
         elif action_hero == "р":
             inventory_system.open_backpack(hero)
 
-#(5.3)Команда "п".
+        # (5.3) Команда "п".
         elif action_hero == "п":
-            	 	hp.show_full_help(hero)	      
-   		   		
+            hp.show_full_help(hero)
+
     except Exception as e:
         print(f"{hp.START_TIRE}Произошла ошибка: {hp.RED_BOLD}{e}{hp.RESET}{hp.END_TIRE}")
         if 'timer' in globals():
             timer.cancel()
-            input_active = False	
+            input_active = False
+
 else:
-	print(f"{hp.START_TIRE}(☠️) Вы погибли, но смерть не стала концом. Синее пламя некромантии выжгло вашу душу и наполнило тело новой, тёмной силой. Вы открыли глаза — теперь они горят холодным синим огнём вечной службы. Герой пал, воин тьмы восстал {hp.END_TIRE}") 
+    print(f"{hp.START_TIRE}(☠️) Вы погибли, но смерть не стала концом. Синее пламя некромантии выжгло вашу душу и наполнило тело новой, тёмной силой. Вы открыли глаза — теперь они горят холодным синим огнём вечной службы. Герой пал, воин тьмы восстал {hp.END_TIRE}")
 	
 					
 	

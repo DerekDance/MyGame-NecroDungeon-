@@ -1,12 +1,63 @@
 {
   "players": [
     {
-      "name": "Nikita",
+      "name": "Том",
+      "kill_monsters": 2,
+      "completed_locations": 4,
+      "completed_locations_list": [
+        "Комната 0",
+        "Комната 1",
+        "Комната 2",
+        "Комната 3"
+      ],
+      "games_played": 4,
+      "all_score": 12,
+      "password": "Том",
+      "achievements": [
+        "BYPASSING"
+      ]
+    },
+    {
+      "name": "Mike",
       "kill_monsters": 0,
-      "completed_locations": 0,
-      "games_played": 2,
-      "best_score": 0,
-      "password": "12345",
+      "completed_locations": 3,
+      "completed_locations_list": [
+        "Комната 0",
+        "Комната 1",
+        "Комната 2"
+      ],
+      "games_played": 3,
+      "all_score": 6,
+      "password": "Mike",
+      "achievements": [
+        "SUICIDE"
+      ]
+    },
+    {
+      "name": "Nik",
+      "kill_monsters": 0,
+      "completed_locations": 2,
+      "completed_locations_list": [
+        "Комната 0",
+        "Комната 1"
+      ],
+      "games_played": 10,
+      "all_score": 3,
+      "password": "123",
+      "achievements": [
+        "BYPASSING"
+      ]
+    },
+    {
+      "name": "Sam",
+      "kill_monsters": 0,
+      "completed_locations": 1,
+      "completed_locations_list": [
+        "Комната 0"
+      ],
+      "games_played": 3,
+      "all_score": 1,
+      "password": "Sam",
       "achievements": []
     }
   ]

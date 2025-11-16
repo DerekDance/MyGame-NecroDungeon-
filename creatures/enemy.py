@@ -43,7 +43,7 @@ class Dummy(Enemy):
 # Аколит
 class Acolyte(Enemy):
     def __init__(self):
-        super().__init__("Аколит",9,2,5)
+        super().__init__("Аколит",9,3,5)
         self.charge_turns = 0
 
 
