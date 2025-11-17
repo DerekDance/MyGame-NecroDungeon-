@@ -1,4 +1,3 @@
-from creatures import Hero
 from system import HelpSystem
 import random
 
@@ -83,7 +82,8 @@ class InventorySystem:
 
     # (4) Функция для вызова в main инвентаря одной строкой - open_backpack(hero)
     def open_backpack(self, hero):
-        print(f"{hp.START_TIRE}")  # Начало формата
+        print(f"{hp.START_TIRE}")
+        # Начало формата
         hero_choice = ""
         while hero_choice != "0":
             try:

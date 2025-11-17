@@ -9,7 +9,7 @@ import time
 #Создаем героя
 hero = Hero()
 
-#Создаем противников
+#Создаем противников2
 dummy = Dummy()
 acolyte = Acolyte()
 necro_student = NecroStudent()
@@ -124,28 +124,7 @@ def dodge_sub_mini2():
 			sub_mini2.distance -= 1
 			part_2 =("Вы просто уворачиваетесь на месте, но склизкая субстанция далеко от вас.Она подползает ближе к вам.")
 #(1)Стрельба с использованием "свитка искр" по Аколиту
-def sparks_first_room():
-	global action_hero
-	if acolyte.distance == 1:
-		acolyte.health -= hero.damage_bullet_of_sparks
-		hero.bullet_of_sparks -= 1
-		acolyte.distance += 1
-		print(
-			f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD} Выстрелом из ружья в упор вы наносите значительный урон Аколиту. Его немного откидывает от вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-	elif acolyte.distance == 2:
-		acolyte.health -= hero.damage_bullet_of_sparks // 2
-		hero.bullet_of_sparks -= 1
-		print(
-			f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD} Выстрелом из ружья, почти в упор,вы наносите урон Аколиту.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-	elif acolyte.distance == 3:
-		acolyte.health -= hero.damage_bullet_of_sparks // 4
-		hero.bullet_of_sparks -= 1
-		print(
-			f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD} Выстрелом из ружья вы наносите незначительный урон Аколиту  из-за большого расстояния.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-	elif acolyte.distance > 3:
-		hero.bullet_of_sparks -= 1
-		print(
-			f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD} Выстрелом из ружья вы не наносите урон Аколиту, слишком большое расстояние.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
 #(4)Стрельба с использованием "свитка искр" по мерзкой субстанции
 def sparks_four_room_sub_mini1():
 	global part_1,part_2
@@ -378,7 +357,7 @@ while hero.hero_health > 0:
 
         # Обработка действий игрока
         elif action_hero == "с" and hero.bullet_of_sparks > 0:
-            sparks_first_room()
+            hero.shooting_with_spark_bullets(acolyte)
 
         elif action_hero == "с":
             if hero.hero_bullet <= 0:

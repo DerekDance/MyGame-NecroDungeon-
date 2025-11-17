@@ -80,7 +80,7 @@ class AchievementsSystem:
         if not self.players:
             print(f"{hp.RED}Список игроков пуст!{hp.RESET}")
         else:
-            print(f"{hp.START_TIRE}Рейтинг Игроков{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}        ⭐ Рейтинг Игроков  ⭐      {hp.END_TIRE}")
             # Сортировка игроков по убыванию
             self.players.sort(key=lambda p: p.get("all_score", 0), reverse=True)
             self.players = self.players[:16]
@@ -164,14 +164,14 @@ class AchievementsSystem:
         character_data = None
         menu_choice = ""
         while True:
-            menu_choice = input(f"{hp.CYAN}Введите цифру:\n(1) Начать игру\n(2) Рейтинг игроков\n(3) Выход\n>{hp.RESET}")
+            menu_choice = input(f"Доступные команды:\n{hp.CYAN}(1) Начать игру\n(2) Рейтинг игроков\n(3) Выход{hp.RESET}\nВведите цифру: ")
             if menu_choice == "3":
                 print("Пока!")
                 sys.exit()
             elif menu_choice == "2":
                 self.show_rating()
             elif menu_choice == "1":
-                name_hero = input(f"{hp.CYAN}Введите имя героя:\n>{hp.RESET}").strip()
+                name_hero = input(f"{hp.CYAN}Введите имя героя: {hp.RESET}").strip()
 
                 if not name_hero:
                     print(f"Имя героя не может быть {hp.RED}пустым!{hp.RESET}")
@@ -191,7 +191,7 @@ class AchievementsSystem:
 
                 if player_in_the_rating_table:
                     print(f"Такой игрок уже существует\nИгрок находится на {hp.RED}{i + 1}{hp.RESET} месте в рейтинговой таблице")
-                    password = input(f"{hp.CYAN}Введите код доступа:\n>{hp.RESET}")
+                    password = input(f"{hp.CYAN}Введите код доступа: {hp.RESET}")
                     if password == player_in_the_rating_table.get("password", ""):
                         print(f"{hp.CYAN}Код доступа верный! Загружаем существующие данные{hp.RESET}")
                         self.character_data = player_in_the_rating_table
@@ -199,7 +199,7 @@ class AchievementsSystem:
                         print(f"{hp.RED}(Х) Код доступа неправильный!{hp.RESET}")
                         continue
                 else:
-                    password = input(f"Придумайте {hp.CYAN}код доступа{hp.RESET}\n>")
+                    password = input(f"Придумайте {hp.CYAN}код доступа{hp.RESET}: ")
                     self.character_data = {
                         "name": name_hero,
                         "kill_monsters": 0,
