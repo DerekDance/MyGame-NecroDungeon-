@@ -39,37 +39,26 @@ class Hero:
                     print(f"(💊) {hp.PURPLE_BOLD}Регенерация завершена (достигнут максимум здоровья){hp.RESET}")
 
     def shooting_with_spark_bullets(self, enemies):
-        # Проверяем, что у героя есть патроны
         if self.bullet_of_sparks <= 0:
             print(f"{hp.START_TIRE}(📜) {hp.YELLOW_BOLD}У вас нет патронов искр{hp.RESET}{hp.END_TIRE}")
             return
 
-        # Проверяем, является ли enemies списком или отдельным врагом
-        if isinstance(enemies, list):
-            # Если enemies - это список
-            if not enemies:
-                print(f"{hp.START_TIRE}(📜) {hp.YELLOW_BOLD}Нет врагов для атаки{hp.RESET}{hp.END_TIRE}")
-                return
-            # Можно пройтись по всем врагам или выбрать первого
-            for enemy in enemies:
-                if enemy.distance <= 3:  # Только в пределах досягаемости
-                    if enemy.distance == 1:
-                        enemy.health -= self.damage_bullet_of_sparks
-                        enemy.distance += 1  # Откидываем врага при ближнем выстреле
-                    elif enemy.distance == 2:
-                        enemy.health -= self.damage_bullet_of_sparks // 2
-                    elif enemy.distance == 3:
-                        enemy.health -= self.damage_bullet_of_sparks // 4
-                    print(
-                        f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Вы выстрелили в {enemy.name or 'врага'}.{hp.RESET}"
-                        f"{hp.info_room(self.hero_health, self.hero_max_health, enemies)}{hp.END_TIRE}")
-                else:
-                    print(
-                        f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Выстрелом из ружья вы не наносите урон {enemy.name or 'врагу'}, слишком большое расстояние.{hp.RESET}"
-                        f"{hp.info_room(self.hero_health, self.hero_max_health, enemies)}{hp.END_TIRE}")
-        else:
-            # Если enemies - это один враг
-            enemy = enemies
+        # Нормализуем входные данные в список
+        if not isinstance(enemies, list):
+            enemies = [enemies]
+
+        # Фильтруем только живых врагов
+        alive_enemies = []
+        for enemy in enemies:
+            if enemy.is_alive():
+                alive_enemies.append(enemy)
+
+        if not alive_enemies:
+            print(f"{hp.START_TIRE}(📜) {hp.YELLOW_BOLD}Нет живых врагов для атаки{hp.RESET}{hp.END_TIRE}")
+            return
+
+        targets_hit = 0
+        for enemy in alive_enemies:
             if enemy.distance <= 3:  # Только в пределах досягаемости
                 if enemy.distance == 1:
                     enemy.health -= self.damage_bullet_of_sparks
@@ -78,13 +67,15 @@ class Hero:
                     enemy.health -= self.damage_bullet_of_sparks // 2
                 elif enemy.distance == 3:
                     enemy.health -= self.damage_bullet_of_sparks // 4
+
+                targets_hit += 1
                 print(
                     f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Вы выстрелили в {enemy.name or 'врага'}.{hp.RESET}"
-                    f"{hp.info_room(self.hero_health, self.hero_max_health, [enemy])}{hp.END_TIRE}")
+                    f"{hp.info_room(self.hero_health, self.hero_max_health, enemies)}{hp.END_TIRE}")
             else:
                 print(
                     f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Выстрелом из ружья вы не наносите урон {enemy.name or 'врагу'}, слишком большое расстояние.{hp.RESET}"
-                    f"{hp.info_room(self.hero_health, self.hero_max_health, [enemy])}{hp.END_TIRE}")
+                    f"{hp.info_room(self.hero_health, self.hero_max_health, enemies)}{hp.END_TIRE}")
 
-        # Уменьшаем количество патронов после всех выстрелов
+        # Уменьшаем количество патронов
         self.bullet_of_sparks -= 1
