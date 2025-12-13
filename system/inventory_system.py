@@ -54,6 +54,7 @@ class InventorySystem:
         elif hero_choice == "3":
             if hero.hero_scroll_of_sparks > 0:
                 hero.bullet_of_sparks += 1
+                hero.hero_scroll_of_sparks -= 1
                 result = (f"(📜)  {hp.YELLOW_BOLD}Прочитав свиток на вашем ружье появились раскаленные красные символы.\n"
                           f"Введите на русском {hp.CYAN}'искры'{hp.RESET},{hp.YELLOW_BOLD} чтобы выстрелить дробью.{hp.RESET}")
             else:

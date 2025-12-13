@@ -1,6 +1,14 @@
+from system import HelpSystem
+from creatures import Hero
 """
 Родительский класс для противников
 """
+
+# Для использования форматирования строк
+hp = HelpSystem()
+#Создаем героя
+hero = Hero()
+
 class Enemy:
     def __init__(self, name: str, health: int, attack: int, distance: int):
         self.name = name
@@ -61,7 +69,6 @@ class NecroStudent(Enemy):
 class MainSubstance(Enemy):
     def __init__(self):
         super().__init__("Субстанция",30,3,6)
-
 
 
 class SubMini1(Enemy):

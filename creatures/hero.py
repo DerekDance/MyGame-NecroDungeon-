@@ -18,7 +18,7 @@ class Hero:
         self.hero_potion_heal = 0
         self.hero_potion_of_regen_hp = 3
         self.count_crit_attack  = 0
-        self.hero_scroll_of_sparks = 10000
+        self.hero_scroll_of_sparks = 1
         self.hero_bullet = 3
         self.bullet_of_sparks = 0
         self.damage_bullet_of_sparks = 12

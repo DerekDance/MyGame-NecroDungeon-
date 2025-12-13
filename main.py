@@ -35,14 +35,14 @@ list_of_command =["в","н","а","р","п","у","о","с"]
 hero_choice = ""
 
 #Пропуск комнат для их тестирования по отдельности. Значение True, чтобы пропустить комнату, False - не пропускать.
-pass_null_room = False
-pass_first_room = False
-pass_second_room = False
-pass_three_room = False
-pass_four_room_phase_one = False
-pass_four_room_phase_two = False
-pass_five_room_phase_one = False
-pass_five_room_phase_two = False
+pass_null_room = True
+pass_first_room = True
+pass_second_room = True
+pass_three_room = True
+pass_four_room_phase_one = True
+pass_four_room_phase_two = True
+pass_five_room_phase_one = True
+pass_five_room_phase_two = True
 pass_five_room_phase_three = False
 
 #Переменные для достижений:
@@ -155,26 +155,6 @@ def sparks_four_room_sub_mini2():
 		sub_mini2.health -= (hero.damage_bullet_of_sparks // 4)
 		hero.bullet_of_sparks -= 0.5
 		part_2 = "Вы нанесли незначительный урон склизкой субстанции.Сноп искр озарил светом помещение."
-#(5)Стрельба с использованием "свитка искр" по Некроманту
-def sparks_five_room():
-	global action_hero
-	if necromancer.distance == 1:
-		necromancer.health -= hero.damage_bullet_of_sparks
-		hero.bullet_of_sparks -= 1
-		necromancer.distance += 1
-		print(
-			f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD} Выстрелом из ружья вы наносите значительный урон Некроманту. Его немного откидывает от вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-	elif necromancer.distance == 2:
-		necromancer.health -= hero.damage_bullet_of_sparks // 2
-		hero.bullet_of_sparks -= 1
-		print(
-			f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD} Выстрелом из ружья, почти в упор,вы наносите урон Некроманту{hp.RESET}.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-	elif necromancer.distance > 2:
-		necromancer.health -= hero.damage_bullet_of_sparks // 4
-		hero.bullet_of_sparks -= 1
-		print(
-			f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD} Выстрелом из ружья вы наносите незначительный урон Некроманту, слишком большое расстояние{hp.RESET}.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-
 
 """(0) Привал у подземелья: Обучение"""
 
@@ -510,7 +490,7 @@ while hero.hero_health > 0:
     ###########
 
 #(2)Нестандартный способ прохождения
-    elif action_hero== "в" and count_dash == 3 and start_fight == 0:
+    if action_hero== "в" and count_dash == 3 and start_fight == 0:
         count_dash = 0#сброс count_dash для следующих комнат
         count_search = 0#сброс count_search для следующих комнат
         hero.hero_potion_heal += 1
@@ -534,7 +514,7 @@ while hero.hero_health > 0:
         print(f"{hp.START_TIRE}(🧟‍♂) {hp.PURPLE}Руки мертвецов вырываются из под земли и наносят вам урон.Руки исчезают в земле.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}{hp.END_TIRE}")
 
     #(2)Команда "о"
-    elif action_hero == "о" and count_search == 0 and start_fight != 1:
+    if action_hero == "о" and count_search == 0 and start_fight != 1:
         count_search += 1
         print(f"{hp.START_TIRE}(🔍) Осматриваясь в комнате, вы замечаете наспех брошенные вещи, капли крови на полу и различные полупыстые сумки. В комнате довольно таки темно и лишь свеча на столе, тусклым светом освещает пространство вокруг. Возможно стоит повнимательнее здесь все осмотреть.{hp.END_TIRE}")
     elif action_hero == "о" and count_search == 1 and start_fight != 1:
@@ -588,22 +568,17 @@ while hero.hero_health > 0:
             necro_student.distance += 1
             print(f"{hp.START_TIRE}Взмахом меча вы поражаете Ученика-некроманта. Получив увечья он отшатнулся и сделал шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
 
-    #(2) Команда "с" с использованием свитка искр
-    elif action_hero == "с" and hero.bullet_of_sparks >= 1:
-        if start_fight == 0:
+    #(2) Команда "искры" с использованием свитка искр
+    elif action_hero == "искры":
+        if start_fight == 0 and hero.bullet_of_sparks >= 1:
             necro_student.health -= hero.damage_bullet_of_sparks // 4
             hero.bullet_of_sparks -= 1
             start_fight = 1
             count_search = 3
             print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Выхватив ружье вы стреляете прямо в стол.Из дула вылетает сноп искр. Вдребезги разлетается какая-то склянка, летают в воздухе страницы блокнота. Притаившийся Ученик-некроманта, получает частично урон от разлетевшейся дроби.Он шагнул к вам с кинжалом наготове. {hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
-        elif necro_student.distance == 1 and start_fight == 1:
-            necro_student.health -= hero.damage_bullet_of_sparks
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Сделав выстрел в упор из ружья вы наносите летальный урон, озаряя комнату ярким светом.Ученик-некроманта падает замертво.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
-        elif necro_student.distance == 2 and start_fight == 1:
-            necro_student.health -= hero.damage_bullet_of_sparks // 2
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Сделав выстрел из ружья вы наносите урон дробью, озаряя комнату ярким светом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
+        else:
+            hero.shooting_with_spark_bullets(necro_student)
+
 
     #(2) Команда "с" (обычная)
     elif action_hero == "с" and start_fight == 0:
@@ -826,11 +801,11 @@ while hero.hero_health > 0:
             hero.hero_health -= hero.hero_attack
             print(f"{hp.START_TIRE}Вы размахиваетесь мечом и бьете по зеркалу, половина меча исчезает в зеркале, ваше отражение делает тоже самое и вы чувствуете как ваш же меч вас ранит.{hp.END_TIRE}\n{hp.YELLOW}**********\nВаше здоровье: {hero.hero_health}|{hero.hero_max_health}\n**********{hp.RESET}")
 
-    # (3) Команда "с" с использованием свитка искр
-    elif action_hero == "с" and hero.bullet_of_sparks >= 1:
+    # (3) Команда "искры" с использованием свитка искр
+    elif action_hero == "искры" and hero.bullet_of_sparks >= 1:
         hero.hero_health -= hero.damage_bullet_of_sparks
         hero.bullet_of_sparks -= 1
-        print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Вы наставляете ружье и стреляете. Ваше отражение делает тоже самое.Вы получили урон от выстрела ружья раскаленной дробью.Это довольно-таки больно.{hp.END_TIRE}\n{hp.YELLOW}**********\nВаше здоровье: {hero.hero_health}|{hero.hero_max_health}\n**********{hp.RESET}")
+        print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Вы наставляете ружье и стреляете. Ваше отражение делает тоже самое.Вы получили урон от выстрела ружья раскаленной дробью.Это довольно-таки больно.{hp.END_TIRE}{hp.YELLOW_STAR_START}Ваше здоровье: {hero.hero_health}|{hero.hero_max_health}{hp.YELLOW_STAR_START}")
 
     # (3) Команда "с" и ее последствия
     elif action_hero == "с" and hero.hero_bullet > 0:
@@ -983,7 +958,7 @@ while sub.health not in split_health:
             print(f"{hp.START_TIRE}Вы взмахнули мечом.Субстанция подползает ближе.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
 
     # (4) Команда "с" с использованием свитка искр
-    elif action_hero == "с" and hero.bullet_of_sparks >= 1:
+    elif action_hero == "искры" and hero.bullet_of_sparks >= 1:
         if sub.distance == 1 and cast_spell == 4:
             sub.health -= (hero.damage_bullet_of_sparks - 5)
             hero.bullet_of_sparks -= 1
@@ -997,19 +972,7 @@ while sub.health not in split_health:
             print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести хоть какой-то урон .{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
         elif sub.distance == 1:
             cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
-            sub.health -= hero.damage_bullet_of_sparks
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Своим выстрелом вы сделали огромную дыру в теле субстанции.Сноп искр озаряеет помещение.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-        elif sub.distance == 2:
-            cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
-            sub.health -= hero.damage_bullet_of_sparks // 2
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Сделав выстрел почти в упор вы наносите урон субстанции. Сноп искр озаряет помещение.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-        elif sub.distance > 2:
-            cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
-            sub.health -= hero.damage_bullet_of_sparks // 4
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(📜)  {hp.YELLOW_BOLD}Большое расстояние не позволяет вам нанести значительный урон субстанции, сноп искр озарил помещение ярким светом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+            hero.shooting_with_spark_bullets(sub)
 
     # (4) Команда "с"
     elif action_hero == "с" and cast_spell != 4 and hero.hero_bullet > 0 and sub.distance > 2:
@@ -1207,7 +1170,7 @@ while sub_mini1.health > 0 or sub_mini2.health > 0:
             print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы наносите урон склизкой субстанции ударом {'заряженного' if hero.count_crit_attack < 1 else 'мечом'}.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
 
     # (4) Команда "с" с использованием свитка искр
-    elif action_hero == "с" and hero.bullet_of_sparks >= 1:
+    elif action_hero == "искры" and hero.bullet_of_sparks >= 1:
         sparks_four_room_sub_mini1()
         sparks_four_room_sub_mini2()
         print(f"{hp.START_TIRE}{part_1 + part_2}{hp.END_TIRE}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub_mini1, sub_mini2])}")
@@ -1682,15 +1645,15 @@ while hero.hero_health > 0:
         elif action_hero == "п":
             hp.show_full_help(hero)
 
-        # (5.1) Команда "с" с использованием свитка искр.
-        elif action_hero == "с" and hero.bullet_of_sparks >= 1:
+        # (5.1) Команда "искры" с использованием свитка искр.
+        elif action_hero == "искры" and hero.bullet_of_sparks >= 1:
             if cast_punch >= 8 and ready_punch != 1:
-                sparks_five_room()
+                hero.shooting_with_spark_bullets(necromancer)
                 print(f" {hp.YELLOW_BOLD}Некромант перестает заряжать 'Отталкивающий удар'{hp.RESET}.{hp.END_TIRE}")
                 cast_punch = 0
                 ready_punch = 0
             else:
-                sparks_five_room()
+                hero.shooting_with_spark_bullets(necromancer)
 
         # (5.1) Команда "о"
         elif action_hero == "о" and skull_distance > 1:
@@ -1956,13 +1919,13 @@ while hero.hero_health > 0:
             else:
                 print(f"{hp.START_TIRE}У вас не получилось отвлечься от боя и понаблюдать за обстановкой вокруг.{hp.END_TIRE}")
 
-        # (5.2) Команда "с" с использованием свитка искр.
-        elif action_hero == "с" and hero.bullet_of_sparks >= 1:
-            if time_action_hero_spell != 0:
+        # (5.2) Команда "искры" с использованием свитка искр.
+        elif action_hero == "искры":
+            if time_action_hero_spell != 0 and hero.bullet_of_sparks >= 1:
                 hero.bullet_of_sparks -= 1
                 print(f"{hp.START_TIRE}(🛡️) Магическое поле не дает пройти вашей пуле дальше. Вы не попадаете по {hp.PURPLE}Некроманту{hp.RESET}.{hp.END_TIRE}")
             else:
-                sparks_five_room()
+                hero.shooting_with_spark_bullets(necromancer)
 
         # (5.2) Команда "с"
         elif action_hero == "с" and hero.hero_bullet <= 0:
