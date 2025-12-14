@@ -62,9 +62,9 @@ class InventorySystem:
 
         elif hero_choice == "4":
             if hero.hero_potion_of_regen_hp > 0:
-                hero.process_regen()
+                hero.start_regen(total_regen_hp = 3,regen_delay = 1,regen_per_tick = 1)
                 hero.hero_potion_of_regen_hp -= 1
-                result = f"(💊)  {hp.PURPLE_BOLD_BOLD} Активирована регенерация здоровья.{hp.RESET}"
+                result = f"(💊)  {hp.PURPLE_BOLD} Активирована регенерация здоровья.{hp.RESET}"
             else:
                 result = f"{hp.RED}Нет зелья регенерации!{hp.RESET}"
 

@@ -10,7 +10,7 @@
         "(2) Комната с наспех брошенными вещами",
         "(3) Помещение с зеркалом"
       ],
-      "games_played": 22,
+      "games_played": 36,
       "all_score": 14,
       "password": "Том",
       "achievements": [
@@ -60,6 +60,16 @@
       "games_played": 3,
       "all_score": 1,
       "password": "Sam",
+      "achievements": []
+    },
+    {
+      "name": "Njv",
+      "kill_monsters": 0,
+      "completed_locations": 0,
+      "completed_locations_list": [],
+      "games_played": 1,
+      "all_score": 0,
+      "password": "3",
       "achievements": []
     }
   ]
