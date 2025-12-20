@@ -19,6 +19,25 @@ class Enemy:
         self.charge_turns = 0
         self.modifiers = []  # Список модификаторов Противников
 
+    #Добавление модификатора
+    def add_modifier(self,modifier):
+        modifier.target = self
+        self.modifiers.append(modifier)
+        modifier.activate()
+
+    def update_all(self):
+        """Обновить все модификаторы"""
+        for modifier in self.modifiers[:]:
+            if not modifier.active:
+                self.modifiers.remove(modifier)
+                continue
+
+            if hasattr(modifier, 'apply_effect'):
+                modifier.apply_effect()
+            elif hasattr(modifier, 'update'):
+                modifier.update()
+
+
 
     def is_alive(self) -> bool:
         return self.health > 0

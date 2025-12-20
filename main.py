@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from creatures import Hero,Dummy,Acolyte,NecroStudent,MainSubstance,SubMini1,SubMini2,Necromancer
+from creatures import Hero,Dummy,Acolyte,NecroStudent,MainSubstance,SubMini1,SubMini2,Necromancer,RegenHP
 from system import HelpSystem, InventorySystem, AchievementsSystem
 import sys
 import threading
@@ -8,7 +8,7 @@ import time
 
 
 
-#Создаем противников2
+#Создаем противников
 dummy = Dummy()
 acolyte = Acolyte()
 necro_student = NecroStudent()
@@ -74,7 +74,14 @@ def price():
         print(f"{hp.START_TIRE}(🎁) Вы вернулись в подземелье с прокаченными характеристиками, ниже представлены эти характеристики.")
         print(f"{hp.START_TIRE}{random.choice(jokes_bonuses)}")
         used_commands.add("уверенность")
-        hero_regen = "" # ЗДЕСЬ ПОКА КОД РАБОТАЕТ НЕККОРЕКТНО
+        low_regen = RegenHP(
+            target=hero,
+            duration=10,
+            step=5,
+            heal_power=1,
+            show_message=True
+        )
+        hero.add_modifier(low_regen)
     elif action_hero == "абсурд":
         hero.count_crit_attack += 1
         print(f"{hp.START_TIRE}(🎁) Вы осознали(наверное),что не стоит сражаться с магическим зеркалом.\n{hp.YELLOW_STAR_START}(🎁) Первый ваш удар в новой игре будет с {hp.CYAN_BOLD} двойным уроном{hp.RESET}, желательно не бить по зеркалу.{hp.YELLOW_STAR_END}")
@@ -173,8 +180,8 @@ print(f"""{hp.START_TIRE}(⛺) Устроив привал не далеко о�
 print(f"{hp.START_TIRE}(!) Для начала попробуйте сделать шаг вперед написав команду {hp.CYAN}'в'{hp.RESET}, а потом шаг назад, написав команду {hp.CYAN}'н'{hp.RESET}.\nНеобходимо писать только первую букву какой-либо команды.\n(!) Если не хотите проходить обучение введите {hp.RED}'выход'{hp.RESET}.{hp.END_TIRE}")
 
 while hero.hero_health > 0:
-    print(hero.name)
-    hero.process_regen()
+    dummy.update_all()
+    hero.update_all()
     price()
     if pass_null_room:
         break
@@ -276,10 +283,9 @@ print(
 
 while hero.hero_health > 0:
     try:
-        hero.process_regen()
-
+        acolyte.update_all()
+        hero.update_all()
         crit()
-        
         price()
 
         if pass_first_room:
@@ -444,8 +450,9 @@ bluff_lines = [
 while hero.hero_health > 0:
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
     print("\n\n\n\n\n\n")
-    hero.process_regen()
     crit()
+    necro_student.update_all()
+    hero.update_all()
     if pass_second_room == True:
         break
 
@@ -652,7 +659,6 @@ count_search = 0
 print(f"{hp.START_TIRE}(🪞) Двигаясь дальше вы замечаете стоящее волшебное зеркало. Вы раньше о нем слышали, зеркало позволяет менять золото на какие-либо предметы. Для покупки необходимо ввести - {hp.CYAN}купить а потом номер предмета{hp.RESET}.{hp.END_TIRE}")
 
 while hero.hero_health > 0:
-    hero.process_regen()
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ")
     print("\n\n\n\n\n\n")
 
@@ -660,8 +666,8 @@ while hero.hero_health > 0:
     hp.reset_all_help()  # сброс всех значений на False
     hp.help_states["help_three_room"] = True  # Включаем подсказки третьей комнаты
 
-    # (3) Обработка критической атаки
     crit()
+    hero.update_all()
 
     if pass_three_room:
         break
@@ -853,7 +859,8 @@ else:
 
 # (4) Бой с единственной субстанцией
 while sub.health not in split_health:
-    hero.process_regen()
+    sub.update_all()
+    hero.update_all()
 
     if pass_four_room_phase_one:
         break
@@ -1098,7 +1105,9 @@ else:
     sub_mini2.health = 11
 
 while sub_mini1.health > 0 or sub_mini2.health > 0:
-    hero.process_regen()
+    sub_mini1.update_all()
+    sub_mini2.update_all()
+    hero.update_all()
     if pass_four_room_phase_two:
         break
 
@@ -1439,7 +1448,8 @@ def timeout_message():
 input_active = False
 
 while hero.hero_health > 0:
-    hero.process_regen()
+    necromancer.update_all()
+    hero.update_all()
     price()
     # (5) Подсказки соратника
     hp.reset_all_help()  # сброс всех значений на False
@@ -1718,7 +1728,8 @@ while hero.hero_health > 0:
 input_active = False
 
 while hero.hero_health > 0:
-    hero.process_regen()
+    necromancer.update_all()
+    hero.update_all()
     # (5) Подсказки соратника
     hp.reset_all_help()  # сброс всех значений на False
     hp.help_states["help_five_room_phase_two"] = True  # Включаем подсказки пятой комнаты(первая фаза)
@@ -2381,7 +2392,8 @@ undead_list = {
 undead_func = list(undead_list.keys())
 
 while hero.hero_health > 0:
-    hero.process_regen()
+    necromancer.update_all()
+    hero.update_all()
     price()
     # (5) Подсказки соратника
     hp.reset_all_help()  # сброс всех значений на False

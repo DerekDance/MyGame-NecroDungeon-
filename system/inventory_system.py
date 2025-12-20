@@ -1,5 +1,4 @@
 from system import HelpSystem
-import random
 
 #Для использования форматирования строк
 hp = HelpSystem()
@@ -61,8 +60,16 @@ class InventorySystem:
                 result = f"{hp.RED}Нет свитков искр!{hp.RESET}"
 
         elif hero_choice == "4":
+            from creatures import RegenHP
             if hero.hero_potion_of_regen_hp > 0:
-                hero.start_regen(total_regen_hp = 3,regen_delay = 1,regen_per_tick = 1)
+                potion_regen_hp = RegenHP(
+                    target=hero,
+                    duration=3,
+                    step=3,
+                    heal_power=1,
+                    show_message=True
+                )
+                hero.add_modifier(potion_regen_hp)
                 hero.hero_potion_of_regen_hp -= 1
                 result = f"(💊)  {hp.PURPLE_BOLD} Активирована регенерация здоровья.{hp.RESET}"
             else:

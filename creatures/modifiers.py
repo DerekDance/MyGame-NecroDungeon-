@@ -1,6 +1,13 @@
+from system import HelpSystem
+
+# Для использования форматирования строк
+hp = HelpSystem()
+
 """
 Универсальный класс для модификаторов существ
 """
+
+
 class Modifier:
     def __init__(self, name, duration, step, target):
         self.name = name  # Название модификатора
@@ -9,15 +16,31 @@ class Modifier:
         self.target = target  # Ссылка на существо, на которое действует модификатор
         self.step = step  # Шаг, который используется в методе update()
         self.active = True  # Флаг активности (True = действует)
+        self.step_counter = 0  # Счетчик текущего шага
 
-    # Функция для отсчета времени действия модификатора
     def update(self):
-        if self.duration > 0 and self.active:
-            self.remaining_duration -= self.step
+        """
+        Обновляет состояние модификатора.
+        Возвращает кортеж (завершен_ли, применять_ли_эффект)
+        """
+        if not self.active or self.duration <= 0:
+            return True, False
+
+        self.step_counter += 1
+
+        # Проверяем, достигли ли нужного шага
+        if self.step_counter >= self.step:
+            self.step_counter = 0
+            self.remaining_duration -= 1
+
+            # Проверяем, не завершился ли модификатор
             if self.remaining_duration <= 0:
                 self.deactivate()
-                return True
-        return False
+                return True, True  # Завершен, но эффект применить нужно (в последний раз)
+
+            return False, True  # Не завершен, эффект применить нужно
+
+        return False, False  # Не завершен, эффект не применять
 
     # Функция активации
     def activate(self):
@@ -29,12 +52,13 @@ class Modifier:
         self.active = False
         self.remaining_duration = self.duration
 
+
 # Регенерация здоровья
 class RegenHP(Modifier):
-    def init(self, target, duration, step, heal_power, show_message=False):
+    def __init__(self, target, duration, step, heal_power, show_message=False):
         if not hasattr(target, "health") and not hasattr(target, "hero_health"):
             raise ValueError(f"Цель {target} не имеет атрибутов здоровья!")
-        super().init("RegenHP", duration, step, target)
+        super().__init__("RegenHP", duration, step, target)
         self.heal_power = heal_power
         self.show_message = show_message
 
@@ -50,6 +74,14 @@ class RegenHP(Modifier):
 
     # Применение регенерации
     def apply_effect(self):
+        """Применяет эффект регенерации, если нужно"""
+        # Обновляем состояние и получаем информацию
+        is_finished, should_apply = self.update()
+
+        # Если не нужно применять эффект на этом шаге, просто возвращаем
+        if not should_apply:
+            return is_finished
+
         health_attr, max_health_attr = self.get_health_attr_names()
 
         # Получить значения с проверкой
@@ -59,17 +91,17 @@ class RegenHP(Modifier):
         if not isinstance(current_hp, (int, float)) or not isinstance(max_hp, (int, float)):
             print("Значения current_hp и max_hp должны быть числами!")
             self.deactivate()
-            return
+            return True
 
         if current_hp is None or max_hp is None:
             print(f"Не могу найти атрибуты здоровья у {self.target}")
             self.deactivate()
-            return
+            return True
 
         # Проверка
         if current_hp >= max_hp:
             self.deactivate()
-            return
+            return True
 
         # Вычисление
         new_hp = min(current_hp + self.heal_power, max_hp)
@@ -84,11 +116,11 @@ class RegenHP(Modifier):
         if self.show_message:
             if healed_amount > 0:
                 target_name = getattr(self.target, "name", "Неизвестный")
-                print(f"{target_name} восстановил {healed_amount} HP\nЗдоровье: {current_hp} -> {new_hp}")
+                print(
+                    f"(💊)  {hp.PURPLE_BOLD}{target_name} восстановил {healed_amount} HP\nЗдоровье: {current_hp} -> {new_hp}{hp.RESET}")
 
-        # Обновление таймера
-        self.update()
-
+        # Возвращаем информацию о завершении
+        return is_finished
 
 
 
