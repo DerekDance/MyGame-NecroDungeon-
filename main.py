@@ -6,8 +6,7 @@ import threading
 import random
 import time
 
-#Создаем героя
-hero = Hero()
+
 
 #Создаем противников2
 dummy = Dummy()
@@ -29,13 +28,18 @@ achievements_system = AchievementsSystem()
 # Вызов ГЛАВНОГО МЕНЮ
 achievements_system.main_menu()
 
+name = achievements_system.current_player_name
+#Создаем героя
+hero = Hero(name = name)  # Передаем имя в конструктор!
+print(f"Герой создан: {hero.name}")  # Проверка
+
 part_1 =""
 part_2 =""
 list_of_command =["в","н","а","р","п","у","о","с"]
 hero_choice = ""
 
 #Пропуск комнат для их тестирования по отдельности. Значение True, чтобы пропустить комнату, False - не пропускать.
-pass_null_room = True
+pass_null_room = False
 pass_first_room = False
 pass_second_room = False
 pass_three_room = False
@@ -70,7 +74,7 @@ def price():
         print(f"{hp.START_TIRE}(🎁) Вы вернулись в подземелье с прокаченными характеристиками, ниже представлены эти характеристики.")
         print(f"{hp.START_TIRE}{random.choice(jokes_bonuses)}")
         used_commands.add("уверенность")
-        hero.start_regen(total_regen_hp = 1,regen_delay = 1,regen_per_tick = 1)
+        hero_regen = "" # ЗДЕСЬ ПОКА КОД РАБОТАЕТ НЕККОРЕКТНО
     elif action_hero == "абсурд":
         hero.count_crit_attack += 1
         print(f"{hp.START_TIRE}(🎁) Вы осознали(наверное),что не стоит сражаться с магическим зеркалом.\n{hp.YELLOW_STAR_START}(🎁) Первый ваш удар в новой игре будет с {hp.CYAN_BOLD} двойным уроном{hp.RESET}, желательно не бить по зеркалу.{hp.YELLOW_STAR_END}")
@@ -169,6 +173,7 @@ print(f"""{hp.START_TIRE}(⛺) Устроив привал не далеко о�
 print(f"{hp.START_TIRE}(!) Для начала попробуйте сделать шаг вперед написав команду {hp.CYAN}'в'{hp.RESET}, а потом шаг назад, написав команду {hp.CYAN}'н'{hp.RESET}.\nНеобходимо писать только первую букву какой-либо команды.\n(!) Если не хотите проходить обучение введите {hp.RED}'выход'{hp.RESET}.{hp.END_TIRE}")
 
 while hero.hero_health > 0:
+    print(hero.name)
     hero.process_regen()
     price()
     if pass_null_room:

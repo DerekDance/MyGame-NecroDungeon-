@@ -10,11 +10,12 @@
         "(2) Комната с наспех брошенными вещами",
         "(3) Помещение с зеркалом"
       ],
-      "games_played": 36,
-      "all_score": 14,
+      "games_played": 60,
+      "all_score": 15,
       "password": "Том",
       "achievements": [
-        "BYPASSING"
+        "BYPASSING",
+        "TRAINED"
       ]
     },
     {
@@ -70,6 +71,16 @@
       "games_played": 1,
       "all_score": 0,
       "password": "3",
+      "achievements": []
+    },
+    {
+      "name": "ооварарвоао",
+      "kill_monsters": 0,
+      "completed_locations": 0,
+      "completed_locations_list": [],
+      "games_played": 1,
+      "all_score": 0,
+      "password": "ффф",
       "achievements": []
     }
   ]

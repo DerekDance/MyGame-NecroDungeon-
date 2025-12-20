@@ -10,13 +10,14 @@ hp = HelpSystem()
 hero = Hero()
 
 class Enemy:
-    def __init__(self, name: str, health: int, attack: int, distance: int):
+    def __init__(self, name, health, max_health, attack, distance):
         self.name = name
         self.health = health
-        self.max_health = health
+        self.max_health = max_health
         self.attack = attack
         self.distance = distance
         self.charge_turns = 0
+        self.modifiers = []  # Список модификаторов Противников
 
 
     def is_alive(self) -> bool:
@@ -45,13 +46,13 @@ class Enemy:
 # Манекен
 class Dummy(Enemy):
     def __init__(self):
-        super().__init__("Тренировочный манекен",20,1,3)
+        super().__init__("Тренировочный манекен",20,20,1,3)
 
 
 # Аколит
 class Acolyte(Enemy):
     def __init__(self):
-        super().__init__("Аколит",9,3,5)
+        super().__init__("Аколит",9,9,3,5)
         self.charge_turns = 0
 
 
@@ -59,7 +60,7 @@ class Acolyte(Enemy):
 # Ученик-некроманта
 class NecroStudent(Enemy):
     def __init__(self):
-        super().__init__("Ученик-некроманта",9,2,3)
+        super().__init__("Ученик-некроманта",9,9,2,3)
         self.charge_turns = 0
 
 
@@ -68,20 +69,20 @@ class NecroStudent(Enemy):
 # Субстанция
 class MainSubstance(Enemy):
     def __init__(self):
-        super().__init__("Субстанция",30,3,6)
+        super().__init__("Субстанция",30,30,3,6)
 
 
 class SubMini1(Enemy):
     def __init__(self):
-        super().__init__("\u001b[32mМерзкая субстанция\u001b[0m",9,3,2)
+        super().__init__("\u001b[32mМерзкая субстанция\u001b[0m",9,9,3,2)
 
 
 class SubMini2(Enemy):
     def __init__(self):
         super().__init__(
-            "\u001b[35mСклизкая субстанция\u001b[0m",11,2,1)
+            "\u001b[35mСклизкая субстанция\u001b[0m",11,11,2,1)
 
 # Некромант
 class Necromancer(Enemy):
     def __init__(self):
-        super().__init__("\u001b[35;1mНекромант\u001b[0m",30,3,3)
+        super().__init__("\u001b[35;1mНекромант\u001b[0m",30,30,3,3)

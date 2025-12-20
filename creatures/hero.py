@@ -1,6 +1,5 @@
 from system import HelpSystem
 
-
 # Для использования форматирования строк
 hp = HelpSystem()
 
@@ -8,7 +7,8 @@ hp = HelpSystem()
 Класс Героя
 """
 class Hero:
-    def __init__(self):
+    def __init__(self,name = "Герой"):
+        self.name = name
         self.hero_health = 10
         self.hero_max_health = 20
         self.hero_attack = 3
@@ -22,41 +22,7 @@ class Hero:
         self.hero_bullet = 3
         self.bullet_of_sparks = 0
         self.damage_bullet_of_sparks = 12
-        #Параметры для регенерации здоровья
-        self.regen_timer = 0
-        self.total_regen_hp = 0
-        self.regen_delay = 0
-        self.regen_per_tick = 0
-        self.regen_active = False
-
-
-    #Для установки параметров регенерации
-    def start_regen(self,total_regen_hp,regen_delay,regen_per_tick):
-        self.total_regen_hp = total_regen_hp
-        self.regen_delay = regen_delay
-        self.regen_per_tick = regen_per_tick
-        self.regen_active = True
-
-        #Регенерация здоровья
-    def process_regen(self):
-        if not self.regen_active:
-            return
-        elif self.total_regen_hp <= 0:
-            self.regen_active = False
-        elif self.total_regen_hp > 0 and self.hero_health < self.hero_max_health:
-            if self.regen_timer < self.regen_delay:
-                self.regen_timer += 1
-            else:
-                heal_amount = min(self.regen_per_tick ,self.hero_max_health - self.hero_health,self.total_regen_hp)
-                self.hero_health += heal_amount
-                self.total_regen_hp -= heal_amount
-                self.regen_timer = 0
-                print(f"(💊) {hp.PURPLE_BOLD}Вы восстановили {heal_amount} Здоровье\n"
-                      f"Еще будет восстановлено: {self.total_regen_hp}{hp.RESET}")
-        else:
-            print(f"(💊) {hp.PURPLE_BOLD}Регенерация завершена (достигнут максимум здоровья){hp.RESET}")
-            self.total_regen_hp = 0
-            self.regen_active = False
+        self.modifiers = [ ] #Список модификаторов Героя
 
     #Стрельба искрами
     def shooting_with_spark_bullets(self, enemies):

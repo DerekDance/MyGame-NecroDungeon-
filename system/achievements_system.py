@@ -43,6 +43,20 @@ class AchievementsSystem:
         self.players = [p for p in self.players_data.get("players", []) if isinstance(p, dict)]
         self.character_data = None
 
+        # Для получения имени игрока
+    @property
+    def current_player_name(self):
+        """Возвращает имя текущего игрока"""
+        if self.character_data:
+            return self.character_data.get("name")
+        return None
+
+    @property
+    def current_player(self):
+        """Возвращает все данные текущего игрока"""
+        return self.character_data
+
+
     # (1) Функция загрузки данных
     def load_data(self):
         try:
@@ -159,7 +173,7 @@ class AchievementsSystem:
         self.players_data["players"] = self.players
         self.save_data()
 
-    # (6) Метод главного меню
+    # (7) Метод главного меню
     def main_menu(self):
         character_data = None
         menu_choice = ""
