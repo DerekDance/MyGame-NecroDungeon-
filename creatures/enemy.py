@@ -19,12 +19,13 @@ class Enemy:
         self.charge_turns = 0
         self.modifiers = []  # Список модификаторов Противников
 
-    #Добавление модификатора
+    #Добавление модификатора противника
     def add_modifier(self,modifier):
         modifier.target = self
         self.modifiers.append(modifier)
         modifier.activate()
 
+    # Обновление модификатора противника
     def update_all(self):
         """Обновить все модификаторы"""
         for modifier in self.modifiers[:]:
@@ -32,10 +33,17 @@ class Enemy:
                 self.modifiers.remove(modifier)
                 continue
 
+            # Для модификаторов с apply_effect
             if hasattr(modifier, 'apply_effect'):
-                modifier.apply_effect()
+                is_finished = modifier.apply_effect()
+                if is_finished:
+                    self.modifiers.remove(modifier)
+
+            # Для простых модификаторов
             elif hasattr(modifier, 'update'):
-                modifier.update()
+                is_finished, _ = modifier.update()
+                if is_finished:
+                    self.modifiers.remove(modifier)
 
 
 

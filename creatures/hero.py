@@ -24,12 +24,13 @@ class Hero:
         self.damage_bullet_of_sparks = 12
         self.modifiers = [ ] #Список модификаторов Героя
 
-    #Добавление модификатора
+    #Добавление модификатора героя
     def add_modifier(self,modifier):
         modifier.target = self
         self.modifiers.append(modifier)
         modifier.activate()
 
+    #Обновление модификатора героя
     def update_all(self):
         """Обновить все модификаторы"""
         for modifier in self.modifiers[:]:
@@ -37,10 +38,17 @@ class Hero:
                 self.modifiers.remove(modifier)
                 continue
 
+            # Для модификаторов с apply_effect
             if hasattr(modifier, 'apply_effect'):
-                modifier.apply_effect()
+                is_finished = modifier.apply_effect()
+                if is_finished:
+                    self.modifiers.remove(modifier)
+
+            # Для простых модификаторов
             elif hasattr(modifier, 'update'):
-                modifier.update()
+                is_finished, _ = modifier.update()
+                if is_finished:
+                    self.modifiers.remove(modifier)
 
     #Стрельба искрами
     def shooting_with_spark_bullets(self, enemies):

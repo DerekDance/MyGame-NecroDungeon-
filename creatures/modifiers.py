@@ -53,7 +53,7 @@ class Modifier:
         self.remaining_duration = self.duration
 
 
-# Регенерация здоровья
+# Модификатор регенерации здоровья
 class RegenHP(Modifier):
     def __init__(self, target, duration, step, heal_power, show_message=False):
         if not hasattr(target, "health") and not hasattr(target, "hero_health"):
@@ -121,6 +121,89 @@ class RegenHP(Modifier):
 
         # Возвращаем информацию о завершении
         return is_finished
+
+
+# Модификатор множителя урона
+class MultiDamage(Modifier):
+    def __init__(self, target, duration, multi_value):
+        if multi_value <= 1.0:
+            raise ValueError("Множитель должен быть больше 1.0!")
+        super().__init__("MultiDamage", duration, 1, target)
+        self.multi_value = multi_value
+        self.original_attack = None
+
+    # Функция активации мультиурона
+    def activate(self):
+        #Защита от повторного применения
+        if self.active:
+            print("Уже активен!")
+            return
+
+        attack_attr = self.get_attack_attr_names()
+
+        if not attack_attr:
+            print(f"Не могу найти атрибуты атаки у {self.target}")
+            return
+
+        # Получить значения с проверкой
+        current_attack = getattr(self.target, attack_attr, None)
+
+        if not isinstance(current_attack, (int, float)):
+            print("Значения current_attack должно быть числом!")
+            return
+
+        if current_attack is None:
+            print(f"Не могу найти атрибуты атаки у {self.target}")
+            return
+        # Устанавливаем атаку до модификатора
+        self.original_attack = current_attack
+        # Устанавливаем атаку после модификатора
+        new_attack = self.original_attack * self.multi_value
+        # Сохраняем новую атаку обьекту
+        setattr(self.target, attack_attr, new_attack)
+        # Получаем имя для форматирования
+        target_name = getattr(self.target, "name", "Неизвестный")
+        print(f"(🗡️){hp.CYAN_BOLD} Урон {target_name} увеличен с {current_attack:.1f} → {new_attack:.1f}\n"
+              f"(🗡️){hp.CYAN_BOLD} Урон {target_name} увеличен в {self.multi_value}× на {self.duration} тиков{hp.RESET}{hp.RESET}")
+        #Вызывается родительский activate. self.active устанавливает True
+        super().activate()
+
+
+    # Функция деактивации мультиурона
+    def deactivate(self):
+        # Получаем имя для форматирования
+        target_name = getattr(self.target, "name", "Неизвестный")
+        if self.original_attack is not None:
+            attack_attr = self.get_attack_attr_names()
+            if attack_attr:
+                setattr(self.target, attack_attr, self.original_attack)
+
+        print(f"(🗡️){hp.CYAN_BOLD} Эффект усиления {target_name} закончился{hp.RESET}")
+        # Вызывается родительский deactivate. self.active устанавливает False
+        super().deactivate()
+
+
+    # Получить имена атаки цели
+    def get_attack_attr_names(self):
+        if hasattr(self.target, "attack"):
+            return "attack"
+        elif hasattr(self.target, "hero_attack"):
+            return "hero_attack"
+        else:
+            return None
+
+    #Применение модификатора множитель урона
+    def apply_effect(self):
+        # Игнорируем should_apply
+        is_finished, _ = self.update()
+
+        # Если время вышло - деактивируем
+        if is_finished:
+            self.deactivate()
+
+        return is_finished
+        
+
 
 
 

@@ -30,8 +30,7 @@ achievements_system.main_menu()
 
 name = achievements_system.current_player_name
 #Создаем героя
-hero = Hero(name = name)  # Передаем имя в конструктор!
-print(f"Герой создан: {hero.name}")  # Проверка
+hero = Hero(name = name)  # Передаем имя в конструктор
 
 part_1 =""
 part_2 =""
