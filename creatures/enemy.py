@@ -19,29 +19,40 @@ class Enemy:
         self.charge_turns = 0
         self.modifiers = []  # Список модификаторов Противников
 
-    #Добавление модификатора противника
-    def add_modifier(self,modifier):
+    #Проверка модификатора противника
+    def has_active_modifier(self, modifier_name):
+        """Проверяет, есть ли активный модификатор с указанным именем"""
+        for existing in self.modifiers:
+            if existing.name == modifier_name and existing.active:
+                return True, existing
+        return False, None
+
+    # Добавление модификатора противника
+    def add_modifier(self, modifier):
+        # Используем вспомогательный метод
+        has_active, existing_mod = self.has_active_modifier(modifier.name)
+
+        if has_active:
+            # Можно показать информацию о существующем
+            print(f"{hp.YELLOW}Эффект '{modifier.name}' уже активен!{hp.RESET}")
+            return False
+
+        # Добавляем
         modifier.target = self
         self.modifiers.append(modifier)
         modifier.activate()
+        return True
 
     # Обновление модификатора противника
     def update_all(self):
-        """Обновить все модификаторы"""
         for modifier in self.modifiers[:]:
             if not modifier.active:
                 self.modifiers.remove(modifier)
                 continue
 
-            # Для модификаторов с apply_effect
             if hasattr(modifier, 'apply_effect'):
                 is_finished = modifier.apply_effect()
-                if is_finished:
-                    self.modifiers.remove(modifier)
 
-            # Для простых модификаторов
-            elif hasattr(modifier, 'update'):
-                is_finished, _ = modifier.update()
                 if is_finished:
                     self.modifiers.remove(modifier)
 
@@ -89,8 +100,6 @@ class NecroStudent(Enemy):
     def __init__(self):
         super().__init__("Ученик-некроманта",9,9,2,3)
         self.charge_turns = 0
-
-
 
 
 # Субстанция

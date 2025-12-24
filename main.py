@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from creatures import Hero,Dummy,Acolyte,NecroStudent,MainSubstance,SubMini1,SubMini2,Necromancer,RegenHP
-from system import HelpSystem, InventorySystem, AchievementsSystem
+from creatures import *
+from system import *
 import sys
 import threading
 import random

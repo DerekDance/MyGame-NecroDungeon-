@@ -35,8 +35,14 @@ class InventorySystem:
         result = ""
 
         if hero_choice == "1":
+            from creatures import MultiDamage
             if hero.hero_potion_strength > 0:
-                hero.count_crit_attack += 1
+                multiplier = MultiDamage(
+                    target=hero,
+                    duration=3,
+                    multi_value=2
+                )
+                hero.add_modifier(multiplier)
                 hero.hero_potion_strength -= 1
                 result = f"(🗡️)  {hp.CYAN_BOLD}Вы выпили зелье силы.{hp.RESET}"
             else:

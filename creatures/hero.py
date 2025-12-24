@@ -9,46 +9,61 @@ hp = HelpSystem()
 class Hero:
     def __init__(self,name = "Герой"):
         self.name = name
-        self.hero_health = 10
+        self.hero_health = 20
         self.hero_max_health = 20
         self.hero_attack = 3
         self.hero_range_attack = 6
         self.hero_gold = 1
-        self.hero_potion_strength = 2
+        self.hero_potion_strength = 999
         self.hero_potion_heal = 0
-        self.hero_potion_of_regen_hp = 3
+        self.hero_potion_of_regen_hp = 999
         self.count_crit_attack  = 0
-        self.hero_scroll_of_sparks = 1
+        self.hero_scroll_of_sparks = 0
         self.hero_bullet = 3
         self.bullet_of_sparks = 0
         self.damage_bullet_of_sparks = 12
         self.modifiers = [ ] #Список модификаторов Героя
 
-    #Добавление модификатора героя
-    def add_modifier(self,modifier):
+    #Проверка модификатора героя
+    def has_active_modifier(self, modifier_name):
+        """Проверяет, есть ли активный модификатор с указанным именем"""
+        for existing in self.modifiers:
+            if existing.name == modifier_name and existing.active:
+                return True, existing
+        return False, None
+
+    # Добавление модификатора героя
+    def add_modifier(self, modifier):
+        # Используем вспомогательный метод
+        has_active, existing_mod = self.has_active_modifier(modifier.name)
+
+        if has_active:
+            # Можно показать информацию о существующем
+            print(f"{hp.YELLOW}Эффект Героя:'{modifier.name}' уже активен!{hp.RESET}")
+            return False
+
+
+
+
+        # Добавляем
         modifier.target = self
         self.modifiers.append(modifier)
         modifier.activate()
+        return True
 
     #Обновление модификатора героя
     def update_all(self):
-        """Обновить все модификаторы"""
         for modifier in self.modifiers[:]:
             if not modifier.active:
                 self.modifiers.remove(modifier)
                 continue
 
-            # Для модификаторов с apply_effect
             if hasattr(modifier, 'apply_effect'):
                 is_finished = modifier.apply_effect()
+
                 if is_finished:
                     self.modifiers.remove(modifier)
 
-            # Для простых модификаторов
-            elif hasattr(modifier, 'update'):
-                is_finished, _ = modifier.update()
-                if is_finished:
-                    self.modifiers.remove(modifier)
 
     #Стрельба искрами
     def shooting_with_spark_bullets(self, enemies):

@@ -15,7 +15,7 @@ class Modifier:
         self.remaining_duration = duration  # Оставшееся время (изначально равно duration)
         self.target = target  # Ссылка на существо, на которое действует модификатор
         self.step = step  # Шаг, который используется в методе update()
-        self.active = True  # Флаг активности (True = действует)
+        self.active = False  # Флаг активности (False = не действует)
         self.step_counter = 0  # Счетчик текущего шага
 
     def update(self):
@@ -164,21 +164,21 @@ class MultiDamage(Modifier):
         # Получаем имя для форматирования
         target_name = getattr(self.target, "name", "Неизвестный")
         print(f"(🗡️){hp.CYAN_BOLD} Урон {target_name} увеличен с {current_attack:.1f} → {new_attack:.1f}\n"
-              f"(🗡️){hp.CYAN_BOLD} Урон {target_name} увеличен в {self.multi_value}× на {self.duration} тиков{hp.RESET}{hp.RESET}")
+              f"(🗡️){hp.CYAN_BOLD} Урон {target_name} увеличен в {self.multi_value}× на {self.duration} шага(ов){hp.RESET}{hp.RESET}")
         #Вызывается родительский activate. self.active устанавливает True
         super().activate()
 
 
     # Функция деактивации мультиурона
     def deactivate(self):
+        if not self.active:
+            return  # Уже деактивирован
         # Получаем имя для форматирования
         target_name = getattr(self.target, "name", "Неизвестный")
         if self.original_attack is not None:
             attack_attr = self.get_attack_attr_names()
             if attack_attr:
                 setattr(self.target, attack_attr, self.original_attack)
-
-        print(f"(🗡️){hp.CYAN_BOLD} Эффект усиления {target_name} закончился{hp.RESET}")
         # Вызывается родительский deactivate. self.active устанавливает False
         super().deactivate()
 
@@ -194,12 +194,12 @@ class MultiDamage(Modifier):
 
     #Применение модификатора множитель урона
     def apply_effect(self):
-        # Игнорируем should_apply
         is_finished, _ = self.update()
 
-        # Если время вышло - деактивируем
         if is_finished:
-            self.deactivate()
+            # Сообщение ТОЛЬКО когда модификатор завершился
+            target_name = getattr(self.target, "name", "Неизвестный")
+            print(f"(🗡️){hp.CYAN_BOLD} Эффект усиления {target_name} закончился{hp.RESET}")
 
         return is_finished
         
