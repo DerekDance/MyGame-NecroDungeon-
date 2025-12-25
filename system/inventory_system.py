@@ -35,16 +35,22 @@ class InventorySystem:
         result = ""
 
         if hero_choice == "1":
-            from creatures import MultiDamage
+            from creatures import DamageModifier
             if hero.hero_potion_strength > 0:
-                multiplier = MultiDamage(
+                multiplier = DamageModifier(
                     target=hero,
                     duration=3,
-                    multi_value=2
+                    value=1.5,
+                    operation_type = "*",
+                    attack_type = "melee",
+                    start_info_msg = f"{hp.CYAN_BOLD}(🗡️) Использовано Зелье силы"
                 )
-                hero.add_modifier(multiplier)
-                hero.hero_potion_strength -= 1
-                result = f"(🗡️)  {hp.CYAN_BOLD}Вы выпили зелье силы.{hp.RESET}"
+
+                if hero.add_modifier(multiplier):  # Проверяем успех добавления
+                    hero.hero_potion_strength -= 1
+                else:
+                    # add_modifier уже вывел сообщение об ошибке
+                    pass
             else:
                 result = f"{hp.RED}Нет зелья силы!{hp.RESET}"
 
@@ -75,9 +81,11 @@ class InventorySystem:
                     heal_power=1,
                     show_message=True
                 )
-                hero.add_modifier(potion_regen_hp)
-                hero.hero_potion_of_regen_hp -= 1
-                result = f"(💊)  {hp.PURPLE_BOLD} Активирована регенерация здоровья.{hp.RESET}"
+                if hero.add_modifier(potion_regen_hp):
+                    hero.hero_potion_of_regen_hp -= 1
+                    result = f"(💊)  {hp.PURPLE_BOLD} Активирована регенерация здоровья.{hp.RESET}"
+                else:
+                    pass
             else:
                 result = f"{hp.RED}Нет зелья регенерации!{hp.RESET}"
 

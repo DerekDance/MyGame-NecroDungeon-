@@ -1,4 +1,5 @@
 from system import HelpSystem
+import random
 
 # Для использования форматирования строк
 hp = HelpSystem()
@@ -9,8 +10,9 @@ hp = HelpSystem()
 
 
 class Modifier:
-    def __init__(self, name, duration, step, target):
-        self.name = name  # Название модификатора
+    def __init__(self, name, duration, step, target, start_info_msg=None):
+        self.name = name  # Техническое имя (для проверок)
+        self.start_info_msg = start_info_msg # Дополнительное сообщение
         self.duration = duration  # Общая длительность действия
         self.remaining_duration = duration  # Оставшееся время (изначально равно duration)
         self.target = target  # Ссылка на существо, на которое действует модификатор
@@ -124,13 +126,34 @@ class RegenHP(Modifier):
 
 
 # Модификатор множителя урона
-class MultiDamage(Modifier):
-    def __init__(self, target, duration, multi_value):
-        if multi_value <= 1.0:
-            raise ValueError("Множитель должен быть больше 1.0!")
-        super().__init__("MultiDamage", duration, 1, target)
-        self.multi_value = multi_value
+class DamageModifier(Modifier):
+    # Допустимые операции
+    VALID_OPERATIONS = {"+", "-", "*", "/"}
+
+    def __init__(self, target, duration, value,operation_type,attack_type,start_info_msg):
+        # Проверяем операцию
+        operation_type = operation_type.lower()
+        if operation_type not in self.VALID_OPERATIONS:
+            raise ValueError(f"Неизвестная операция: {operation_type}. "
+                             f"Допустимо: {', '.join(self.VALID_OPERATIONS)}")
+            # Проверяем значение
+        self._validate_value(operation_type, value)
+
+        super().__init__("DamageModifier", duration, 1, target, start_info_msg)
+        self.value = value
         self.original_attack = None
+        self.operation_type = operation_type #Параметр выбора математической операции для модификатора
+        self.attack_type = attack_type #Тип атаки
+
+    # Функция проверки значений
+    def _validate_value(self, operation_type, value):
+        if operation_type in ["+", "-"] and value <= 0:
+            raise ValueError(f"Для {operation_type} значение должно быть > 0")
+        elif operation_type == "*" and value <= 1.0:
+            raise ValueError("Для умножения множитель должен быть > 1.0")
+        elif operation_type == "/" and value <= 0:
+            raise ValueError("Для деления значение должно быть > 0")
+
 
     # Функция активации мультиурона
     def activate(self):
@@ -157,14 +180,26 @@ class MultiDamage(Modifier):
             return
         # Устанавливаем атаку до модификатора
         self.original_attack = current_attack
-        # Устанавливаем атаку после модификатора
-        new_attack = self.original_attack * self.multi_value
+
+        self.operation_type = self.operation_type.lower()
+        if self.operation_type == "+":
+            new_attack = self.original_attack + self.value
+        elif self.operation_type == "*":
+            new_attack = self.original_attack * self.value
+        elif self.operation_type == "-":
+            new_attack = max(self.original_attack - self.value,0)
+        elif self.operation_type == "/":
+            if self.value == 0:
+                print("Ошибка: деление на ноль!")
+                return
+            new_attack = self.original_attack / self.value
         # Сохраняем новую атаку обьекту
         setattr(self.target, attack_attr, new_attack)
         # Получаем имя для форматирования
         target_name = getattr(self.target, "name", "Неизвестный")
-        print(f"(🗡️){hp.CYAN_BOLD} Урон {target_name} увеличен с {current_attack:.1f} → {new_attack:.1f}\n"
-              f"(🗡️){hp.CYAN_BOLD} Урон {target_name} увеличен в {self.multi_value}× на {self.duration} шага(ов){hp.RESET}{hp.RESET}")
+        print(f"{self.start_info_msg}\n"
+              f"-  Урон '{target_name}' = {current_attack:.1f} → {new_attack:.1f}\n"
+              f"-  Урон '{current_attack:.1f} {self.operation_type} {self.value}' на {self.duration} шага(ов){hp.RESET}")
         #Вызывается родительский activate. self.active устанавливает True
         super().activate()
 
@@ -185,12 +220,18 @@ class MultiDamage(Modifier):
 
     # Получить имена атаки цели
     def get_attack_attr_names(self):
-        if hasattr(self.target, "attack"):
-            return "attack"
-        elif hasattr(self.target, "hero_attack"):
-            return "hero_attack"
+        if self.attack_type == "melee":
+            if hasattr(self.target, "attack"):
+                return "attack"
+            elif hasattr(self.target, "hero_attack"):
+                return "hero_attack"
+        elif self.attack_type == "ranged":
+            if hasattr(self.target, "hero_range_attack"):
+                return "hero_range_attack"
+            else:
+                return None
         else:
-            return None
+            return
 
     #Применение модификатора множитель урона
     def apply_effect(self):
@@ -202,6 +243,12 @@ class MultiDamage(Modifier):
             print(f"(🗡️){hp.CYAN_BOLD} Эффект усиления {target_name} закончился{hp.RESET}")
 
         return is_finished
+
+
+
+
+
+
         
 
 

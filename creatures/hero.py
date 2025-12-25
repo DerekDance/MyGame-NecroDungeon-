@@ -17,7 +17,7 @@ class Hero:
         self.hero_potion_strength = 999
         self.hero_potion_heal = 0
         self.hero_potion_of_regen_hp = 999
-        self.count_crit_attack  = 0
+        self.count_crit_attack  = 0 # НЕ НУЖНЫЙ ПАРАМЕТР
         self.hero_scroll_of_sparks = 0
         self.hero_bullet = 3
         self.bullet_of_sparks = 0
@@ -39,7 +39,7 @@ class Hero:
 
         if has_active:
             # Можно показать информацию о существующем
-            print(f"{hp.YELLOW}Эффект Героя:'{modifier.name}' уже активен!{hp.RESET}")
+            print(f"{hp.YELLOW}Эффект Героя:'{modifier.display_name}' уже активен!{hp.RESET}")
             return False
 
 

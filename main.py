@@ -108,12 +108,17 @@ def price():
         print(f"{hp.START_TIRE}(⏳) Пока недоступна активация этой команды. Запомните ее и следите за обновлениями игры!{hp.END_TIRE}")
           	    
     	     	    
-####################
+##################################
 
-#Для работы "зелья силы" и hero.count_crit_attack
+#Для работы "зелья силы" и hero.count_crit_attack НУЖНО БУДЕТ УДАЛИТЬ ПОСЛЕ ИЗМЕНЕНИЯ РАБОТЫ ЗЕЛИЙ СИЛЫ ВО ВСЕМ КОДЕ.
+#ПРЕЖДЕ ЧЕМ УДАЛЯТЬ НЕОБХОДИМО ПЕРЕРАБОТАТЬ ДЕБАФФЫ СУБСТАНЦИИ В 4-ОЙ КОМНАТЕ(ПЕРВАЯ ФАЗА),
+# И ПЕРЕРАБОТАТЬ ПОЛНОСТЬЮ 4-УЮ КОМНАТУ(ВТОРАЯ ФАЗА)
 def crit():
 	if hero.count_crit_attack < 0:
 		hero.count_crit_attack = 0
+
+##################################
+
 
 #(4)Команда"у" для мерзкой субстанции(вторая фаза)
 def dodge_sub_mini1():
@@ -276,7 +281,7 @@ print(
 not_attack = [0, 1, -1]  # дистанции, на которых Аколит не может атаковать
 
 print(
-    f"{hp.START_TIRE}В узком коридоре вы замечаете фигуру в оборванном плаще, которая направляет арбалет на вас. "
+    f"{hp.START_TIRE}В узком коридоре вы замечаете фигуру в оборванном плаще, которая направляет арбалет на вас.\n"
     f"Коридор имеет множественные пустые углубления, в которых можно будет укрыться от выстрелов.{hp.END_TIRE}"
 )
 
@@ -284,7 +289,6 @@ while hero.hero_health > 0:
     try:
         acolyte.update_all()
         hero.update_all()
-        crit()
         price()
 
         if pass_first_room:
@@ -317,7 +321,7 @@ while hero.hero_health > 0:
                 f"(*) Вы одолели Аколита!{hp.YELLOW}\n{hp.YELLOW_STAR_START} + 1 Золотая монета.\n + 1 'Свиток Искр.'{hp.YELLOW_STAR_END}"
             )
             print(
-                f"{hp.START_TIRE}Войдя в открытую дверь дальше по коридору, вы закрываете дверь. "
+                f"{hp.START_TIRE}Войдя в открытую дверь дальше по коридору, вы закрываете дверь.\n"
                 f"При беглом осмотре угрозы вы никакой не заметили для себя.{hp.END_TIRE}"
             )
             break
@@ -373,23 +377,7 @@ while hero.hero_health > 0:
             print(f"{hp.START_TIRE} Вы двигаетесь назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[acolyte])}{hp.END_TIRE}")
 
         elif action_hero == "а":
-            if hero.count_crit_attack > 0:
-                if acolyte.distance in not_attack:
-                    hero.count_crit_attack -= 1
-                    acolyte.distance += 1
-                    acolyte.health -= hero.hero_attack * 2
-                    print(
-                        f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы попадаете заряженным мечом по Аколиту. "
-                        f"Он делает шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[acolyte])}{hp.END_TIRE}"
-                    )
-                else:
-                    hero.count_crit_attack -= 1
-                    acolyte.distance += 1
-                    print(
-                        f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы промахиваетесь заряженным мечом по Аколиту. "
-                        f"Он делает шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[acolyte])}{hp.END_TIRE}"
-                    )
-            elif acolyte.distance in not_attack:
+            if acolyte.distance in not_attack:
                 acolyte.distance += 1
                 acolyte.health -= hero.hero_attack
                 print(f"{hp.START_TIRE} Вы поражаете своим мечом Аколита. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[acolyte])}{hp.END_TIRE}")
@@ -449,7 +437,6 @@ bluff_lines = [
 while hero.hero_health > 0:
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
     print("\n\n\n\n\n\n")
-    crit()
     necro_student.update_all()
     hero.update_all()
     if pass_second_room == True:
@@ -559,26 +546,13 @@ while hero.hero_health > 0:
 
     #(2) Команда "а"
     elif action_hero == "а" and count_search != 3 and start_fight == 0:
-        if hero.count_crit_attack > 0:
-            hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы просто рассекаете воздух мечом.Заряд меча вы потратили.{hp.RESET}Ничего не происходит.{hp.END_TIRE}")
-        else:
             print(f"{hp.START_TIRE}Вы просто рассекаете воздух мечом. Ничего не происходит.{hp.END_TIRE}")
+
     elif action_hero == "а" and count_search == 3 and necro_student.distance == 2 and start_fight == 1:
-        if hero.count_crit_attack > 0:
-            hero.count_crit_attack -= 1
-            hero.hero_health -= necro_student.attack
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы взмахнули заряженным мечом, но не попали, так как Ученик-некроманта стоит вне досягаемости вашей атаки.Заряд на мече пропал.{hp.RESET} В свою очередь он сделал подшаг и наносит удар кинжалом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
-        else:
             hero.hero_health -= necro_student.attack
             print(f"{hp.START_TIRE}Вы взмахнули мечом, но не попали, так как Ученик-некроманта стоит вне досягаемости вашей атаки. В свою очередь он сделал подшаг и наносит удар кинжалом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
+
     elif action_hero == "а" and count_search == 3 and necro_student.distance == 1 and start_fight == 1:
-        if hero.count_crit_attack == 1:
-            necro_student.health -= hero.hero_attack * 2
-            necro_student.distance += 1
-            hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Взмахом заряженного меча вы поражаете Ученика-некроманта.{hp.RESET} Получив увечья он отшатнулся и сделал шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
-        else:
             necro_student.health -= hero.hero_attack
             necro_student.distance += 1
             print(f"{hp.START_TIRE}Взмахом меча вы поражаете Ученика-некроманта. Получив увечья он отшатнулся и сделал шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[necro_student])}")
@@ -655,7 +629,9 @@ count_dodge = 0
 count_dash = 0
 count_search = 0
 
-print(f"{hp.START_TIRE}(🪞) Двигаясь дальше вы замечаете стоящее волшебное зеркало. Вы раньше о нем слышали, зеркало позволяет менять золото на какие-либо предметы. Для покупки необходимо ввести - {hp.CYAN}купить а потом номер предмета{hp.RESET}.{hp.END_TIRE}")
+print(f"{hp.START_TIRE}(🪞) Двигаясь дальше вы замечаете стоящее волшебное зеркало.\n"
+      f" Вы раньше о нем слышали, зеркало позволяет менять золото на какие-либо предметы.\n"
+      f" Для покупки необходимо ввести - {hp.CYAN}купить а потом номер предмета{hp.RESET}.{hp.END_TIRE}")
 
 while hero.hero_health > 0:
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ")
@@ -665,7 +641,6 @@ while hero.hero_health > 0:
     hp.reset_all_help()  # сброс всех значений на False
     hp.help_states["help_three_room"] = True  # Включаем подсказки третьей комнаты
 
-    crit()
     hero.update_all()
 
     if pass_three_room:
@@ -801,17 +776,8 @@ while hero.hero_health > 0:
 
     # (3) Команда "а" и ее последствия
     elif action_hero == "а" and count_dash == 0:
-        if hero.count_crit_attack > 0:
-            hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы размахиваетесь заряженным.Заряд вы потратили.Ничего не присходит.{hp.RESET}{hp.END_TIRE}\n{hp.YELLOW}**********\nВаше здоровье: {hero.hero_health}|{hero.hero_max_health}\n**********{hp.RESET}")
-        else:
             print(f"{hp.START_TIRE}Вы размахиваетесь мечом.Ничего не происходит.{hp.END_TIRE}\n{hp.YELLOW}**********\nВаше здоровье: {hero.hero_health}|{hero.hero_max_health}\n**********{hp.RESET}")
     elif action_hero == "а" and count_dash == 1:
-        if hero.count_crit_attack > 0:
-            hero.count_crit_attack -= 1
-            hero.hero_health -= (hero.hero_attack * 2)
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы размахиваетесь заряженным мечом и бьете по зеркалу, половина меча исчезает в зеркале, ваше отражение делает тоже самое и вы чувствуете как ваш же меч вас ранит. Очень больно ранит.Даже есть вероятнось, что вы погибли от этого удара.{hp.RESET}{hp.END_TIRE}\n{hp.YELLOW}**********\nВаше здоровье: {hero.hero_health}|{hero.hero_max_health}\n**********{hp.RESET}")
-        else:
             hero.hero_health -= hero.hero_attack
             print(f"{hp.START_TIRE}Вы размахиваетесь мечом и бьете по зеркалу, половина меча исчезает в зеркале, ваше отражение делает тоже самое и вы чувствуете как ваш же меч вас ранит.{hp.END_TIRE}\n{hp.YELLOW}**********\nВаше здоровье: {hero.hero_health}|{hero.hero_max_health}\n**********{hp.RESET}")
 
@@ -850,7 +816,9 @@ split_health = range(1,10)#диапазон разделения субстан�
 defeat_of_sub = 0#счетчик поражения субстанции#
 sword_debuff = 3
 rifle_debuff = 5
-print(f"{hp.START_TIRE}Пройдя через зеркало вы оказались в зале какой-то древней цивилизации, впереди виднеется проход, арка которого украшена вырезанными неизвестными символами. Проход преграждает некая субстанция, собранная из множества тел. Услышав звук со стороны зеркала она медленно движется в вашу сторону.{hp.END_TIRE}")
+print(f"{hp.START_TIRE}Пройдя через зеркало вы оказались в зале какой-то древней цивилизации, впереди виднеется проход, арка которого украшена вырезанными неизвестными символами.\n"
+      f" Проход преграждает некая субстанция, собранная из множества тел.\n"
+      f" Услышав звук со стороны зеркала она медленно движется в вашу сторону.{hp.END_TIRE}")
 if flag_anti_mitoz == True:
 		sub.health = 28
 else:
@@ -1091,7 +1059,8 @@ while sub.health not in split_health:
 
 else:
     count_search = 0
-    print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Субстанция раздвоилась после вашей атаки.Теперь перед вами две субстанции поменьше.{hp.RESET}{hp.END_TIRE}")
+    print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Субстанция раздвоилась после вашей атаки.\n"
+          f"Теперь перед вами две субстанции поменьше.{hp.RESET}{hp.END_TIRE}")
 
 # (4) Вторая фаза сражения
 # [Здесь будет код второй фазы]
@@ -1375,7 +1344,14 @@ cast_spell_mimic_backpack = 0  # Подготовка призыва закли�
 mimic_backpack_spell_time = 0  # Время действия заклинания 'Голодный рюкзак' во второй фазе
 magic_field_var = 0  # переменная сообщающая о безопасности поля Некроманта
 
-print(f"{hp.START_TIRE}Вы двигаетесь по небольшому коридору, стены и потолок, которого украшены вырезанными неизвестными символами. Чем дальше вы проходите тем ярче они светятся фиолетовым светом.\nДойдя до конца вы оказываетесь в пыльном помещении в центре которого левитирует в воздухе тот ради которого вы проделали весь этот путь.Судя по всему {hp.PURPLE}Некромант{hp.RESET} снимает силовое поле, которое огораживает \u001b[30;1mтаинственную статую в черных доспехах{hp.RESET}. Он оборачивается на вас и приземляется на землю.Пора выполнить контракт, расправившись с {hp.PURPLE}Некромантом{hp.RESET}.{hp.END_TIRE}")
+print(f"{hp.START_TIRE}Вы двигаетесь по небольшому коридору, стены и потолок,\n"
+      f"которого украшены вырезанными неизвестными символами.\n"
+      f"Чем дальше вы проходите тем ярче они светятся фиолетовым светом.\n"
+      f"Дойдя до конца вы оказываетесь в пыльном помещении в центре которого левитирует в воздухе\n"
+      f"тот ради которого вы проделали весь этот путь.Судя по всему {hp.PURPLE}Некромант{hp.RESET} снимает силовое поле,\n"
+      f"которое огораживает {hp.PURPLE}таинственную статую в черных доспехах{hp.RESET}.\n"
+      f"Он оборачивается на вас и приземляется на землю.\n"
+      f"Пора выполнить контракт, расправившись с {hp.PURPLE}Некромантом{hp.RESET}.{hp.END_TIRE}")
 
 necromancer_taunts_after_push = [
     "Как далеко ты отлетел? Достаточно, чтобы понять своё ничтожество?",
@@ -1544,32 +1520,18 @@ while hero.hero_health > 0:
 
         # (5.1) Команда "а" и 'Отталкивающий удар некроманта'
         if action_hero == "а" and necromancer.distance == 1 and cast_punch < 9:
-            if hero.count_crit_attack > 0:
-                necromancer.health -= (hero.hero_attack * 2)
-                necromancer.distance += 1
-                hero.count_crit_attack -= 1
-                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Ударом,заряженного меча, вы наносите значительный урон Некроманту. Он делает шаг назад и готовится сделать удар с выпадом.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            elif hero.count_crit_attack <= 0:
-                necromancer.health -= hero.hero_attack
-                necromancer.distance += 1
-                print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад и готовится сделать удар с выпадом.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")  # удар с выпадом
+            necromancer.health -= hero.hero_attack
+            necromancer.distance += 1
+            print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад и готовится сделать удар с выпадом.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")  # удар с выпадом
         elif action_hero == "а" and necromancer.distance == 2:
             hero.hero_health -= necromancer.attack
             print(f"{hp.START_TIRE}Сделав удар мечом вы рассекаете воздух.Некромант делает удар с выпадом и отходит назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")  # удар с выпадом
         elif action_hero == "а" and necromancer.distance == 1 and cast_punch != 14 and ready_punch == 0:
-            if hero.count_crit_attack > 0:
-                necromancer.health -= hero.hero_attack * 2
-                necromancer.distance += 1
-                hero.count_crit_attack -= 1
-                cast_punch = 0  # сброс подготовки удара Некроманта
-                ready_punch = 0  # сброс подготовки удара Некроманта
-                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Заряженным мечом вы поражаете {hp.PURPLE}Некроманта{hp.RESET} и он перестал заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            else:
-                necromancer.health -= hero.hero_attack
-                necromancer.distance += 1
-                cast_punch = 0  # сброс подготовки удара Некроманта
-                ready_punch = 0  # сброс подготовки удара Некроманта
-                print(f"{hp.START_TIRE}Мечом вы поражаете {hp.PURPLE}Некроманта{hp.RESET} и он перестал заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            necromancer.health -= hero.hero_attack
+            necromancer.distance += 1
+            cast_punch = 0  # сброс подготовки удара Некроманта
+            ready_punch = 0  # сброс подготовки удара Некроманта
+            print(f"{hp.START_TIRE}Мечом вы поражаете {hp.PURPLE}Некроманта{hp.RESET} и он перестал заряжать {hp.PURPLE}'Отталкивающий удар'{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "а" and necromancer.distance == 1 and ready_punch == 2:
             necromancer.distance += 3
             hero.hero_health -= 2
@@ -1737,8 +1699,6 @@ while hero.hero_health > 0:
     try:
         if pass_five_room_phase_two:
             break
-        # (5.2) hero.count_crit_attack
-        crit()
         action_hero = ask_for_action_hero()
         timeout_message()
         if action_hero is None:
@@ -1758,7 +1718,11 @@ while hero.hero_health > 0:
             necromancer.distance += 1
             hero.hero_bullet += 2
             hero.hero_potion_of_regen_hp += 1
-            print(f"{hp.START_TIRE}{hp.PURPLE}(*) Изувеченный Некромант еле отходит от вас.Куски плоти свисают с его лица оголяя череп. Глаза его горят синим пламенем.\nНекромант - 'Ты достойный противник, но ты все равно пополнишь мою армию.Готовься к смерти жалкий человечишка!'{hp.RESET}\n{hp.YELLOW_STAR_START} + 2 Пули\n + 1 Зелье регенерации здоровья{hp.YELLOW_STAR_END}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}{hp.PURPLE}(*) Изувеченный Некромант еле отходит от вас.\n"
+                  f"Куски плоти свисают с его лица оголяя череп. Глаза его горят синим пламенем.\n"
+                  f"Некромант - 'Ты достойный противник, но ты все равно пополнишь мою армию.Готовься к смерти жалкий человечишка!'{hp.RESET}\n"
+                  f"{hp.YELLOW_STAR_START} + 2 Пули\n"
+                  f" + 1 Зелье регенерации здоровья{hp.YELLOW_STAR_END}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
             break
 
         # (5.2) Код отвечающий за работу снаряда Некроманта в 2-ой фазе:
@@ -1861,24 +1825,13 @@ while hero.hero_health > 0:
 
         # (5.2) Команда "а".
         if action_hero == "а" and necromancer.distance == 1:  # Если дистанция 1
-            if hero.count_crit_attack > 0:
-                necromancer.health -= (hero.hero_attack * 2)
-                necromancer.distance += 1
-                hero.count_crit_attack -= 1
-                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Ударом,заряженного меча, вы наносите значительный урон Некроманту. Он делает шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            elif hero.count_crit_attack <= 0:
-                necromancer.health -= hero.hero_attack
-                necromancer.distance += 1
-                print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            necromancer.health -= hero.hero_attack
+            necromancer.distance += 1
+            print(f"{hp.START_TIRE}Ударом меча вы наносите урон {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif action_hero == "а" and necromancer.distance > 1:  # Если дистанция больше 1
-            if hero.count_crit_attack > 0:
-                necromancer.distance += 1
-                hero.count_crit_attack -= 1
-                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Заряженным мечом вы промахиваетесь по {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-            else:
-                necromancer.health -= hero.hero_attack
-                necromancer.distance += 1
-                print(f"{hp.START_TIRE}Мечом вы промахиваетесь по {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            necromancer.health -= hero.hero_attack
+            necromancer.distance += 1
+            print(f"{hp.START_TIRE}Мечом вы промахиваетесь по {hp.PURPLE}Некроманту{hp.RESET}. Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 
         # (5.2) Команда "н" и специальная атака
         elif cast_special_attack == 5 and ready_special_attack == 1 and special_attack_distance == 0 and change_of_attacks == False:
@@ -2000,8 +1953,6 @@ special = False #Переменная спец-удара для каждого 
 axe_swing = 0#Замах топором(подготовка удара)
 input_active = False
 #(5.3)Функции смены оружия третьей фазы
-#(5.3)hero.count_crit_attack
-crit()
 def shield_and_sword():
 	global action_hero,special
 #(5.3) Оружие "Щит и меч"
@@ -2015,25 +1966,13 @@ def shield_and_sword():
 			hero.hero_health -= necromancer.attack
 			print(f"{hp.START_TIRE}(🛡️🗡️) Своим ударом вы попадаете по тяжелому щиту Некроманта не нанося ему урон, он бьет вас мечом.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance == 1 and special == True:
-		if hero.count_crit_attack > 0:
-			necromancer.health -= hero.hero_attack*2
-			necromancer.distance += 1
-			special = not special
-			hero.count_crit_attack -= 1
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Заряженным мечом вы попадаете в бок Некроманта нанося ему урон.Он делает шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			necromancer.health -= hero.hero_attack
-			necromancer.distance += 1
-			special = not special
-			print(f"{hp.START_TIRE}(🛡️🗡️) Ударив мечом в бок Некроманта вы наносите ему урон.Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		necromancer.health -= hero.hero_attack
+		necromancer.distance += 1
+		special = not special
+		print(f"{hp.START_TIRE}(🛡️🗡️) Ударив мечом в бок Некроманта вы наносите ему урон.Он делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance > 1 and special == False:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			special = not special
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Сделав замах заряженным мечом вы рассекли воздух.Некромант открывшись наносит удар мечом, не попадая по вам.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			special = not special
-			print(f"{hp.START_TIRE}(🛡️🗡️) Сделав замах ваш клинок рассек воздух.Некромант открывшись наносит удар мечом, не попадая по вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		special = not special
+		print(f"{hp.START_TIRE}(🛡️🗡️) Сделав замах ваш клинок рассек воздух.Некромант открывшись наносит удар мечом, не попадая по вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 #(5.3)shield_and_sword() команда "н"
 	elif action_hero == "н":
 		necromancer.distance += 1
@@ -2102,47 +2041,21 @@ def trident():
 	global action_hero,special
 #(5.3)trident() команда "а"
 	if action_hero == "а" and necromancer.distance == 3:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			hero.hero_health -= necromancer.attack
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Сделав замах заряженным мечом вы рассекли воздух.Некромант наносит удар трезубцем.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			hero.hero_health -= necromancer.attack
-			print(f"{hp.START_TIRE}(🔱) Своим трезубцем Некромант поражает вас.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		hero.hero_health -= necromancer.attack
+		print(f"{hp.START_TIRE}(🔱) Своим трезубцем Некромант поражает вас.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance == 2:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			necromancer.distance += 1
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Сделав замах заряженным мечом вы рассекли воздух.Некромант делает шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			necromancer.distance += 1
-			print(f"{hp.START_TIRE}(🔱) Сделав удар мечом вы рассекаете воздух.Некромант делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		necromancer.distance += 1
+		print(f"{hp.START_TIRE}(🔱) Сделав удар мечом вы рассекаете воздух.Некромант делает шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance == 1 and special == False:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			necromancer.health -= hero.hero_attack*2
-			special = not special
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Ударом заряженного меча вы наносите Некроманту урон. Он перехватил трезубец по другому.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			necromancer.health -= hero.hero_attack
-			special = not special
-			print(f"{hp.START_TIRE}(🔱) Сделав удар мечом вы поражаете Некроманта.Он перехватил трезубец по другому.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		necromancer.health -= hero.hero_attack
+		special = not special
+		print(f"{hp.START_TIRE}(🔱) Сделав удар мечом вы поражаете Некроманта.Он перехватил трезубец по другому.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance == 1 and special == True:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			necromancer.distance += 2
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Ваш заряженный удар мечом Некромант парирует, отталкивая вас и при этом сделав шаг назад.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			necromancer.distance += 2
-			print(f"{hp.START_TIRE}(🔱) Ваш удар мечом Некромант парирует, отталкивая вас и при этом сделав шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		necromancer.distance += 2
+		print(f"{hp.START_TIRE}(🔱) Ваш удар мечом Некромант парирует, отталкивая вас и при этом сделав шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance > 3:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			necromancer.distance -= 1
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Вы рассекаете воздух заряженным мечом.Некромант подходит ближе.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			necromancer.distance -= 1
-			print(f"{hp.START_TIRE}(🔱) Вы рассекаете воздух мечом. Некромант подходит ближе.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		necromancer.distance -= 1
+		print(f"{hp.START_TIRE}(🔱) Вы рассекаете воздух мечом. Некромант подходит ближе.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 #(5.3)trident()Команда "в"
 	elif action_hero == "в" and necromancer.distance == 1 and special == False:
 		special = not special
@@ -2272,25 +2185,13 @@ def axe():
 		special = not special
 		print(f"{hp.START_TIRE}(🪓) Попытавшись увернуться вы все равно получаете значительный урон от кругового удара.Вас откидывает. Топор становится прежним.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance == 1 and special == False and axe_swing == 0:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			necromancer.health -= hero.hero_attack*2
-			axe_swing = 1
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Вы наносите урон Некроманту заряженным мечом.Топор он все еще держит над головой.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			necromancer.health -= hero.hero_attack
-			axe_swing = 1
-			print(f"{hp.START_TIRE}(🪓) Вы наносите урон Некроманту.Топор он все еще держит над головой.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		necromancer.health -= hero.hero_attack
+		axe_swing = 1
+		print(f"{hp.START_TIRE}(🪓) Вы наносите урон Некроманту.Топор он все еще держит над головой.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif action_hero == "а" and necromancer.distance == 1 and special == True and axe_swing == 0:
-		if hero.count_crit_attack > 0:
-			hero.count_crit_attack -= 1
-			necromancer.health -= hero.hero_attack*2
-			axe_swing = 1
-			print(f"{hp.START_TIRE}(🗡️) {hp.CYAN_BOLD}Вы наносите урон Некроманту заряженным мечом.Заряженный топор он все еще держит от бедра.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-		else:
-			necromancer.health -= hero.hero_attack
-			axe_swing = 1
-			print(f"{hp.START_TIRE}(🪓) Вы наносите урон Некроманту.Заряженный топор он все еще держит от бедра.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+		necromancer.health -= hero.hero_attack
+		axe_swing = 1
+		print(f"{hp.START_TIRE}(🪓) Вы наносите урон Некроманту.Заряженный топор он все еще держит от бедра.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 	elif necromancer.distance == 1 and special == False and axe_swing == 0:
 		axe_swing = 1
 		print(f"{hp.START_TIRE}(🪓) Некромант делает замах двуручным топором.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
@@ -2407,7 +2308,9 @@ while hero.hero_health > 0:
             continue
         if necromancer.health <= 0:
             flag_winner = True
-            print(f"{hp.START_TIRE}{hp.GREEN}(*) С последним ударом вашего клинка тело Некроманта обмякло на полу. С исчезновением тёмной магии, мертвецы вокруг рухнули на землю, обратившись в прах. Подойдя к статуи в темных доспехах вы касаетесь пальцами постамента. В глазах засияло, а потом все погрузилось в мрак...{hp.RESET}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}{hp.GREEN}(*) С последним ударом вашего клинка тело Некроманта обмякло на полу.\n"
+                  f"С исчезновением тёмной магии, мертвецы вокруг рухнули на землю, обратившись в прах.\n"
+                  f" Подойдя к статуи в темных доспехах вы касаетесь пальцами постамента. В глазах засияло, а потом все погрузилось в мрак...{hp.RESET}{hp.END_TIRE}")
             if flag_winner:
                 achievements_system.add_killed_monster("Некромант 3-ая фаза", 2)
                 achievements_system.add_completed_location("(7)  Орда мертвых и  полумертвый Некромант", 2)
