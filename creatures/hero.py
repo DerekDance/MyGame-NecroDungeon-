@@ -19,38 +19,38 @@ class Hero:
         self.hero_potion_of_regen_hp = 999
         self.count_crit_attack  = 0 # НЕ НУЖНЫЙ ПАРАМЕТР
         self.hero_scroll_of_sparks = 0
-        self.hero_bullet = 3
+        self.hero_bullet = 999
         self.bullet_of_sparks = 0
         self.damage_bullet_of_sparks = 12
         self.modifiers = [ ] #Список модификаторов Героя
 
-    #Проверка модификатора героя
+    # Проверка
     def has_active_modifier(self, modifier_name):
-        """Проверяет, есть ли активный модификатор с указанным именем"""
-        for existing in self.modifiers:
-            if existing.name == modifier_name and existing.active:
+        for i, existing in enumerate(self.modifiers):
+            if existing.display_name == modifier_name and existing.active:
                 return True, existing
         return False, None
 
-    # Добавление модификатора героя
+    # Добавление модификатора
     def add_modifier(self, modifier):
-        # Используем вспомогательный метод
-        has_active, existing_mod = self.has_active_modifier(modifier.name)
+        has_active, existing_mod = self.has_active_modifier(modifier.display_name)
 
         if has_active:
-            # Можно показать информацию о существующем
             print(f"{hp.YELLOW}Эффект Героя:'{modifier.display_name}' уже активен!{hp.RESET}")
             return False
 
-
-
-
-        # Добавляем
-        modifier.target = self
         self.modifiers.append(modifier)
-        modifier.activate()
+        print(f"{hp.GREEN}Герой использовал: '{modifier.display_name}'!{hp.RESET}")
         return True
 
+
+        # АКТИВИРУЕМ модификатор, если он поддерживает активацию
+        if hasattr(modifier, 'activate'):
+            modifier.activate()
+
+
+
+        return True
     #Обновление модификатора героя
     def update_all(self):
         for modifier in self.modifiers[:]:

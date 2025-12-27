@@ -10,14 +10,16 @@ hp = HelpSystem()
 
 
 class Modifier:
-    def __init__(self, name, duration, step, target, start_info_msg=None):
+    def __init__(self, name, duration, step, target, start_info_msg=None, end_info_msg=None, display_name = None):
         self.name = name  # Техническое имя (для проверок)
-        self.start_info_msg = start_info_msg # Дополнительное сообщение
+        self.start_info_msg = start_info_msg # Дополнительное сообщение(начальное)
+        self.end_info_msg = end_info_msg  # Дополнительное сообщение(начальное)
+        self.display_name = display_name or name
         self.duration = duration  # Общая длительность действия
         self.remaining_duration = duration  # Оставшееся время (изначально равно duration)
         self.target = target  # Ссылка на существо, на которое действует модификатор
         self.step = step  # Шаг, который используется в методе update()
-        self.active = False  # Флаг активности (False = не действует)
+        self.active = True  # Флаг активности (действует)
         self.step_counter = 0  # Счетчик текущего шага
 
     def update(self):
@@ -57,10 +59,10 @@ class Modifier:
 
 # Модификатор регенерации здоровья
 class RegenHP(Modifier):
-    def __init__(self, target, duration, step, heal_power, show_message=False):
+    def __init__(self, target, duration, step, heal_power, show_message=False,display_name=None):
         if not hasattr(target, "health") and not hasattr(target, "hero_health"):
             raise ValueError(f"Цель {target} не имеет атрибутов здоровья!")
-        super().__init__("RegenHP", duration, step, target)
+        super().__init__("RegenHP", duration, step, target,display_name)
         self.heal_power = heal_power
         self.show_message = show_message
 
@@ -72,7 +74,8 @@ class RegenHP(Modifier):
         elif hasattr(self.target, "hero_health") and hasattr(self.target, "hero_max_health"):
             return "hero_health", "hero_max_health"
         else:
-            return None, None
+            # Если ничего не найдено — лучше вызвать ошибку явно
+            raise AttributeError(f"Цель не имеет атрибута атаки !")
 
     # Применение регенерации
     def apply_effect(self):
@@ -130,7 +133,7 @@ class DamageModifier(Modifier):
     # Допустимые операции
     VALID_OPERATIONS = {"+", "-", "*", "/"}
 
-    def __init__(self, target, duration, value,operation_type,attack_type,start_info_msg):
+    def __init__(self, target, duration, value,operation_type,attack_type,start_info_msg, end_info_msg, display_name):
         # Проверяем операцию
         operation_type = operation_type.lower()
         if operation_type not in self.VALID_OPERATIONS:
@@ -139,7 +142,7 @@ class DamageModifier(Modifier):
             # Проверяем значение
         self._validate_value(operation_type, value)
 
-        super().__init__("DamageModifier", duration, 1, target, start_info_msg)
+        super().__init__("DamageModifier", duration, 1, target, start_info_msg, end_info_msg,display_name)
         self.value = value
         self.original_attack = None
         self.operation_type = operation_type #Параметр выбора математической операции для модификатора
@@ -159,7 +162,6 @@ class DamageModifier(Modifier):
     def activate(self):
         #Защита от повторного применения
         if self.active:
-            print("Уже активен!")
             return
 
         attack_attr = self.get_attack_attr_names()
@@ -197,9 +199,9 @@ class DamageModifier(Modifier):
         setattr(self.target, attack_attr, new_attack)
         # Получаем имя для форматирования
         target_name = getattr(self.target, "name", "Неизвестный")
-        print(f"{self.start_info_msg}\n"
+        print(f"{hp.START_TIRE}{self.start_info_msg}\n"
               f"-  Урон '{target_name}' = {current_attack:.1f} → {new_attack:.1f}\n"
-              f"-  Урон '{current_attack:.1f} {self.operation_type} {self.value}' на {self.duration} шага(ов){hp.RESET}")
+              f"-  Урон '{current_attack:.1f} {self.operation_type} {self.value}' на {self.duration} шага(ов){hp.RESET}{hp.END_TIRE}")
         #Вызывается родительский activate. self.active устанавливает True
         super().activate()
 
@@ -240,7 +242,7 @@ class DamageModifier(Modifier):
         if is_finished:
             # Сообщение ТОЛЬКО когда модификатор завершился
             target_name = getattr(self.target, "name", "Неизвестный")
-            print(f"(🗡️){hp.CYAN_BOLD} Эффект усиления {target_name} закончился{hp.RESET}")
+            print(f"{self.end_info_msg} {target_name} закончился{hp.RESET}")
 
         return is_finished
 
