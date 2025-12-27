@@ -43,7 +43,9 @@ class InventorySystem:
                     value=1.5,
                     operation_type = "*",
                     attack_type = "melee",
-                    start_info_msg = f"{hp.CYAN_BOLD}(🗡️) Использовано Зелье силы"
+                    start_info_msg = f"{hp.CYAN_BOLD}(🗡️) Использовано Зелье силы",
+                    end_info_msg = f"(🗡️){hp.CYAN_BOLD} Эффект усиления от Зелья силы",
+                    display_name = "Зелье силы"
                 )
 
                 if hero.add_modifier(multiplier):  # Проверяем успех добавления
