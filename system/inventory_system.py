@@ -43,7 +43,9 @@ class InventorySystem:
                     value=1.5,
                     operation_type = "*",
                     attack_type = "melee",
-                    start_info_msg = f"{hp.CYAN_BOLD}(🗡️) Использовано Зелье силы"
+                    start_info_msg = f"{hp.CYAN_BOLD}(🗡️) Использовано Зелье силы",
+                    show_message=True,
+                    display_name = 'Зелье силы'
                 )
 
                 if hero.add_modifier(multiplier):  # Проверяем успех добавления
@@ -79,7 +81,8 @@ class InventorySystem:
                     duration=3,
                     step=3,
                     heal_power=1,
-                    show_message=True
+                    show_message=True,
+                    display_name='Зелье регенерации здоровья'
                 )
                 if hero.add_modifier(potion_regen_hp):
                     hero.hero_potion_of_regen_hp -= 1

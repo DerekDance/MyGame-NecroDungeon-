@@ -10,8 +10,7 @@ hp = HelpSystem()
 
 
 class Modifier:
-    def __init__(self, name, duration, step, target, start_info_msg=None):
-        self.name = name  # Техническое имя (для проверок)
+    def __init__(self, name, duration, step, target, start_info_msg=None,show_message = False,display_name = None):
         self.start_info_msg = start_info_msg # Дополнительное сообщение
         self.duration = duration  # Общая длительность действия
         self.remaining_duration = duration  # Оставшееся время (изначально равно duration)
@@ -19,6 +18,9 @@ class Modifier:
         self.step = step  # Шаг, который используется в методе update()
         self.active = False  # Флаг активности (False = не действует)
         self.step_counter = 0  # Счетчик текущего шага
+        self.show_message = show_message
+        self.display_name = display_name or name
+        self.name = name if name is not None else display_name# Техническое имя (для проверок)
 
     def update(self):
         """
@@ -57,12 +59,13 @@ class Modifier:
 
 # Модификатор регенерации здоровья
 class RegenHP(Modifier):
-    def __init__(self, target, duration, step, heal_power, show_message=False):
+    def __init__(self, target, duration, step, heal_power, show_message=False,display_name = None):
         if not hasattr(target, "health") and not hasattr(target, "hero_health"):
             raise ValueError(f"Цель {target} не имеет атрибутов здоровья!")
         super().__init__("RegenHP", duration, step, target)
         self.heal_power = heal_power
         self.show_message = show_message
+        self.display_name = display_name
 
     # Получить имена цели
     def get_health_attr_names(self):
@@ -130,7 +133,7 @@ class DamageModifier(Modifier):
     # Допустимые операции
     VALID_OPERATIONS = {"+", "-", "*", "/"}
 
-    def __init__(self, target, duration, value,operation_type,attack_type,start_info_msg):
+    def __init__(self, target, duration, value,operation_type,attack_type,start_info_msg,show_message,display_name):
         # Проверяем операцию
         operation_type = operation_type.lower()
         if operation_type not in self.VALID_OPERATIONS:
@@ -144,6 +147,8 @@ class DamageModifier(Modifier):
         self.original_attack = None
         self.operation_type = operation_type #Параметр выбора математической операции для модификатора
         self.attack_type = attack_type #Тип атаки
+        self.show_message = show_message
+        self.display_name = display_name
 
     # Функция проверки значений
     def _validate_value(self, operation_type, value):
@@ -240,7 +245,7 @@ class DamageModifier(Modifier):
         if is_finished:
             # Сообщение ТОЛЬКО когда модификатор завершился
             target_name = getattr(self.target, "name", "Неизвестный")
-            print(f"(🗡️){hp.CYAN_BOLD} Эффект усиления {target_name} закончился{hp.RESET}")
+            print(f"{self.start_info_msg} {target_name} закончился{hp.RESET}")
 
         return is_finished
 

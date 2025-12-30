@@ -1,4 +1,4 @@
-from .modifiers import RegenHP,DamageModifier
+from .modifiers import RegenHP,DamageModifier,Modifier
 from .hero import Hero
 from .enemy import (
     Enemy,

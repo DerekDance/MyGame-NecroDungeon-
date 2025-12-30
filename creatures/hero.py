@@ -2,7 +2,6 @@ from system import HelpSystem
 
 # Для использования форматирования строк
 hp = HelpSystem()
-
 """
 Класс Героя
 """
@@ -18,18 +17,26 @@ class Hero:
         self.hero_potion_heal = 0
         self.hero_potion_of_regen_hp = 999
         self.count_crit_attack  = 0 # НЕ НУЖНЫЙ ПАРАМЕТР
-        self.hero_scroll_of_sparks = 0
+        self.hero_scroll_of_sparks = 999
         self.hero_bullet = 3
         self.bullet_of_sparks = 0
         self.damage_bullet_of_sparks = 12
         self.modifiers = [ ] #Список модификаторов Героя
 
     #Проверка модификатора героя
+    # def has_active_modifier(self, modifier_name):
+    #     for mod in self.modifiers:
+    #         if mod.duration > 0 and (
+    #                 getattr(mod, 'name', None) == modifier_name or
+    #                 getattr(mod, 'display_name', None) == modifier_name
+    #         ):
+    #             return True, mod
+    #     return False, None
+
     def has_active_modifier(self, modifier_name):
-        """Проверяет, есть ли активный модификатор с указанным именем"""
-        for existing in self.modifiers:
-            if existing.name == modifier_name and existing.active:
-                return True, existing
+        for mod in self.modifiers:
+            if mod.duration > 0 and getattr(mod, 'display_name', None) == modifier_name:
+                return True, mod
         return False, None
 
     # Добавление модификатора героя
@@ -39,12 +46,11 @@ class Hero:
 
         if has_active:
             # Можно показать информацию о существующем
-            print(f"{hp.YELLOW}Эффект Героя:'{modifier.display_name}' уже активен!{hp.RESET}")
-            return False
-
-
-
-
+            if modifier.show_message:
+                print(f"{hp.YELLOW}Эффект Героя:'{modifier.display_name}' уже активен!{hp.RESET}")
+                return False
+            else:
+                return False
         # Добавляем
         modifier.target = self
         self.modifiers.append(modifier)

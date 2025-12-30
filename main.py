@@ -38,10 +38,10 @@ list_of_command =["в","н","а","р","п","у","о","с"]
 hero_choice = ""
 
 #Пропуск комнат для их тестирования по отдельности. Значение True, чтобы пропустить комнату, False - не пропускать.
-pass_null_room = False
-pass_first_room = False
-pass_second_room = False
-pass_three_room = False
+pass_null_room = True
+pass_first_room = True
+pass_second_room = True
+pass_three_room = True
 pass_four_room_phase_one = False
 pass_four_room_phase_two = False
 pass_five_room_phase_one = False
@@ -810,176 +810,170 @@ else:
 """(4) Древний зал: Субстанция"""
 
 lock_backpack = False #заблокированный рюкзак героя
-sub_init = False #инициатива Субстанции переходит к ней после вашего удара
-split_msg = 0# сообщение о скором разделении
+split_msg = False# сообщение о скором разделении
 split_health = range(1,10)#диапазон разделения субстанции
 defeat_of_sub = 0#счетчик поражения субстанции#
-sword_debuff = 3
-rifle_debuff = 5
+
+
 print(f"{hp.START_TIRE}Пройдя через зеркало вы оказались в зале какой-то древней цивилизации, впереди виднеется проход, арка которого украшена вырезанными неизвестными символами.\n"
       f" Проход преграждает некая субстанция, собранная из множества тел.\n"
       f" Услышав звук со стороны зеркала она медленно движется в вашу сторону.{hp.END_TIRE}")
+
 if flag_anti_mitoz == True:
 		sub.health = 28
 else:
 		sub.health = 30
 
-# (4) Бой с единственной субстанцией
+# (4.1) Бой с единственной субстанцией
 while sub.health not in split_health:
     sub.update_all()
     hero.update_all()
+    print(f"DEBUG:hero.modifiers = {[m.display_name for m in hero.modifiers]}")
+
+    # Проверяем, есть ли у героя активные дебаффы
+    has_sword, _ = hero.has_active_modifier('Облепленный клинок')
+    has_rifle, _ = hero.has_active_modifier('Загрязненный ствол')
 
     if pass_four_room_phase_one:
         break
 
-    # (4) Подсказки соратника
+    # (4.1) Подсказки соратника
     hp.reset_all_help()  # сброс всех значений на False
     hp.help_states["help_fourth_room_phase_one"] = True  # Включаем подсказки четвертой комнаты (первая фаза)
 
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
     print("\n\n\n\n\n\n")
 
-    # #########
-    # (4.1) Для меча дебафф
-    if cast_spell == 1 and time_action_hero_spell == 0:
-        time_action_hero_spell = 3  # Время действия дебаффа "Скользкий клинок"
-        cast_spell = 2
-        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После удара вас заляпало слизью субстанции.Ваш клинок стал скользким от налипшей массы на него. Следующие {time_action_hero_spell} хода вы будете наносить урон со штрафом.{hp.RESET}{hp.END_TIRE}")
-    elif cast_spell == 2 and time_action_hero_spell == 0:
-        cast_spell = 0
-        lock_backpack = True
-        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Действие дебаффа 'Скользкий клинок' закончилось.{hp.RESET}{hp.END_TIRE}")
-    elif cast_spell == 2 and time_action_hero_spell != 0:
-        time_action_hero_spell -= 1  # Отнимаем по единице пока не достигнем нуля
-
-    # (4.1) Для ружья дебафф
-    elif cast_spell == 4 and time_action_hero_spell == 0:
-        hero.hero_range_attack += 5
-        cast_spell = 0
-        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Действие дебаффа 'Загрязнение ствола' закончилось.{hp.RESET}{hp.END_TIRE}")
-    elif cast_spell == 3 and time_action_hero_spell == 0:
-        time_action_hero_spell = 3  # Время действия дебаффа "Загрязнение ствола"
-        cast_spell = 4
-        lock_backpack = True
-        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После вашего выстрела субстанция плюнула в вашу сторону сгустком массы. Вы увернулись, но ваше ружье задело.Дуло ружья загрязнено налипшей слизью. Следующие {time_action_hero_spell} хода вы будете наносить урон со штрафом.{hp.RESET}{hp.END_TIRE}")
-    elif cast_spell == 4 and time_action_hero_spell != 0:
-        time_action_hero_spell -= 1  # Отнимаем по единице пока не достигнем нуля
-
-    # ########
-    # (4) hero.count_crit_attack
-    crit()
     if count_dash == 3:
         count_search = 0
         fast_as_hermes += 1  # не стандартный выход из комнаты
         achievements_system.add_completed_location("(4) Древний зал", 2)
-        print(f"{hp.START_TIRE}(⚡) {hp.YELLOW_BOLD} Вам удалось пройти через арку в следующее помещение.{hp.RESET}{hp.END_TIRE}")
+        print(
+            f"{hp.START_TIRE}(⚡) {hp.YELLOW_BOLD} Вам удалось пройти через арку в следующее помещение.{hp.RESET}{hp.END_TIRE}")
         break
     if sub.health <= 0:
         defeat_of_sub += 1
         count_search = 0
         hero.hero_bullet += 2
-        achievements_system.add_killed_monster("Субстанция",2)
+        achievements_system.add_killed_monster("Субстанция", 2)
         achievements_system.add_completed_location("(4) Древний зал", 2)
         achievements_system.add_achievement(achievements_system.character_data, "ANTI_MITOZ", 3)
-        print(f"{hp.START_TIRE}{hp.GREEN}(*) Субстанция на ваших глазах распадается и исчезает вместе с темной магией.\n{hp.RESET}\n(🎖) Получено достижение {hp.CYAN}'Анти-митоз'{hp.RESET}.Введите в следующей игре {hp.CYAN}'антиделение'{hp.RESET},чтобы получить награду.\n{hp.YELLOW_STAR_START} + 2 Пули{hp.YELLOW_STAR_END}{hp.END_TIRE}")
+        print(
+            f"{hp.START_TIRE}{hp.GREEN}(*) Субстанция на ваших глазах распадается и исчезает вместе с темной магией.\n{hp.RESET}\n(🎖) Получено достижение {hp.CYAN}'Анти-митоз'{hp.RESET}.Введите в следующей игре {hp.CYAN}'антиделение'{hp.RESET},чтобы получить награду.\n{hp.YELLOW_STAR_START} + 2 Пули{hp.YELLOW_STAR_END}{hp.END_TIRE}")
         break
     elif hero.hero_health <= 0:
         print(f"{hp.START_TIRE}☠️Вы погибли.Вас поглотила субстанция.{hp.END_TIRE}")
         sys.exit()
 
-    # (4) Предупреждение о скором разделении
-    elif sub.health < 16 and split_msg == 0:
-        split_msg += 1
+        # (4.1) Предупреждение о скором разделении
+    elif sub.health < 16 and split_msg == False:
+        split_msg = True
         print(f"{hp.START_TIRE}Создается впечатление, что субстанция хочет разделиться...{hp.END_TIRE}")
 
-    # (4) Команда "а"
-    elif action_hero == "а" and cast_spell == 2 and sub.distance == 1 and sub_init == False:  # команда "а" с действующим дебаффом.
-        if hero.count_crit_attack > 0:
-            sub_init = not sub_init
-            sub.health -= (hero.hero_attack * 2) - sword_debuff
-            hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию заряженным мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона и скорей всего зря потратили зелье силы.Субстанция задрожала от недовольства.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-        else:
-            sub_init = not sub_init
-            sub.health -= (hero.hero_attack - sword_debuff)
-            hero.hero_health -= sub.attack
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
 
-    # если инициатива у Субстанции
-    elif action_hero == "а" and cast_spell == 2 and sub.distance == 1 and sub_init == True:  # команда "а" с действующим дебаффом.
-        count_dash = 0
-        if hero.count_crit_attack > 0:
-            sub.health -= (hero.hero_attack * 2) - sword_debuff
-            hero.hero_health -= sub.attack
-            hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию заряженным мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона и скорей всего зря потратили зелье силы.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-        else:
-            sub.health -= (hero.hero_attack - sword_debuff)
-            hero.hero_health -= sub.attack
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона.Она в свою очередь бьет вас.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+    # (4.1) Дебафф на атаку мечом 'Облепленный клинок'
+    if action_hero == "а":
+        lock_backpack = True # Закрываем рюкзак
+        count_dash = 0 # Сбрасываем счетчик "побега" после любой попытки нанести урон Субстанции
+        if sub.distance == 1:
+            if has_sword:
+                sub.health -= hero.hero_attack
+                hero.hero_health -= sub.attack
+                print(
+                    f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Вы поражаете субстанцию мечом, но из-за действующего дебаффа вы нанесли ничтожно мало урона."
+                    f"Она в свою очередь бьет вас.{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.END_TIRE}")
 
-    # инициатива героя
-    elif action_hero == "а" and sub.distance == 1 and sub_init == False:
-        count_dash = 0
-        if hero.count_crit_attack > 0:
-            sub_init = not sub_init
-            cast_spell = 1  # Начало действия дебаффа "Скользкий клинок"
-            sub.health -= hero.hero_attack * 2
-            hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы поражаете субстанцию заряженным мечом, из нее выпадают куски массы в разные стороны.Субстанция задрожала от недовольства.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}\n{hp.PURPLE_BOLD}{hp.RESET}")
-        else:
-            sub_init = not sub_init
-            cast_spell = 1  # Начало действия дебаффа "Скользкий клинок"
-            sub.health -= hero.hero_attack
-            print(f"{hp.START_TIRE} Вы поражаете субстанцию мечом, из нее выпадают куски массы во все стороны.Субстанция задрожала от недовольства.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.RESET}")
-    elif action_hero == "а" and sub.distance != 1:
-        if hero.count_crit_attack > 0:
-            hero.count_crit_attack -= 1
-            sub.distance -= 1
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы взмахнули заряженным мечом.Заряд на мече пропал.Субстанция подползает ближе.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.RESET}")
+            elif has_rifle:
+                sub.health -= hero.hero_attack
+                print(f"{hp.START_TIRE}Вы поражаете субстанцию мечом, из нее выпадают куски массы во все стороны."
+                      f"{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.RESET}")
+
+            # Нет никаких дебаффов → наносим урон и накладываем дебафф меча
+            else:
+                sub.health -= hero.hero_attack
+                sub_debuff = DamageModifier(
+                    target=hero,
+                    duration=6,
+                    value=3,
+                    operation_type="-",
+                    attack_type="melee",
+                    start_info_msg=f"{hp.START_TIRE}{hp.GREEN_BOLD}(🦠) Дебафф 'Облепленный клинок' на",
+                    show_message=False,
+                    display_name='Облепленный клинок'
+                )
+
+                hero.add_modifier(sub_debuff)
+                print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После удара вас заляпало слизью субстанции."
+                      f"Ваша атака в ближнем бою уменьшена! {hp.RESET}")
+                print(
+                    f"{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.END_TIRE}")
         else:
             sub.distance -= 1
-            print(f"{hp.START_TIRE}Вы взмахнули мечом.Субстанция подползает ближе.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}Вы просто рассекаете воздух мечом.Субстанция подползает ближе.{hp.RESET}{hp.END_TIRE}")
+            print(
+                f"{hp.START_TIRE}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.END_TIRE}")
 
-    # (4) Команда "с" с использованием свитка искр
-    elif action_hero == "искры" and hero.bullet_of_sparks >= 1:
-        if sub.distance == 1 and cast_spell == 4:
-            sub.health -= (hero.damage_bullet_of_sparks - 5)
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести максимальный урон .Сноп искр озаряет помещение.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
-        elif sub.distance == 2 and cast_spell == 4:
-            sub.health -= (hero.damage_bullet_of_sparks // 2) - 5
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести минимальный урон .Сноп искр немного осветил помещение.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-        elif sub.distance > 2 and cast_spell == 4:
-            hero.bullet_of_sparks -= 1
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Налипшая слизь не позволила вам нанести хоть какой-то урон .{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
+
+    # (4.1) Дебафф на атаку ружьем 'Загрязненный ствол'
+    elif action_hero == "с":
+        lock_backpack = True # Закрываем рюкзак
+        count_dash = 0  # Сбрасываем счетчик "побега" после любой попытки нанести урон Субстанции
+        if sub.distance > 2:
+            if has_rifle:
+                sub.health -= hero.hero_range_attack
+                hero.hero_bullet -= 1
+                sub.distance -= 1
+                print(f"{hp.START_TIRE}{hp.GREEN_BOLD}(🦠) Сделав выстрел из ружья вы попадаете по субстанции,"
+                      f" но из-за загрязненного ствола наносите ей минимальный урон."
+                      f"Она движется вам навстречу.{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.END_TIRE}")
+            elif has_sword:
+                sub.health -= hero.hero_range_attack
+                hero.hero_bullet -= 1
+                sub.distance -= 1
+                print(f"{hp.START_TIRE}Сделав выстрел из ружья вы попадаете по субстанции.Субстанция подползает ближе"
+                      f"{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.RESET}")
+
+            # Нет никаких дебаффов → наносим урон и накладываем дебафф ружья
+            else:
+                sub.health -= hero.hero_range_attack
+                hero.hero_bullet -= 1
+                sub.distance -= 1
+                sub_debuff = DamageModifier(
+                    target=hero,
+                    duration=6,
+                    value=5,
+                    operation_type="-",
+                    attack_type="ranged",
+                    start_info_msg=f"{hp.START_TIRE}{hp.GREEN_BOLD}(🦠) Дебафф 'Загрязненный ствол' на",
+                    show_message=False,
+                    display_name='Загрязненный ствол'
+                )
+
+                hero.add_modifier(sub_debuff)
+                print(
+                    f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}После вашего выстрела субстанция плюнула в вашу сторону сгустком массы."
+                    f" Вы увернулись, но ваше ружье задело."
+                    f"Дуло ружья загрязнено налипшей слизью. {hp.RESET}")
+                print(
+                    f"{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.END_TIRE}")
+        elif sub.distance == 2:
+            sub.distance -= 1
+            print(f"{hp.START_TIRE}Нельзя выстрелить с такого расстояния.Субстанция подползает ближе."
+                  f"{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.RESET}")
         elif sub.distance == 1:
-            cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
-            hero.shooting_with_spark_bullets(sub)
+            hero.hero_health -= sub.attack
+            sub.distance += 1
+            print(f"{hp.START_TIRE}Попытавшись выстрелить, Субстанция тут же бьет вас и откидывает от себя"
+                  f"{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.RESET}")
 
-    # (4) Команда "с"
-    elif action_hero == "с" and cast_spell != 4 and hero.hero_bullet > 0 and sub.distance > 2:
-        cast_spell = 3  # Начало действия дебаффа "Загрязнение ствола"
-        sub.health -= hero.hero_range_attack
-        hero.hero_bullet -= 1
-        sub.distance -= 1
-        print(f"{hp.START_TIRE}Сделав выстрел из ружья вы попадаете по субстанции.Она движется вам навстречу.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-    elif action_hero == "с" and cast_spell == 4 and hero.hero_bullet > 0 and sub.distance > 2:
-        sub.health -= (hero.hero_range_attack - rifle_debuff)
-        hero.hero_bullet -= 1
-        sub.distance -= 1
-        print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Сделав выстрел из ружья вы попадаете по субстанции, но из-за загрязненного ствола наносите ей минимальный урон.Она движется вам навстречу.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-    elif action_hero == "с" and hero.hero_bullet > 0 and sub.distance == 2:
-        sub.distance -= 1
-        print(f"{hp.START_TIRE}Не получится выстрелить с такой дистанции.Субстанция движется вам навстречу.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-    elif action_hero == "с" and hero.hero_bullet > 0 and sub.distance == 1:
-        hero.hero_health -= sub.attack
-        print(f"{hp.START_TIRE} Выстрелить не получилось.Субстанция бьет вас.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-    elif action_hero == "с" and hero.hero_bullet <= 0:
-        print(f"{hp.START_TIRE}Похоже у вас закончились пули.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
+    # (4.1)Выстрел дробью "искры" игнорирует дебафф 'Загрязненный ствол'
+    elif action_hero == "искры" and hero.bullet_of_sparks > 0:
+        count_dash = 0  # Сбрасываем счетчик "побега" после любой попытки нанести урон Субстанции
+        hero.shooting_with_spark_bullets(sub)
 
-    # (4) Команда "в"
+
+    # (4.1) Команда "в"
     elif action_hero == "в" and sub.distance > 1:
         sub.distance -= 1
         print(f"{hp.START_TIRE}Вы делаете шаг вперед.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
@@ -988,18 +982,23 @@ while sub.health not in split_health:
         sub.distance += 1
         print(f"{hp.START_TIRE}Пытаясь обойти субстанцию,она бьет вас, отталкивая от себя.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
 
-    # (4) Команда "н"
+    # (4.1) Команда "н"
     elif action_hero == "н" and sub.distance == 1:
-        if sub_init == True:
-            sub_init = False  # сброс инициативы субстанции
-            sub.distance += 1
-            print(f"{hp.START_TIRE} Вы увернулись от удара субстанции сделав шаг назад.Субстанция перестала дрожать.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-        elif sub_init == False:
-            sub.distance += 1
-            print(f"{hp.START_TIRE} Вы увернулись от удара субстанции сделав шаг назад.Субстанция перестала дрожать.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        sub.distance += 1
+        print(f"{hp.START_TIRE}Вы увернулись от удара субстанции сделав шаг назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+    elif action_hero == "н" and sub.distance <= 3:
+        sub.distance += 1
+        print(
+            f"{hp.START_TIRE}Вы делаете шаг назад.Субстанция медленно за вами движется.{hp.info_room(hero.hero_health, hero.hero_max_health, [sub])}{hp.END_TIRE}")
 
-    # #########
-    # (4.1) Не стандартное прохождение
+    # (4.1) Команда "у"
+    elif action_hero == "у" and sub.distance == 1:
+        hero.hero_health -= sub.attack
+        sub.distance += 1
+        print(f"{hp.START_TIRE}Попытавшись увернуться вы получаете урон так как каждый непонятно из какой части необьятной массы будет произведен удар."
+              f"Вас немного откидывает.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
+   #(4.1) Не стандартное прохождение
     elif action_hero != "н" and count_dash > 0:
         count_dash = 0  # сброс count_dash, если не двигаться все время назад
     elif action_hero == "н" and sub.distance > 3:
@@ -1013,45 +1012,40 @@ while sub.health not in split_health:
             count_dash = 3
             print(f"{hp.START_TIRE}Вы продолжаете двигаться вдоль стены.Выход уже совсем рядом.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}")
 
-    # ########
-    elif action_hero == "н" and sub.distance > 1:
-        sub.distance += 1
-        print(f"{hp.START_TIRE} Вы двигаетесь назад.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-
-    # (4) Команда "у"
-    elif action_hero == "у" and sub.distance == 1:
-        hero.hero_health -= sub.attack
-        sub.distance += 1
-        print(f"{hp.START_TIRE}Вы пытаетесь увернуться от удара субстанции, но она всегда бьет непредсказуемо.Вы получаете урон и вас немного откидывает.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-    elif action_hero == "у" and sub.distance > 1:
-        print(f"{hp.START_TIRE}Вы просто уворачиваетесь на месте.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-
-    # (4) Команда-заглушка "о"
+    # (4.1) Команда "о"
     elif action_hero == "о":
         if count_search == 0:
             count_search += 1
-            print(f"{hp.START_TIRE}Ничего примечательного вы не видете. Только очень медленно двигающуюся субстанцию.{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}Ничего примечательного вы не обнаружили. Только очень медленно двигающуюся субстанцию.{hp.END_TIRE}")
         elif count_search == 1:
             count_search += 1
             hero.hero_bullet += 2
-            print(f"{hp.START_TIRE}Вы обнаружили в углу комнаты ружье, рядом с которым лежали патроны.\n{hp.YELLOW_STAR_START}{hp.YELLOW} +2 Пули\nКоличество пуль: {hero.hero_bullet}{hp.RESET}{hp.YELLOW_STAR_END}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}Внимательно присмотревшись вы обнаружили в углу комнаты ружье, рядом с которым лежали патроны.\n{hp.YELLOW_STAR_START}{hp.YELLOW} +2 Пули\nКоличество пуль: {hero.hero_bullet}{hp.RESET}{hp.YELLOW_STAR_END}{hp.END_TIRE}")
         elif count_search == 2:
             print(f"{hp.START_TIRE} Больше вы ничего не обнаружили.{hp.END_TIRE}")
+            print(f"{hp.START_TIRE} Больше вы ничего не обнаружили.{hp.END_TIRE}")
 
-    # (4) Здесь прописан рюкзак для 4-ой комнаты
+    # (4.1) Здесь прописан рюкзак для 4-ой комнаты
     elif action_hero == "р" and lock_backpack == True:
-        if sub.distance > 1:
+        if sub.distance > 2:
             lock_backpack = not lock_backpack
-            sub.distance -= 1
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Ненадолго отвернувшись, вы попытались вскрыть сумку, но слизь намертво склеила её. Пришлось забыть о снаряжении и вернуться к бою.Субстанция подползает ближе.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
-        elif sub.distance == 1:
+            sub.distance -= 2
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Ненадолго отвернувшись, вы попытались вскрыть рюкзак, но вам пришлось сначала убрать всю слизь с него.\n"
+                  f"Субстанция делает стремительный рывок,абсурдный для ее массы почуствовав как вы пытались устранить слизь с рюкзака."
+                  f"{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+        elif sub.distance <= 2:
+            lock_backpack = not lock_backpack
             hero.hero_health -= sub.attack
-            sub.distance += 2
-            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Пока вы пытались открыть сумку, субстанция наносит вам урон и отбрасывет вас от себя.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+            sub.distance = 2
+            print(f"{hp.START_TIRE}(🦠) {hp.GREEN_BOLD}Ненадолго отвернувшись, вы попытались вскрыть рюкзак, но вам пришлось сначала убрать всю слизь с него.\n"
+                  f"Субстанция делает стремительный рывок,\n"
+                  f"абсурдный для ее массы почуствовав как вы пытались устранить слизь с рюкзака\n"
+                  f" и врезается в вас нанося урон и откидывая.{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub])}{hp.END_TIRE}")
+
     elif action_hero == "р" and lock_backpack == False:
         inventory_system.open_backpack(hero)
 
-    # (4) Команда "п"
+    # (4.1) Команда "п"
     elif action_hero == "п":
         hp.show_full_help(hero)
     else:
@@ -1063,7 +1057,7 @@ else:
           f"Теперь перед вами две субстанции поменьше.{hp.RESET}{hp.END_TIRE}")
 
 # (4) Вторая фаза сражения
-# [Здесь будет код второй фазы]
+
 sub_mini_init = 0  # очки подготовки ударов субстанций
 if flag_anti_mitoz:
     sub_mini1.health = 8
