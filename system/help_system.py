@@ -61,19 +61,21 @@ class HelpSystem:
             else:
 
                 name = getattr(enemy, 'name', 'Неизвестный')
-                health = getattr(enemy, 'health', '???')
-                distance = getattr(enemy, 'distance', '???')
+                health = getattr(enemy, 'health', 'X')
+                max_health = getattr(enemy, 'max_health', 'X')
+                distance = getattr(enemy, 'distance', 'X')
 
             enemy_lines.append(
-                f"Здоровье \u001b[35m{name}\u001b[0m: {health}\n"
+                f"Здоровье \u001b[35m{name}\u001b[0m: {health}|{max_health}\n"
                 f"Дистанция до вас: {distance}"
             )
 
-        enemies_block = "\n".join(enemy_lines)
+        enemies_block = "\n------------\n".join(enemy_lines)
 
         return (
             f"{self.YELLOW_STAR_START}"
             f"Ваше здоровье: {hero_health}|{hero_max_health}\n"
+            f"------------\n"
             f"{enemies_block}"
             f"{self.YELLOW_STAR_END}"
         )

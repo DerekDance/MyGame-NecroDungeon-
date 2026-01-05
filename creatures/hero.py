@@ -24,15 +24,6 @@ class Hero:
         self.modifiers = [ ] #Список модификаторов Героя
 
     #Проверка модификатора героя
-    # def has_active_modifier(self, modifier_name):
-    #     for mod in self.modifiers:
-    #         if mod.duration > 0 and (
-    #                 getattr(mod, 'name', None) == modifier_name or
-    #                 getattr(mod, 'display_name', None) == modifier_name
-    #         ):
-    #             return True, mod
-    #     return False, None
-
     def has_active_modifier(self, modifier_name):
         for mod in self.modifiers:
             if mod.duration > 0 and getattr(mod, 'display_name', None) == modifier_name:

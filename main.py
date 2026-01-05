@@ -6,15 +6,16 @@ import threading
 import random
 import time
 
-
+#Создаем обьект класса BattleSystem
+bs = BattleSystem()
 
 #Создаем противников
 dummy = Dummy()
 acolyte = Acolyte()
 necro_student = NecroStudent()
 sub = MainSubstance()
-sub_mini1 = SubMini1()
-sub_mini2 = SubMini2()
+sub_mini1 = SubMini("\u001b[32mМерзкая субстанция\u001b[0m",9,9,3,2)
+sub_mini2 = SubMini("\u001b[35mСклизкая субстанция\u001b[0m",11,11,2,1)
 necromancer = Necromancer()
 
 # Создание обьекта класса HelpSystem
@@ -38,10 +39,10 @@ list_of_command =["в","н","а","р","п","у","о","с"]
 hero_choice = ""
 
 #Пропуск комнат для их тестирования по отдельности. Значение True, чтобы пропустить комнату, False - не пропускать.
-pass_null_room = True
-pass_first_room = True
-pass_second_room = True
-pass_three_room = True
+pass_null_room = False
+pass_first_room = False
+pass_second_room = False
+pass_three_room = False
 pass_four_room_phase_one = False
 pass_four_room_phase_two = False
 pass_five_room_phase_one = False
@@ -287,6 +288,18 @@ print(
 
 while hero.hero_health > 0:
     try:
+        print(f"{hp.info_room(hero.hero_health, hero.hero_max_health, [acolyte,sub_mini1,sub_mini2])}{hp.END_TIRE}")
+
+        print(bs.move_enemies(
+
+                [sub_mini1, 1, "+"],
+                [sub_mini2, 5, "-"],
+                [necromancer, 1, "+"]
+
+        ))
+        print(f"{hp.info_room(hero.hero_health, hero.hero_max_health, [acolyte,sub_mini1,sub_mini2])}{hp.END_TIRE}")
+
+
         acolyte.update_all()
         hero.update_all()
         price()
@@ -828,7 +841,6 @@ else:
 while sub.health not in split_health:
     sub.update_all()
     hero.update_all()
-    print(f"DEBUG:hero.modifiers = {[m.display_name for m in hero.modifiers]}")
 
     # Проверяем, есть ли у героя активные дебаффы
     has_sword, _ = hero.has_active_modifier('Облепленный клинок')
@@ -1091,217 +1103,206 @@ while sub_mini1.health > 0 or sub_mini2.health > 0:
     action_hero = input("Напишите какое действие вы хотите совершить(по русски): ").lower()
     print("\n\n\n\n\n\n")
 
+
     # (4) Команда "а" (атака мечом)
-    if action_hero == "а":
-        target = input(f"{hp.START_TIRE}Выберите кого вы будете атаковать мечом(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{hp.END_TIRE}").lower()
-        if target == "1" and sub_mini1.health <= 0:
-            print(f"{hp.START_TIRE}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{hp.END_TIRE}")
-        elif target == "2" and sub_mini2.health <= 0:
-            print(f"{hp.START_TIRE}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{hp.END_TIRE}")
-        elif target == "1" and sub_mini1.distance != 1 and sub_mini2.distance == 1:
-            if hero.count_crit_attack > 0:
-                hero.hero_health -= sub_mini2.attack
-                sub_mini1.distance -= 1
-                hero.count_crit_attack -= 1
-                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы попытались нанести удар заряженным мечом по мерзкой субстанции, но не достали до нее.Заряд на мече пропал.{hp.RESET}Склизкая субстанция бьет вас.Мерзкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{hp.END_TIRE}")
-            else:
-                hero.hero_health -= sub_mini2.attack
-                sub_mini1.distance -= 1
-                print(f"{hp.START_TIRE}Вы попытались нанести удар мечом по мерзкой субстанции, но не достали до нее.Склизкая субстанция бьет вас.Мерзкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{hp.END_TIRE}")
-        elif target == "2" and sub_mini2.distance != 1 and sub_mini1.distance == 1:
-            if hero.count_crit_attack > 0:
-                hero.hero_health -= sub_mini1.attack
-                sub_mini2.distance -= 1
-                hero.count_crit_attack -= 1
-                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы попытались нанести удар заряженным мечом по склизкой субстанции, но не достали до нее.Заряд на мече пропал.{hp.RESET}.Мерзкая субстанция бьет вас.Склизкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{hp.END_TIRE}")
-            else:
-                hero.hero_health -= sub_mini1.attack
-                sub_mini2.distance -= 1
-                print(f"{hp.START_TIRE}Вы попытались нанести удар мечом по склизкой субстанции, но не достали до нее.Мерзкая субстанция бьет вас.Склизкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{hp.END_TIRE}")
-        elif target in ("1", "2") and sub_mini1.distance > 1 and sub_mini2.distance > 1:
-            if hero.count_crit_attack > 0:
-                sub_mini1.distance -= 1
-                sub_mini2.distance -= 1
-                hero.count_crit_attack -= 1
-                print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы рассекаете воздух заряженным мечом.Заряд на мече пропал.{hp.RESET}Обе субстанции подползают ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            else:
-                sub_mini1.distance -= 1
-                sub_mini2.distance -= 1
-                print(f"{hp.START_TIRE}Вы рассекаете воздух мечом.Обе субстанции подползают ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-        elif target == "1" and sub_mini1.distance == 1:
-            damage_mult = 3 if sub_mini2.health <= 0 and sub_mini_init == 1 else 2
-            sub_mini1.health -= hero.hero_attack * damage_mult
-            if sub_mini2.health > 0 and sub_mini2.distance == 1:
-                hero.hero_health -= sub_mini2.attack
-            elif sub_mini2.health <= 0:
-                hero.hero_health -= sub_mini1.attack
-            sub_mini_init = 1
-            if hero.count_crit_attack > 0:
-                hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы наносите урон мерзкой субстанции ударом {'заряженного' if hero.count_crit_attack < 1 else 'мечом'}.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-        elif target == "2" and sub_mini2.distance == 1:
-            damage_mult = 3 if sub_mini1.health <= 0 and sub_mini_init == 1 else 2
-            sub_mini2.health -= hero.hero_attack * damage_mult
-            if sub_mini1.health > 0 and sub_mini1.distance == 1:
-                hero.hero_health -= sub_mini1.attack
-            elif sub_mini1.health <= 0:
-                hero.hero_health -= sub_mini2.attack
-            sub_mini_init = 1
-            if hero.count_crit_attack > 0:
-                hero.count_crit_attack -= 1
-            print(f"{hp.START_TIRE}(🗡️)  {hp.CYAN_BOLD}Вы наносите урон склизкой субстанции ударом {'заряженного' if hero.count_crit_attack < 1 else 'мечом'}.{hp.RESET}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
 
-    # (4) Команда "с" с использованием свитка искр
-    elif action_hero == "искры" and hero.bullet_of_sparks >= 1:
-        sparks_four_room_sub_mini1()
-        sparks_four_room_sub_mini2()
-        print(f"{hp.START_TIRE}{part_1 + part_2}{hp.END_TIRE}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub_mini1, sub_mini2])}")
-        continue
 
-    # (4) Команда "с" (обычная стрельба)
-    elif action_hero == "с":
-        if hero.hero_bullet <= 0:
-            print(f"{hp.START_TIRE}У вас кончились патроны.{hp.END_TIRE}")
-        else:
-            range_target = input(f"{hp.START_TIRE}Выберите в кого вы будете стрелять(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{hp.END_TIRE}").lower()
-            if range_target == "1" and sub_mini1.health <= 0:
-                print(f"{hp.START_TIRE}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{hp.END_TIRE}")
-            elif range_target == "2" and sub_mini2.health <= 0:
-                print(f"{hp.START_TIRE}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{hp.END_TIRE}")
-            elif range_target == "1" and sub_mini1.distance < 3:
-                print(f"{hp.START_TIRE}Слишком близкое расстояние для выстрела.{hp.END_TIRE}")
-            elif range_target == "2" and sub_mini2.distance < 3:
-                print(f"{hp.START_TIRE}Слишком близкое расстояние для выстрела.{hp.END_TIRE}")
-            elif range_target == "1" and sub_mini1.distance > 2:
-                sub_mini1.health -= hero.hero_range_attack
-                hero.hero_bullet -= 1
-                if sub_mini2.distance == 1 and sub_mini2.health > 0:
-                    hero.hero_health -= sub_mini2.attack
-                sub_mini1.distance -= 1
-                sub_mini2.distance = max(1, sub_mini2.distance - 1) if sub_mini2.health > 0 else sub_mini2.distance
-                print(f"{hp.START_TIRE}Своим выстрелом вы попадаете в мерзкую субстанцию и она подползает ближе к вам. Вторая субстанция {'наносит вам урон.' if sub_mini2.distance == 1 else 'тоже подползает ближе к вам.'}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            elif range_target == "2" and sub_mini2.distance > 2:
-                sub_mini2.health -= hero.hero_range_attack
-                hero.hero_bullet -= 1
-                if sub_mini1.distance == 1 and sub_mini1.health > 0:
-                    hero.hero_health -= sub_mini1.attack
-                sub_mini2.distance -= 1
-                sub_mini1.distance = max(1, sub_mini1.distance - 1) if sub_mini1.health > 0 else sub_mini1.distance
-                print(f"{hp.START_TIRE}Своим выстрелом вы попадаете в склизкую субстанцию и она подползает к вам ближе. Вторая субстанция {'наносит вам урон.' if sub_mini1.distance == 1 else 'тоже подползает ближе к вам.'}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
 
-    # (4) Команда "в" (вперёд)
-    elif action_hero == "в":
-        if sub_mini1.health <= 0 and sub_mini2.health <= 0:
-            pass
-        elif sub_mini1.health <= 0:
-            if sub_mini2.distance == 1:
-                hero.hero_health -= sub_mini2.attack
-                print(f"{hp.START_TIRE}Вы просто обходите по кругу склизкую субстанцию, и то, что осталось от второй субстанции.Склизкой субстанции удается вас ударить.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            else:
-                sub_mini2.distance -= 1
-                print(f"{hp.START_TIRE}Вы подходите ближе к склизкой субстанции, обходя то, что осталось от второй субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-        elif sub_mini2.health <= 0:
-            if sub_mini1.distance == 1:
-                hero.hero_health -= sub_mini1.attack
-                print(f"{hp.START_TIRE}Вы просто обходите по кругу мерзкую субстанцию, и то, что осталось от второй субстанции.Мерзкой субстанции удается вас ударить.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            else:
-                sub_mini1.distance -= 1
-                print(f"{hp.START_TIRE}Вы подходите ближе к мерзкой субстанции, обходя то, что осталось от второй субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-        else:
-            if sub_mini1.distance == 1 and sub_mini2.distance == 1:
-                hero.hero_health -= (sub_mini1.attack + sub_mini2.attack)
-                print(f"{hp.START_TIRE}Обходя тварей по кругу, вы получаете урон от обеих субстанций.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            elif sub_mini1.distance > 1 and sub_mini2.distance == 1:
-                hero.hero_health -= sub_mini2.attack
-                sub_mini1.distance -= 1
-                print(f"{hp.START_TIRE}Пытаясь обойти по кругу склизкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            elif sub_mini1.distance == 1 and sub_mini2.distance > 1:
-                hero.hero_health -= sub_mini1.attack
-                sub_mini2.distance -= 1
-                print(f"{hp.START_TIRE}Пытаясь обойти по кругу мерзкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            else:
-                sub_mini1.distance -= 1
-                sub_mini2.distance -= 1
-                print(f"{hp.START_TIRE}Вы двигаетесь навстречу двум субстанциям.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
 
-    # (4) Команда "н" (назад)
-    elif action_hero == "н":
-        if sub_mini1.distance <= 0:
-            sub_mini1.distance = 1
-        if sub_mini2.distance <= 0:
-            sub_mini2.distance = 1
-        if sub_mini1.health <= 0 and sub_mini2.health <= 0:
-            pass
-        elif sub_mini1.health <= 0:
-            if sub_mini2.distance == 1:
-                sub_mini2.distance += 1
-            elif sub_mini2.distance == 4:
-                sub_mini2.distance -= 1
-                print(f"{hp.START_TIRE}Похоже вы уперлись в стену,вы пытаетесь двигаться вдоль стены.Склизкая субстанция подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            else:
-                sub_mini2.distance += 1
-            sub_mini_init = 0
-            print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-        elif sub_mini2.health <= 0:
-            if sub_mini1.distance == 1:
-                sub_mini1.distance += 1
-            elif sub_mini1.distance == 4:
-                sub_mini1.distance -= 1
-                print(f"{hp.START_TIRE}Похоже вы уперлись в стену, вы пытаетесь двигаться вдоль стены.Мерзкая субстанция подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            else:
-                sub_mini1.distance += 1
-            sub_mini_init = 0
-            print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-        else:
-            if sub_mini1.distance == 1 and sub_mini2.distance == 1:
-                sub_mini1.distance += 1
-                sub_mini2.distance += 1
-                print(f"{hp.START_TIRE}Вы уворачиваетесь от удара обоих субстанций сделав шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            elif sub_mini1.distance == 4 and sub_mini2.distance == 4:
-                sub_mini1.distance -= 1
-                sub_mini2.distance -= 1
-                print(f"{hp.START_TIRE}Вы достигли максимальной дистанции. Обе субстанции подползают ближе.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            elif sub_mini1.distance == 1:
-                sub_mini1.distance += 1
-                sub_mini2.distance = max(1, sub_mini2.distance - 1)
-                print(f"{hp.START_TIRE}Вы делаете шаг назад и уворачиваетесь от удара мерзкой субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            elif sub_mini2.distance == 1:
-                sub_mini2.distance += 1
-                sub_mini1.distance = max(1, sub_mini1.distance - 1)
-                print(f"{hp.START_TIRE}Вы делаете шаг назад и уворачиваетесь от удара склизкой субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            else:
-                sub_mini1.distance += 1
-                sub_mini2.distance += 1
-                print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
-            sub_mini_init = 0
+    # # (4) Команда "а" (атака мечом)
+    # if action_hero == "а":
+    #     target = input(f"{hp.START_TIRE}Выберите кого вы будете атаковать мечом(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{hp.END_TIRE}").lower()
+    #     if target == "1" and sub_mini1.health <= 0:
+    #         print(f"{hp.START_TIRE}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{hp.END_TIRE}")
+    #
+    #     elif target == "2" and sub_mini2.health <= 0:
+    #         print(f"{hp.START_TIRE}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{hp.END_TIRE}")
+    #
+    #     elif target == "1" and sub_mini1.distance != 1 and sub_mini2.distance == 1:
+    #         hero.hero_health -= sub_mini2.attack
+    #         sub_mini1.distance -= 1
+    #         print(f"{hp.START_TIRE}Вы попытались нанести удар мечом по мерзкой субстанции, но не достали до нее.Склизкая субстанция бьет вас.Мерзкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{hp.END_TIRE}")
+    #
+    #     elif target == "2" and sub_mini2.distance != 1 and sub_mini1.distance == 1:
+    #         hero.hero_health -= sub_mini1.attack
+    #         sub_mini2.distance -= 1
+    #
+    #         print(f"{hp.START_TIRE}Вы попытались нанести удар мечом по склизкой субстанции, но не достали до нее.Мерзкая субстанция бьет вас.Склизкая субстанция подползает ближе к вам.{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}{hp.END_TIRE}")
+    #     elif target in ("1", "2") and sub_mini1.distance > 1 and sub_mini2.distance > 1:
+    #         sub_mini1.distance -= 1
+    #         sub_mini2.distance -= 1
+    #         print(f"{hp.START_TIRE}Вы рассекаете воздух мечом.Обе субстанции подползают ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+    #
+    #     elif target == "1" and sub_mini1.distance == 1:
+    #         damage_mult = 3 if sub_mini2.health <= 0 and sub_mini_init == 1 else 2
+    #         sub_mini1.health -= hero.hero_attack * damage_mult
+    #         if sub_mini2.health > 0 and sub_mini2.distance == 1:
+    #             hero.hero_health -= sub_mini2.attack
+    #         elif sub_mini2.health <= 0:
+    #             hero.hero_health -= sub_mini1.attack
+    #         sub_mini_init = 1
+    #
+    #     elif target == "2" and sub_mini2.distance == 1:
+    #         damage_mult = 3 if sub_mini1.health <= 0 and sub_mini_init == 1 else 2
+    #         sub_mini2.health -= hero.hero_attack * damage_mult
+    #         if sub_mini1.health > 0 and sub_mini1.distance == 1:
+    #             hero.hero_health -= sub_mini1.attack
+    #         elif sub_mini1.health <= 0:
+    #             hero.hero_health -= sub_mini2.attack
+    #         sub_mini_init = 1
+    #
+    # # (4) Команда "с" с использованием свитка искр
+    # elif action_hero == "искры" and hero.bullet_of_sparks >= 1:
+    #     sparks_four_room_sub_mini1()
+    #     sparks_four_room_sub_mini2()
+    #     print(f"{hp.START_TIRE}{part_1 + part_2}{hp.END_TIRE}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub_mini1, sub_mini2])}")
+    #     continue
 
-    # (4) Рюкзак
-    elif action_hero == "р":
-        inventory_system.open_backpack(hero)
+#     # (4) Команда "с" (обычная стрельба)
 
-    # (4) Осмотр
-    elif action_hero == "о":
-        print(f"{hp.START_TIRE}Ничего примечательного вы не нашли.{hp.END_TIRE}")
-
-    # (4) Помощь
-    elif action_hero == "п":
-        hp.show_full_help(hero)
-
-    # (4) Увернуться
-    elif action_hero == "у":
-        dodge_sub_mini1()
-        dodge_sub_mini2()
-        print(f"{hp.START_TIRE}{part_1 + part_2}{hp.END_TIRE}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub_mini1, sub_mini2])}")
-
-    # Неизвестная команда
-    elif action_hero not in list_of_command:
-        print(f"{hp.START_TIRE}Неизвестная команда.{hp.END_TIRE}")
-
-else:
-    print(f"{hp.START_TIRE}{hp.GREEN}(*) Вы одолели две субстанции.{hp.RESET}\n{hp.YELLOW_STAR_START} + 2 Пули{hp.YELLOW_STAR_END}{hp.END_TIRE}")
-    hero.hero_bullet += 2
-    achievements_system.add_killed_monster("2-Субстанции", 2)
-    achievements_system.add_completed_location("(4) Древний зал", 2)
+#     elif action_hero == "с":
+#         if hero.hero_bullet <= 0:
+#             print(f"{hp.START_TIRE}У вас кончились патроны.{hp.END_TIRE}")
+#         else:
+#             range_target = input(f"{hp.START_TIRE}Выберите в кого вы будете стрелять(введите цифру):\n(1){sub_mini1.name}\n(2){sub_mini2.name}{hp.END_TIRE}").lower()
+#             if range_target == "1" and sub_mini1.health <= 0:
+#                 print(f"{hp.START_TIRE}Похоже вы одолели мерзкую тварь.\nЗдоровье {sub_mini1.name}: {sub_mini1.health}{hp.END_TIRE}")
+#             elif range_target == "2" and sub_mini2.health <= 0:
+#                 print(f"{hp.START_TIRE}Похоже вы одолели склизкую тварь.\nЗдоровье {sub_mini2.name}: {sub_mini2.health}{hp.END_TIRE}")
+#             elif range_target == "1" and sub_mini1.distance < 3:
+#                 print(f"{hp.START_TIRE}Слишком близкое расстояние для выстрела.{hp.END_TIRE}")
+#             elif range_target == "2" and sub_mini2.distance < 3:
+#                 print(f"{hp.START_TIRE}Слишком близкое расстояние для выстрела.{hp.END_TIRE}")
+#             elif range_target == "1" and sub_mini1.distance > 2:
+#                 sub_mini1.health -= hero.hero_range_attack
+#                 hero.hero_bullet -= 1
+#                 if sub_mini2.distance == 1 and sub_mini2.health > 0:
+#                     hero.hero_health -= sub_mini2.attack
+#                 sub_mini1.distance -= 1
+#                 sub_mini2.distance = max(1, sub_mini2.distance - 1) if sub_mini2.health > 0 else sub_mini2.distance
+#                 print(f"{hp.START_TIRE}Своим выстрелом вы попадаете в мерзкую субстанцию и она подползает ближе к вам. Вторая субстанция {'наносит вам урон.' if sub_mini2.distance == 1 else 'тоже подползает ближе к вам.'}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             elif range_target == "2" and sub_mini2.distance > 2:
+#                 sub_mini2.health -= hero.hero_range_attack
+#                 hero.hero_bullet -= 1
+#                 if sub_mini1.distance == 1 and sub_mini1.health > 0:
+#                     hero.hero_health -= sub_mini1.attack
+#                 sub_mini2.distance -= 1
+#                 sub_mini1.distance = max(1, sub_mini1.distance - 1) if sub_mini1.health > 0 else sub_mini1.distance
+#                 print(f"{hp.START_TIRE}Своим выстрелом вы попадаете в склизкую субстанцию и она подползает к вам ближе. Вторая субстанция {'наносит вам урон.' if sub_mini1.distance == 1 else 'тоже подползает ближе к вам.'}{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#
+#     # (4) Команда "в" (вперёд)
+#     elif action_hero == "в":
+#         if sub_mini1.health <= 0 and sub_mini2.health <= 0:
+#             pass
+#         elif sub_mini1.health <= 0:
+#             if sub_mini2.distance == 1:
+#                 hero.hero_health -= sub_mini2.attack
+#                 print(f"{hp.START_TIRE}Вы просто обходите по кругу склизкую субстанцию, и то, что осталось от второй субстанции.Склизкой субстанции удается вас ударить.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             else:
+#                 sub_mini2.distance -= 1
+#                 print(f"{hp.START_TIRE}Вы подходите ближе к склизкой субстанции, обходя то, что осталось от второй субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#         elif sub_mini2.health <= 0:
+#             if sub_mini1.distance == 1:
+#                 hero.hero_health -= sub_mini1.attack
+#                 print(f"{hp.START_TIRE}Вы просто обходите по кругу мерзкую субстанцию, и то, что осталось от второй субстанции.Мерзкой субстанции удается вас ударить.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             else:
+#                 sub_mini1.distance -= 1
+#                 print(f"{hp.START_TIRE}Вы подходите ближе к мерзкой субстанции, обходя то, что осталось от второй субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#         else:
+#             if sub_mini1.distance == 1 and sub_mini2.distance == 1:
+#                 hero.hero_health -= (sub_mini1.attack + sub_mini2.attack)
+#                 print(f"{hp.START_TIRE}Обходя тварей по кругу, вы получаете урон от обеих субстанций.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             elif sub_mini1.distance > 1 and sub_mini2.distance == 1:
+#                 hero.hero_health -= sub_mini2.attack
+#                 sub_mini1.distance -= 1
+#                 print(f"{hp.START_TIRE}Пытаясь обойти по кругу склизкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             elif sub_mini1.distance == 1 and sub_mini2.distance > 1:
+#                 hero.hero_health -= sub_mini1.attack
+#                 sub_mini2.distance -= 1
+#                 print(f"{hp.START_TIRE}Пытаясь обойти по кругу мерзкую субстанцию вы все-таки получаете урон от нее.Другая подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             else:
+#                 sub_mini1.distance -= 1
+#                 sub_mini2.distance -= 1
+#                 print(f"{hp.START_TIRE}Вы двигаетесь навстречу двум субстанциям.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#
+#     # (4) Команда "н" (назад)
+#     elif action_hero == "н":
+#         if sub_mini1.distance <= 0:
+#             sub_mini1.distance = 1
+#         if sub_mini2.distance <= 0:
+#             sub_mini2.distance = 1
+#         if sub_mini1.health <= 0 and sub_mini2.health <= 0:
+#             pass
+#         elif sub_mini1.health <= 0:
+#             if sub_mini2.distance == 1:
+#                 sub_mini2.distance += 1
+#             elif sub_mini2.distance == 4:
+#                 sub_mini2.distance -= 1
+#                 print(f"{hp.START_TIRE}Похоже вы уперлись в стену,вы пытаетесь двигаться вдоль стены.Склизкая субстанция подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             else:
+#                 sub_mini2.distance += 1
+#             sub_mini_init = 0
+#             print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#         elif sub_mini2.health <= 0:
+#             if sub_mini1.distance == 1:
+#                 sub_mini1.distance += 1
+#             elif sub_mini1.distance == 4:
+#                 sub_mini1.distance -= 1
+#                 print(f"{hp.START_TIRE}Похоже вы уперлись в стену, вы пытаетесь двигаться вдоль стены.Мерзкая субстанция подползает ближе к вам.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             else:
+#                 sub_mini1.distance += 1
+#             sub_mini_init = 0
+#             print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#         else:
+#             if sub_mini1.distance == 1 and sub_mini2.distance == 1:
+#                 sub_mini1.distance += 1
+#                 sub_mini2.distance += 1
+#                 print(f"{hp.START_TIRE}Вы уворачиваетесь от удара обоих субстанций сделав шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             elif sub_mini1.distance == 4 and sub_mini2.distance == 4:
+#                 sub_mini1.distance -= 1
+#                 sub_mini2.distance -= 1
+#                 print(f"{hp.START_TIRE}Вы достигли максимальной дистанции. Обе субстанции подползают ближе.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             elif sub_mini1.distance == 1:
+#                 sub_mini1.distance += 1
+#                 sub_mini2.distance = max(1, sub_mini2.distance - 1)
+#                 print(f"{hp.START_TIRE}Вы делаете шаг назад и уворачиваетесь от удара мерзкой субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             elif sub_mini2.distance == 1:
+#                 sub_mini2.distance += 1
+#                 sub_mini1.distance = max(1, sub_mini1.distance - 1)
+#                 print(f"{hp.START_TIRE}Вы делаете шаг назад и уворачиваетесь от удара склизкой субстанции.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             else:
+#                 sub_mini1.distance += 1
+#                 sub_mini2.distance += 1
+#                 print(f"{hp.START_TIRE}Вы делаете шаг назад.{hp.END_TIRE}{hp.info_room(hero.hero_health,hero.hero_max_health,[sub_mini1,sub_mini2])}")
+#             sub_mini_init = 0
+#
+#     # (4) Рюкзак
+#     elif action_hero == "р":
+#         inventory_system.open_backpack(hero)
+#
+#     # (4) Осмотр
+#     elif action_hero == "о":
+#         print(f"{hp.START_TIRE}Ничего примечательного вы не нашли.{hp.END_TIRE}")
+#
+#     # (4) Помощь
+#     elif action_hero == "п":
+#         hp.show_full_help(hero)
+#
+#     # (4) Увернуться
+#     elif action_hero == "у":
+#         dodge_sub_mini1()
+#         dodge_sub_mini2()
+#         print(f"{hp.START_TIRE}{part_1 + part_2}{hp.END_TIRE}{hp.info_room(hero.hero_health, hero.hero_max_health, [sub_mini1, sub_mini2])}")
+#
+#     # Неизвестная команда
+#     elif action_hero not in list_of_command:
+#         print(f"{hp.START_TIRE}Неизвестная команда.{hp.END_TIRE}")
+#
+# else:
+#     print(f"{hp.START_TIRE}{hp.GREEN}(*) Вы одолели две субстанции.{hp.RESET}\n{hp.YELLOW_STAR_START} + 2 Пули{hp.YELLOW_STAR_END}{hp.END_TIRE}")
+#     hero.hero_bullet += 2
+#     achievements_system.add_killed_monster("2-Субстанции", 2)
+#     achievements_system.add_completed_location("(4) Древний зал", 2)
 
 
 """(5)  Древняя гробница: Некромант"""

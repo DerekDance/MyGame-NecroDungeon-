@@ -1,3 +1,4 @@
+
 from system import HelpSystem
 from creatures import Hero
 """
@@ -79,7 +80,7 @@ class Enemy:
         """Сбросить заряд после выстрела"""
         self.charge_turns = 0
 
-# Классы противников
+    # Классы противников
 
 # Манекен
 class Dummy(Enemy):
@@ -109,10 +110,10 @@ class MainSubstance(Enemy):
 
 
 
+class SubMini(Enemy):
+    def __init__(self, name, health, max_health, attack, distance):
+        super().__init__(name, health, max_health, attack, distance)
 
-class SubMini1(Enemy):
-    def __init__(self):
-        super().__init__("\u001b[32mМерзкая субстанция\u001b[0m",9,9,3,2)
 
 
 class SubMini2(Enemy):

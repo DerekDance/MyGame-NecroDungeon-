@@ -6,7 +6,6 @@ from .enemy import (
     Acolyte,
     NecroStudent,
     MainSubstance,
-    SubMini1,
-    SubMini2,
+    SubMini,
     Necromancer
 )

@@ -39,7 +39,7 @@ class InventorySystem:
             if hero.hero_potion_strength > 0:
                 multiplier = DamageModifier(
                     target=hero,
-                    duration=3,
+                    duration=5,
                     value=1.5,
                     operation_type = "*",
                     attack_type = "melee",
