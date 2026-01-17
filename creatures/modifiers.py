@@ -7,7 +7,8 @@ hp = HelpSystem()
 """
 Универсальный класс для модификаторов существ
 """
-
+# Допустимые операции
+VALID_OPERATIONS ={"+", "-", "*", "/"}
 
 class Modifier:
     def __init__(self, name, duration, step, target, start_info_msg=None,show_message = False,display_name = None):
@@ -21,6 +22,16 @@ class Modifier:
         self.show_message = show_message
         self.display_name = display_name or name
         self.name = name if name is not None else display_name# Техническое имя (для проверок)
+
+    # Получить имена цели
+    def get_health_attr_names(self):
+        # Проверяем разные варианты имён
+        if hasattr(self.target, "health") and hasattr(self.target, "max_health"):
+            return "health", "max_health"
+        elif hasattr(self.target, "hero_health") and hasattr(self.target, "hero_max_health"):
+            return "hero_health", "hero_max_health"
+        else:
+            return None, None
 
     def update(self):
         """
@@ -59,6 +70,11 @@ class Modifier:
 
 # Модификатор регенерации здоровья
 class RegenHP(Modifier):
+    """Модификатор, периодически восстанавливающий здоровье цели.
+
+      Поддерживает как врагов (атрибуты `health`/`max_health`), так и героя (`hero_health`/`hero_max_health`).
+      Эффект применяется каждые `step` шагов, пока не истечёт `duration` или здоровье не станет максимальным.
+      """
     def __init__(self, target, duration, step, heal_power, show_message=False,display_name = None):
         if not hasattr(target, "health") and not hasattr(target, "hero_health"):
             raise ValueError(f"Цель {target} не имеет атрибутов здоровья!")
@@ -66,16 +82,6 @@ class RegenHP(Modifier):
         self.heal_power = heal_power
         self.show_message = show_message
         self.display_name = display_name
-
-    # Получить имена цели
-    def get_health_attr_names(self):
-        # Проверяем разные варианты имён
-        if hasattr(self.target, "health") and hasattr(self.target, "max_health"):
-            return "health", "max_health"
-        elif hasattr(self.target, "hero_health") and hasattr(self.target, "hero_max_health"):
-            return "hero_health", "hero_max_health"
-        else:
-            return None, None
 
     # Применение регенерации
     def apply_effect(self):
@@ -130,9 +136,12 @@ class RegenHP(Modifier):
 
 # Модификатор множителя урона
 class DamageModifier(Modifier):
-    # Допустимые операции
-    VALID_OPERATIONS = {"+", "-", "*", "/"}
+    """Модификатор, временно изменяющий урон цели с помощью арифметической операции.
 
+     Поддерживает операции: сложение (+), вычитание (-), умножение (*), деление (/).
+     Применяется к ближней ('melee') или дальней ('ranged') атаке.
+     При деактивации восстанавливает исходное значение урона.
+     """
     def __init__(self, target, duration, value,operation_type,attack_type,start_info_msg,show_message,display_name):
         # Проверяем операцию
         operation_type = operation_type.lower()
@@ -248,6 +257,76 @@ class DamageModifier(Modifier):
             print(f"{self.start_info_msg} {target_name} закончился{hp.RESET}")
 
         return is_finished
+
+
+# Модификатор полета снаряда
+class ProjectileModifier(Modifier):
+    def __init__(self, target, duration, value,operation_type,start_info_msg,finish_info_msg):
+        # Проверяем операцию
+        operation_type = operation_type.lower()
+        if operation_type not in self.VALID_OPERATIONS:
+            raise ValueError(f"Неизвестная операция: {operation_type}. "
+                             f"Допустимо: {', '.join(self.VALID_OPERATIONS)}")
+            # Проверяем значение
+        self._validate_value(operation_type, value)
+
+        super().__init__("ProjectileModifier", duration, 1, target)
+        self.value = value
+        self.operation_type = operation_type #Параметр выбора математической операции для модификатора
+        self.start_info_msg = start_info_msg
+        self.finish_info_msg = finish_info_msg
+
+
+    # Функция проверки значений
+    def _validate_value(self, operation_type, value):
+        if operation_type in ["+", "-"] and value <= 0:
+            raise ValueError(f"Для {operation_type} значение должно быть > 0")
+        elif operation_type == "*":
+            raise ValueError("Умножение не доступно для этого метода!")
+        elif operation_type == "/":
+            raise ValueError("Деление не доступно для этого метода!")
+
+
+# Функция активации полета снаряда ПОКА НЕ РАБОТАЕТ
+    def activate(self):
+        #Защита от повторного применения
+        if self.active:
+            print("Уже активен!")
+            return
+
+        health_attr, max_health_attr = self.get_health_attr_names()
+
+        # Получить значения с проверкой
+        current_hp = getattr(self.target, health_attr, None)
+        max_hp = getattr(self.target, max_health_attr, None)
+
+        if not isinstance(current_hp, (int, float)) or not isinstance(max_hp, (int, float)):
+            print("Значения current_hp и max_hp должны быть числами!")
+            self.deactivate()
+            return True
+
+        if current_hp is None or max_hp is None:
+            print(f"Не могу найти атрибуты здоровья у {self.target}")
+            self.deactivate()
+            return True
+
+        # Вычисление
+        new_hp = min(current_hp,max_hp)
+
+        self.operation_type = self.operation_type.lower()
+        # Прибавляет здоровья
+        if self.operation_type == "+":
+            new_hp = min(current_hp + self.value,max_hp)
+        # Отнимает здоровье
+        elif self.operation_type == "-":
+            new_hp = current_hp - self.value
+
+        # Сохранение
+        setattr(self.target, health_attr, new_hp)
+        target_name = getattr(self.target, "name", "Неизвестный")
+        print(f"{self.start_info_msg}{target_name}{self.finish_info_msg}\n{hp.RESET}")
+        #Вызывается родительский activate. self.active устанавливает True
+        super().activate()
 
 
 

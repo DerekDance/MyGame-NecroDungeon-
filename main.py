@@ -37,12 +37,12 @@ list_of_command =["в","н","а","р","п","у","о","с"]
 hero_choice = ""
 
 #Пропуск комнат для их тестирования по отдельности. Значение True, чтобы пропустить комнату, False - не пропускать.
-pass_null_room = False
+pass_null_room = True
 pass_first_room = True
 pass_second_room = True
 pass_three_room = True
-pass_four_room_phase_one = False
-pass_four_room_phase_two = False
+pass_four_room_phase_one = True
+pass_four_room_phase_two = True
 pass_five_room_phase_one = False
 pass_five_room_phase_two = False
 pass_five_room_phase_three = False
@@ -85,7 +85,7 @@ def price():
         used_commands.add("абсурд")
     elif action_hero == "отстрел":
         hero.hero_bullet += 1
-        flag_skull_shoot = not flag_skull_shoot
+        necromancer.skull_shoot(True)
         print(
             f"{hp.START_TIRE}(🎁) Вы получаете за отстрел черепов:\n{hp.YELLOW_STAR_START} -1 от максимальной атаки всех летающих черепов\n +1 к максимальной дистанции черепов до вас\n + 1 Пуля{hp.YELLOW_STAR_END}{hp.END_TIRE}")
         used_commands.add("отстрел")
@@ -225,6 +225,7 @@ print(
 
 while hero.hero_health > 0:
     try:
+        user_action = acolyte.ask_for_action_hero(hero, hp,10)
         acolyte.update_all()
         hero.update_all()
         price()
@@ -1148,14 +1149,7 @@ flag_winner = False
 # Вызов снаряда и его характеристики
 summon_projectile = 0  # для корректной работы прописываем число 0
 ##############
-# Для работы награды 'отстрел'
-if flag_skull_shoot:
-    summon_distance = range(3, 8)
-    summon_attack = range(2, 3)
-else:
-    summon_distance = range(3, 7)
-    summon_attack = range(2, 4)
-###############
+
 skull_attack = 0
 skull_distance = 0
 skull_fly = 0
@@ -1180,76 +1174,10 @@ print(f"{hp.START_TIRE}Вы двигаетесь по небольшому ко�
       f"Он оборачивается на вас и приземляется на землю.\n"
       f"Пора выполнить контракт, расправившись с {hp.PURPLE}Некромантом{hp.RESET}.{hp.END_TIRE}")
 
-necromancer_taunts_after_push = [
-    "Как далеко ты отлетел? Достаточно, чтобы понять своё ничтожество?",
-    "Ха! Ты даже не устоял перед лёгким взмахом моей руки!",
-    "Падаешь так изящно... Может, сразу ляжешь в могилу?",
-    "Разве это не унизительно? Тебя отшвырнуло, как щепку!"
-]
-
-# (5) Функция с таймером 50 секунд.
-def ask_for_action_hero():
-    global timer, input_active
-    input_active = True
-
-    # Создаем поток для ввода
-    def input_thread():
-        global user_input
-        try:
-            print("\nНапишите какое действие вы хотите совершить (по-русски): ", end='', flush=True)
-            user_input = sys.stdin.readline().strip().lower()
-        except:
-            user_input = None
-
-    # Запускаем поток ввода
-    input_thread_obj = threading.Thread(target=input_thread)
-    input_thread_obj.daemon = True
-    input_thread_obj.start()
-
-    # Таймер на 50 секунд
-    timer = threading.Timer(50.0, timeout_message)
-    timer.start()
-
-    # Ждем завершения ввода или таймера
-    input_thread_obj.join(50.0)
-    if input_thread_obj.is_alive():
-        # Время вышло, прерываем ввод
-        timer.cancel()
-        input_active = False
-        return None
-    else:
-        # Пользователь успел ввести
-        timer.cancel()
-        input_active = False
-        return user_input
-
-
-# Функция timeout_message().
-def timeout_message():
-    global input_active
-    if not input_active:
-        return
-    necromancer_phrases = [
-        "Мёртвые не раздумывают - они повинуются!",
-        "Твоя нерешительность - лучший союзник моей армии теней!",
-        "Каждая упущенная секунда - ещё один глоток твоей жизненной силы!",
-        "В моём царстве время течёт иначе... прямо как кровь из твоих ран!",
-        "Ты замер, словно труп на виселице...",
-        "Время кончилось... как и твои шансы!",
-        "Ты что, надеялся, что смерть будет ждать?",
-        "Упущенное время не вернуть...",
-    ]
-    hero.hero_health -= necromancer.attack
-    chosen_phrase = random.choice(necromancer_phrases)
-    print(f"\n{hp.START_TIRE}{hp.PURPLE}Некромант - '{chosen_phrase}'{hp.RESET}\nНекромант атакует первым!\n{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-    # Автоматически запрашиваем новое действие
-    print(f"\n{hp.START_TIRE}У вас есть 50 секунд для следующего действия...{hp.END_TIRE}")
-
-
-# (5.1) Основной игровой цикл 1-ой фазы боя
-input_active = False
-
 while hero.hero_health > 0:
+    # Таймер до истечения которого нужно выполнить действие
+    user_action = necromancer.ask_for_action_hero(hero, hp)
+
     necromancer.update_all()
     hero.update_all()
     price()
@@ -1260,7 +1188,7 @@ while hero.hero_health > 0:
     try:
         if pass_five_room_phase_one:
             break
-        action_hero = ask_for_action_hero()
+        
         if action_hero is None:
             continue
         if skull_shoot == 2:
@@ -1296,8 +1224,8 @@ while hero.hero_health > 0:
         if summon_projectile != 5:
             summon_projectile += 1
         elif summon_projectile == 5 and skull_fly == 0:  # Если summon_projectile равен 5, то будет призван череп.
-            skull_distance = random.choice(summon_distance)
-            skull_attack = random.choice(summon_attack)
+            skull_distance = random.choice(necromancer.summon_distance)
+            skull_attack = random.choice(necromancer.summon_attack)
             skull_fly = 1
             print(f"{hp.START_TIRE}(💀) Позади вас в одной из многочисленных открытых гробниц вылетает призванный {hp.PURPLE}Некромантом{hp.RESET}, пылающий огнем, череп.Череп летит в вашу сторону.{hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
         elif skull_distance != 1 and skull_fly == 1:
@@ -1368,7 +1296,7 @@ while hero.hero_health > 0:
                 skull_distance -= 3
                 ready_punch = 0
                 cast_punch = 0
-            print(f"{hp.START_TIRE}(👊) Своим мечом вы пытаетесь нанести урон, но {hp.PURPLE} Некромант{hp.RESET} быстрым движением руки бьет вас {hp.PURPLE}'Отталкивающим ударом'{hp.RESET}.\nВы пролетев приличное расстояние получаете урон при падении.\n{hp.PURPLE}Некромант - '{random.choice(necromancer_taunts_after_push)}'{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}(👊) Своим мечом вы пытаетесь нанести урон, но {hp.PURPLE} Некромант{hp.RESET} быстрым движением руки бьет вас {hp.PURPLE}'Отталкивающим ударом'{hp.RESET}.\nВы пролетев приличное расстояние получаете урон при падении.\n{hp.PURPLE}Некромант - '{random.choice(necromancer.TAUNTS_AFTER_PUSH)}'{hp.RESET}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 
         #######################
         # (5.1) Секретный способ пройти игру #
@@ -1502,18 +1430,17 @@ while hero.hero_health > 0:
             elif range_target == "2" and skull_distance < 3:
                 print(f"{hp.START_TIRE}Не получится выстрелить с такого расстояния.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
 
+
     except Exception as e:
         print(f"{hp.START_TIRE}Произошла ошибка: {hp.RED_BOLD}{e}{hp.RESET}{hp.END_TIRE}")
-        if 'timer' in globals():
-            timer.cancel()
-            input_active = False
 
 # Вторая фаза боя с Некромантом
 
 # (5.2) Основной игровой цикл 2-ой фазы боя
-input_active = False
 
 while hero.hero_health > 0:
+    # Таймер до истечения которого нужно выполнить действие
+    user_action = necromancer.ask_for_action_hero(hero, hp)
     necromancer.update_all()
     hero.update_all()
     # (5) Подсказки соратника
@@ -1524,8 +1451,8 @@ while hero.hero_health > 0:
     try:
         if pass_five_room_phase_two:
             break
-        action_hero = ask_for_action_hero()
-        timeout_message()
+        
+        
         if action_hero is None:
             continue
         if necromancer.health <= 0:
@@ -1555,8 +1482,8 @@ while hero.hero_health > 0:
         elif summon_projectile != 5:
             summon_projectile += 1
         elif summon_projectile == 5 and skull_fly == 0:
-            skull_distance = random.choice(summon_distance)
-            skull_attack = random.choice(summon_attack)
+            skull_distance = random.choice(necromancer.summon_distance)
+            skull_attack = random.choice(necromancer.summon_attack)
             skull_fly = 1
             if change_of_skulls == False:  # Синий череп со стандартной скоростью полета.
                 print(f"{hp.START_TIRE}(\u001b[44m💀){hp.RESET})Позади вас в одной из многочисленных открытых гробниц вылетает призванный {hp.PURPLE}Некромантом{hp.RESET}, \u001b[34;1mпылающий синим огнем 'Череп-призрак'{hp.RESET}.Череп летит в вашу сторону.{hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
@@ -1763,9 +1690,6 @@ while hero.hero_health > 0:
             hp.show_full_help(hero)
     except Exception as e:
         print(f"{hp.START_TIRE}Произошла ошибка: {hp.RED_BOLD}{e}{hp.RESET}{hp.END_TIRE}")
-        if 'timer' in globals():
-            timer.cancel()
-            input_active = False
 
 # Третья фаза боя с Некромантом
 
@@ -2117,6 +2041,8 @@ undead_list = {
 undead_func = list(undead_list.keys())
 
 while hero.hero_health > 0:
+    # Таймер до истечения которого нужно выполнить действие
+    user_action = necromancer.ask_for_action_hero(hero, hp)
     necromancer.update_all()
     hero.update_all()
     price()
@@ -2127,8 +2053,8 @@ while hero.hero_health > 0:
     try:
         if pass_five_room_phase_three:
             break
-        action_hero = ask_for_action_hero()
-        timeout_message()
+        
+        
         if action_hero is None:
             continue
         if necromancer.health <= 0:
@@ -2204,7 +2130,7 @@ while hero.hero_health > 0:
     except Exception as e:
         print(f"{hp.START_TIRE}Произошла ошибка: {hp.RED_BOLD}{e}{hp.RESET}{hp.END_TIRE}")
         if 'timer' in globals():
-            timer.cancel()
+            
             input_active = False
 
 else:
