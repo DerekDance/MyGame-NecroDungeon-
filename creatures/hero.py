@@ -21,7 +21,12 @@ class Hero:
         self.hero_bullet = 3
         self.bullet_of_sparks = 0
         self.damage_bullet_of_sparks = 12
-        self.modifiers = [ ] #Список модификаторов Героя
+        self.modifiers = [] #Список модификаторов Героя
+        self.hero_type_attack = "melee" #Атака мечом(тип атаки) по умолчанию
+
+    # Жив ли герой
+    def is_alive(self) -> bool:
+        return self.hero_health > 0
 
     #Проверка модификатора героя
     def has_active_modifier(self, modifier_name):

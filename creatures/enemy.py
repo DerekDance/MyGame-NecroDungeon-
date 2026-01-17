@@ -108,11 +108,21 @@ class MainSubstance(Enemy):
     def __init__(self):
         super().__init__("Субстанция",30,30,3,6)
 
+    def anti_mitoz(self,flag):
+        if isinstance (flag, bool):
+            self.health = 28
+            self.max_health = 28
+
 
 
 class SubMini(Enemy):
     def __init__(self, name, health, max_health, attack, distance):
         super().__init__(name, health, max_health, attack, distance)
+
+    def anti_mitoz(self, flag):
+        if isinstance(flag, bool):
+            self.health = 8
+            self.max_health = 8
 
 
 
@@ -120,6 +130,11 @@ class SubMini2(Enemy):
     def __init__(self):
         super().__init__(
             "\u001b[35mСклизкая субстанция\u001b[0m",11,11,2,1)
+
+    def anti_mitoz(self, flag):
+        if isinstance(flag, bool):
+            self.health = 9
+            self.max_health = 9
 
 # Некромант
 class Necromancer(Enemy):

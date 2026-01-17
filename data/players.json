@@ -2,16 +2,17 @@
   "players": [
     {
       "name": "Том",
-      "kill_monsters": 6,
-      "completed_locations": 4,
+      "kill_monsters": 7,
+      "completed_locations": 5,
       "completed_locations_list": [
         "(0) Привал у подземелья",
         "(1) Темный коридор",
         "(2) Комната с наспех брошенными вещами",
-        "(3) Помещение с зеркалом"
+        "(3) Помещение с зеркалом",
+        "(4) Древний зал"
       ],
-      "games_played": 207,
-      "all_score": 21,
+      "games_played": 226,
+      "all_score": 25,
       "password": "Том",
       "achievements": [
         "BYPASSING",
