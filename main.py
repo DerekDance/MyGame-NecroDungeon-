@@ -1188,7 +1188,7 @@ while hero.hero_health > 0:
     try:
         if pass_five_room_phase_one:
             break
-        
+
         if action_hero is None:
             continue
         if skull_shoot == 2:
@@ -1220,29 +1220,33 @@ while hero.hero_health > 0:
             print(f"{hp.START_TIRE}{hp.PURPLE}(*) После нанесенного урона Некромант телепортировался подальше от вас.\nНекромант - 'Ты думал это все? Я уже умер тысячу раз... и тысячу раз восставал!'{hp.RESET}\n{hp.YELLOW_STAR_START} + 2 Пули\n + 1 Зелье лечения{hp.YELLOW_STAR_END}{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
             break
 
-        # (5.1) Код отвечающий за работу снаряда Некроманта в 1-ой фазе:
-        if summon_projectile != 5:
-            summon_projectile += 1
-        elif summon_projectile == 5 and skull_fly == 0:  # Если summon_projectile равен 5, то будет призван череп.
-            skull_distance = random.choice(necromancer.summon_distance)
-            skull_attack = random.choice(necromancer.summon_attack)
-            skull_fly = 1
-            print(f"{hp.START_TIRE}(💀) Позади вас в одной из многочисленных открытых гробниц вылетает призванный {hp.PURPLE}Некромантом{hp.RESET}, пылающий огнем, череп.Череп летит в вашу сторону.{hp.YELLOW}\n***************\nДистанция до героя: {skull_distance}\nАтака черепа: {skull_attack}\n***************{hp.END_TIRE}")
-        elif skull_distance != 1 and skull_fly == 1:
-            skull_distance -= 1  # Полет снаряда до героя
         # -------------------------------------
-        # (5.1) Команда "у" от снаряда
-        elif action_hero == "у" and skull_distance == 1 and skull_fly == 1:
-            skull_fly = 0
+        # (5.1) Код отвечающий за работу снаряда (череп) Некроманта в 1-ой фазе:
+        # Увеличиваем счётчик призыва каждый ход
+        summon_projectile += 1
+
+        # Призываем снаряд каждые 5 ходов
+        if summon_projectile >= 5:
+            skull = Projectile(
+                target=hero,
+                distance=3,
+                power=5,
+                operation_type="-",
+                message_when_receiving_damage=f"(💀) Максимально приблизившись к вам, череп открыв пасть устремился в вашу спину"
+                                              f" и разбившись о нее наносит вам урон темной магией",
+                message_when_dodging=f"(💀) Череп пролетев мимо вас разбивается об землю.Вам удалось увернуться.",
+                display_name="Летающий череп",
+                dodgeable=True,
+            )
+            hero.add_modifier(skull)
             summon_projectile = 0
-            print(f"{hp.START_TIRE}(💀) Череп пролетев мимо вас разбивается об землю.Вам удалось увернуться.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
-        # -------------------------------------------------
-        elif skull_distance == 1 and skull_fly == 1:
-            hero.hero_health -= skull_attack
-            skull_fly = 0
-            summon_projectile = 0
-            skull_distance = 0
-            print(f"{hp.START_TIRE}(💀) Максимально приблизившись к вам, череп открыв пасть устремился в вашу спину и разбившись о нее наносит вам урон темной магией {hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+
+        # Обработка уворота
+        has_skull, skull_mod = hero.has_active_modifier("Летающий череп")
+        if user_action == "у" and has_skull and skull_mod.dodgeable:
+            skull_mod.dodge_projectile()
+            necromancer.remove_modifier(skull_mod)  # удаляем после уворота
+        # -------------------------------------
 
         # (5.1) Код описывающий действие заклинания "Реверс-поступь" в 1-ой фазе
         if cast_spell != 10:
@@ -1261,7 +1265,7 @@ while hero.hero_health > 0:
         elif cast_punch < 8:
             cast_punch += 1
             necromancer.distance += 3
-            print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}Некромант \u001b[0 переместился подальше от вас с помощью темной магии, заряжает свободной рукой {hp.PURPLE}'Отталкивающий удар'{hp.RESET}.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
+            print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}Некромант{hp.RESET}переместился подальше от вас с помощью темной магии, заряжает свободной рукой {hp.PURPLE}'Отталкивающий удар'{hp.RESET}.{hp.info_room(hero.hero_health,hero.hero_max_health,[necromancer])}{hp.END_TIRE}")
         elif cast_punch < 14:
             cast_punch += 1
             print(f"{hp.START_TIRE}(👊)  {hp.PURPLE}Некромант{hp.RESET} продолжает заряжать свободной рукой {hp.PURPLE}'Отталкивающий удар'{hp.RESET}.{hp.END_TIRE}")

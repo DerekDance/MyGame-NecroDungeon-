@@ -11,7 +11,7 @@
         "(3) Помещение с зеркалом",
         "(4) Древний зал"
       ],
-      "games_played": 235,
+      "games_played": 248,
       "all_score": 25,
       "password": "Том",
       "achievements": [
@@ -82,6 +82,16 @@
       "games_played": 1,
       "all_score": 0,
       "password": "ффф",
+      "achievements": []
+    },
+    {
+      "name": "Тос",
+      "kill_monsters": 0,
+      "completed_locations": 0,
+      "completed_locations_list": [],
+      "games_played": 1,
+      "all_score": 0,
+      "password": "Том",
       "achievements": []
     }
   ]

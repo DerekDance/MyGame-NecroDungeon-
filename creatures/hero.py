@@ -28,6 +28,12 @@ class Hero:
     def is_alive(self) -> bool:
         return self.hero_health > 0
 
+    # Удаление модификатора
+    def remove_modifier(self, modifier):
+        """Удаляет модификатор из списка"""
+        if modifier in self.modifiers:
+            self.modifiers.remove(modifier)
+
     #Проверка модификатора героя
     def has_active_modifier(self, modifier_name):
         for mod in self.modifiers:

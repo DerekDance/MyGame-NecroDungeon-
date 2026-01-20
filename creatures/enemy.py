@@ -24,6 +24,12 @@ class Enemy:
         self.modifiers = []  # Список модификаторов Противников
         self._input_active = False
 
+    # Удаление модификатора
+    def remove_modifier(self, modifier):
+        """Удаляет модификатор из списка"""
+        if modifier in self.modifiers:
+            self.modifiers.remove(modifier)
+
     #Проверка модификатора противника
     def has_active_modifier(self, modifier_name):
         """Проверяет, есть ли активный модификатор с указанным именем"""

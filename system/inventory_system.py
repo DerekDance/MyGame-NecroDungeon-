@@ -45,7 +45,7 @@ class InventorySystem:
                     attack_type = "melee",
                     start_info_msg = f"{hp.CYAN_BOLD}(🗡️) Использовано Зелье силы",
                     show_message=True,
-                    display_name = 'Зелье силы'
+                    display_name = 'Зелье силы',
                 )
 
                 if hero.add_modifier(multiplier):  # Проверяем успех добавления
