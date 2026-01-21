@@ -2,8 +2,11 @@
 from system import HelpSystem
 from creatures import Hero
 import sys
-import threading
+import time
+import select
 import random
+
+
 """
 Родительский класс для противников
 """
@@ -72,6 +75,25 @@ class Enemy:
     def is_alive(self) -> bool:
         return self.health > 0
 
+
+    def ask_for_action_hero(self, timeout=10):
+        """Неблокирующий ввод с таймаутом и рандомными фразами."""
+        print("\nНапишите какое действие вы хотите совершить (по-русски): ", end='', flush=True)
+
+        start_time = time.time() # точка отсчёта для таймера.
+        while time.time() - start_time < timeout:
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                return sys.stdin.readline().strip().lower()
+            time.sleep(0.1)
+
+        # Таймаут: выбираем случайную фразу
+        timeout_phrases = getattr(self, 'TIMEOUT_PHRASES', [None, None, None])
+        chosen_phrase = random.choice(timeout_phrases)
+        if chosen_phrase:
+            print(f"\n{hp.PURPLE}{self.name} - '{chosen_phrase}'{hp.RESET}")
+
+        return None
+
     """
     Для подготовки заряженных заклинаний:
     Комната 1 - Заряжание арбалета Аколита,
@@ -89,63 +111,6 @@ class Enemy:
     def reset_charge(self):
         """Сбросить заряд после выстрела"""
         self.charge_turns = 0
-
-
-    # Методы для наказания игрока за истечение таймера
-    def timeout_message(self, hero, help_sys):
-        """Вызывается по истечении таймера."""
-        if not getattr(self, '_input_active', False):
-            return
-
-        self._input_active = False
-
-        timeout_phrases = getattr(self, 'TIMEOUT_PHRASES', ['','',''])
-        enemy_name = getattr(self,"name","Неизвестный")
-        enemy_attack = getattr(self,"attack",0)
-
-        hero.hero_health -= enemy_attack
-        chosen_phrase = random.choice(timeout_phrases)
-        print(f"\n{hp.START_TIRE}{hp.PURPLE}{enemy_name} - '{chosen_phrase}'{hp.RESET}")
-        print(f"\n{enemy_name} атакует первым!")
-        print(f"{hp.info_room(hero.hero_health, hero.hero_max_health, [self])}{hp.END_TIRE}")
-        print(f"\n{hp.START_TIRE}У вас есть какое-то количество времени для следующего действия...{hp.END_TIRE}")
-
-    def ask_for_action_hero(self, hero, help_sys, amount_of_time=30):
-        """Запрашивает действие героя с таймером amount_of_time=30 по умолчанию)."""
-        if self._input_active:
-            raise RuntimeError("Запрос действия уже активен!")
-        self._input_active = True
-        user_input_ref = {'value': None}
-        timer_ref = {'obj': None}
-
-        def input_thread():
-            try:
-                print("\nНапишите какое действие вы хотите совершить (по-русски): ", end='', flush=True)
-                user_input_ref['value'] = sys.stdin.readline().strip().lower()
-            except Exception:
-                user_input_ref['value'] = None
-
-        thread = threading.Thread(target=input_thread)
-        thread.daemon = True
-        thread.start()
-
-        # Создаём таймер, который вызовет метод экземпляра
-        timer_ref['obj'] = threading.Timer(amount_of_time, self.timeout_message, args=(hero, hp))
-        timer_ref['obj'].start()
-
-        thread.join(amount_of_time)
-
-        if thread.is_alive():
-            # Время вышло
-            timer_ref['obj'].cancel()
-            self._input_active = False
-            return None
-        else:
-            # Пользователь успел ответить
-            timer_ref['obj'].cancel()
-            self._input_active = False
-            return user_input_ref['value']
-
     # Классы противников
 
 # Манекен

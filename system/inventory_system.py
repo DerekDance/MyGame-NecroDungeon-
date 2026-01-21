@@ -35,19 +35,10 @@ class InventorySystem:
         result = ""
 
         if hero_choice == "1":
-            from creatures import DamageModifier
+            # Берем готовый шаблон из файла modifiers.py
+            from creatures import modifiers
             if hero.hero_potion_strength > 0:
-                multiplier = DamageModifier(
-                    target=hero,
-                    duration=5,
-                    value=1.5,
-                    operation_type = "*",
-                    attack_type = "melee",
-                    start_info_msg = f"{hp.CYAN_BOLD}(🗡️) Использовано Зелье силы",
-                    show_message=True,
-                    display_name = 'Зелье силы',
-                )
-
+                multiplier = modifiers.create_hero_potion_of_strength(hero)
                 if hero.add_modifier(multiplier):  # Проверяем успех добавления
                     hero.hero_potion_strength -= 1
                 else:
@@ -74,16 +65,10 @@ class InventorySystem:
                 result = f"{hp.RED}Нет свитков искр!{hp.RESET}"
 
         elif hero_choice == "4":
-            from creatures import RegenHP
+            # Берем готовый шаблон из файла modifiers.py
+            from creatures import modifiers
             if hero.hero_potion_of_regen_hp > 0:
-                potion_regen_hp = RegenHP(
-                    target=hero,
-                    duration=3,
-                    step=3,
-                    heal_power=1,
-                    show_message=True,
-                    display_name='Зелье регенерации здоровья'
-                )
+                potion_regen_hp = modifiers.create_hero_potion_of_regen_hp(hero)
                 if hero.add_modifier(potion_regen_hp):
                     hero.hero_potion_of_regen_hp -= 1
                     result = f"(💊)  {hp.PURPLE_BOLD} Активирована регенерация здоровья.{hp.RESET}"

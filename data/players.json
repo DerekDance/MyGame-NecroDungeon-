@@ -2,7 +2,7 @@
   "players": [
     {
       "name": "Том",
-      "kill_monsters": 7,
+      "kill_monsters": 11,
       "completed_locations": 5,
       "completed_locations_list": [
         "(0) Привал у подземелья",
@@ -11,12 +11,13 @@
         "(3) Помещение с зеркалом",
         "(4) Древний зал"
       ],
-      "games_played": 248,
-      "all_score": 25,
+      "games_played": 278,
+      "all_score": 36,
       "password": "Том",
       "achievements": [
         "BYPASSING",
-        "TRAINED"
+        "TRAINED",
+        "ANTI_MITOZ"
       ]
     },
     {

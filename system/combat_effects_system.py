@@ -11,7 +11,7 @@ class Modifier:
     def __init__(self, name, duration, step, target,one_time,cooldown_turns = None,
                  cooldown_start_msg = None,cooldown_end_msg = None,
                  start_info_msg = None,show_message = False,display_name = None):
-        self.valid_operations = {"+", "-", "*", "/"}# Допустимые операции
+        self.valid_operations =  {"+", "-", "*", "/"} # Допустимые операции
         self.start_info_msg = start_info_msg # Дополнительное сообщение
         self.duration = duration  # Общая длительность действия
         self.remaining_duration = duration  # Оставшееся время (изначально равно duration)
@@ -109,6 +109,7 @@ class RegenHP(Modifier):
             duration=duration,
             step=step,
             target=target,
+            one_time = False,
             cooldown_turns=0,  # ← Мгновенная активация
             show_message=show_message,
             display_name=display_name
@@ -178,23 +179,28 @@ class DamageModifier(Modifier):
      """
     def __init__(self, target, duration, value,operation_type,attack_type,start_info_msg,show_message,display_name):
         # Проверяем операцию
+        self.attack_type = attack_type
+        self.operation_type = operation_type
+        self.value = value
+        self.valid_operations = ["+", "-", "*", "/"]
         operation_type = operation_type.lower()
         if operation_type not in self.valid_operations:
             raise ValueError(f"Неизвестная операция: {operation_type}. "
                              f"Допустимо: {', '.join(self.valid_operations)}")
             # Проверяем значение
         self._validate_value(operation_type, value)
-
         super().__init__(
             name="DamageModifier",
             duration=duration,
             step=1,
             target=target,
+            one_time=False,
             cooldown_turns=0,  # ← Мгновенная активация
             start_info_msg=start_info_msg,
             show_message=show_message,
             display_name=display_name,
         )
+
 
     # Функция проверки значений
     def _validate_value(self, operation_type, value):
