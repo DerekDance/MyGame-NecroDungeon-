@@ -8,9 +8,15 @@ hp = HelpSystem()
 """
 
 class Modifier:
-    def __init__(self, name, duration, step, target,one_time,cooldown_turns = None,
-                 cooldown_start_msg = None,cooldown_end_msg = None,
-                 start_info_msg = None,show_message = False,display_name = None):
+    def __init__(self, name, duration, step, target,
+                 one_time=False,  # ← По умолчанию False
+                 cooldown_turns=0,
+                 cooldown_start_msg=None,
+                 cooldown_end_msg=None,
+                 start_info_msg=None,
+                 show_message=False,
+                 display_name=None):
+
         self.valid_operations =  {"+", "-", "*", "/"} # Допустимые операции
         self.start_info_msg = start_info_msg # Дополнительное сообщение
         self.duration = duration  # Общая длительность действия
@@ -31,6 +37,14 @@ class Modifier:
         self.cooldown_start_msg = cooldown_start_msg
         self.cooldown_end_msg = cooldown_end_msg
 
+        if self.cooldown_turns and self.cooldown_turns > 0:
+            self.cooldown_active = True
+            self.remaining_cooldown_turns = self.cooldown_turns
+        else:
+            self.active = True
+            self.remaining_duration = self.duration
+
+
     # Получить имена цели
     def get_health_attr_names(self):
         # Проверяем разные варианты имён
@@ -41,48 +55,39 @@ class Modifier:
         else:
             return None, None
 
-    #Обновление состояния модификатора(основной метод)
     def update(self):
-        """
-        Обновляет состояние модификатора.
-        Возвращает кортеж (завершен_ли, применять_ли_эффект)
-        """
-        # Этап 1: Обработка подготовки (cooldown)
-        if self.remaining_cooldown_turns > 0:
+        # Фаза 1: Подготовка (cooldown)
+        if self.cooldown_turns and self.remaining_cooldown_turns > 0:
             if self.cooldown_start_msg and self.remaining_cooldown_turns == self.cooldown_turns:
-                print(self.cooldown_start_msg)  # ← Только при старте!
+                print(self.cooldown_start_msg)
             self.remaining_cooldown_turns -= 1
-        else:
-            self.cooldown_active = False
+            return False, False
+
+        # Фаза 2: Завершение подготовки
+        if self.cooldown_turns and not hasattr(self, '_cooldown_ended'):
+            self._cooldown_ended = True  # Флаг завершения
+            if self.cooldown_end_msg:
+                print(self.cooldown_end_msg)  # ← КЛЮЧЕВАЯ СТРОКА!
             self.active = True
             self.remaining_duration = self.duration
-            if self.cooldown_end_msg:
-                print(self.cooldown_end_msg)  # ← При завершении
+            return False, False
 
-        # Этап 2: Действие эффекта
+        # Фаза 3: Активная фаза (полёт/действие)
         if not self.active or self.duration <= 0:
             return True, False
 
         self.step_counter += 1
-
-        # Проверяем, достигли ли нужного шага
         if self.step_counter >= self.step:
             self.step_counter = 0
             self.remaining_duration -= 1
 
-            # Применяем эффект один раз если активен one_time
-            if self.one_time:
-                self.deactivate()  # Сразу деактивируем после применения
-                return True, True  # Завершен, но эффект применить нужно
-
-            # Проверяем, не завершился ли модификатор
-            if self.remaining_duration <= 0:
+            if self.one_time or self.remaining_duration <= 0:
                 self.deactivate()
-                return True, True  # Завершен, но эффект применить нужно (в последний раз)
+                return True, True
 
-            return False, True  # Не завершен, эффект применить нужно
+            return False, True
 
-        return False, False  # Не завершен, эффект не применять
+        return False, False
 
     # Функция активации
     def activate(self):
@@ -182,7 +187,7 @@ class DamageModifier(Modifier):
         self.attack_type = attack_type
         self.operation_type = operation_type
         self.value = value
-        self.valid_operations = ["+", "-", "*", "/"]
+        self.valid_operations = Modifier.valid_operations
         operation_type = operation_type.lower()
         if operation_type not in self.valid_operations:
             raise ValueError(f"Неизвестная операция: {operation_type}. "
@@ -302,31 +307,31 @@ class DamageModifier(Modifier):
         return is_finished
 
 
-# Модификатор полета снаряда
 class Projectile(Modifier):
     """Модификатор, представляющий летящий снаряд или отложенный эффект с задержкой по времени.
 
-        Используется для моделирования объектов, которые:
-        - "летят" к цели в течение заданного числа ходов (`distance`),
-        - по достижении цели применяют эффект: наносят урон или восстанавливают здоровье,
-        - могут быть уничтожены досрочно (например, при увороте игрока).
+            Используется для моделирования объектов, которые:
+            - "летят" к цели в течение заданного числа ходов (`distance`),
+            - по достижении цели применяют эффект: наносят урон или восстанавливают здоровье,
+            - могут быть уничтожены досрочно (например, при увороте игрока).
 
-        Эффект активируется только по истечении длительности (когда снаряд "достигает" цели).
-        Поддерживает только операции сложения ('+') и вычитания ('-') над здоровьем цели.
-        """
-    def __init__(self, target, distance, power,message_when_receiving_damage,message_when_dodging,
-                 operation_type,display_name,one_time = True,dodgeable = True):
+            Эффект активируется только по истечении длительности (когда снаряд "достигает" цели).
+            Поддерживает только операции сложения ('+') и вычитания ('-') над здоровьем цели.
+            """
+    def __init__(self, target, distance, power, message_when_receiving_damage,
+                 message_when_dodging, operation_type, display_name,
+                 one_time=True, dodgeable=True,auto_recast=False, **kwargs):
+
         super().__init__(
             name="Projectile",
-            duration=distance,  # длительность полёта
+            duration=distance,
             step=1,
             target=target,
-            cooldown_turns=0,
-            cooldown_start_msg=None,
-            cooldown_end_msg=None,
-            display_name = display_name,
-            one_time = one_time # По умолчанию стоит True для снарядов в инициализаторе Projectile
+            display_name=display_name,
+            one_time=one_time,
+            **kwargs  # ← Без перезаписи параметров!
         )
+        self.auto_recast = auto_recast #Перезапуск снаряда для работы в цикле while файла main.py
         self.operation_type = operation_type  # Параметр выбора математической операции для модификатора
         self.power = power
         self.dodgeable = dodgeable #Можно ли увернуться от снаряда
@@ -353,43 +358,59 @@ class Projectile(Modifier):
 
     def activate(self):
         super().activate()
-        # Можно ничего не делать, или напечатать "Череп призван!"
 
     def apply_effect(self):
         is_finished, should_apply = self.update()
 
         if not self.target.is_alive():
             self.deactivate()
+            return True
 
-        # Если не нужно применять эффект на этом шаге, просто возвращаем
-        if not should_apply:
-            return is_finished
-
-        # Если мы здесь — прошёл 1 ход полёта
-        if is_finished:
-            # Попадание!
+        if should_apply and is_finished:
+            # Применяем эффект
             health_attr, max_health_attr = self.get_health_attr_names()
-            if not health_attr or not max_health_attr:
-                print(f"Ошибка: цель {self.target} не поддерживает здоровье.")
-                self.deactivate()
-                return True
-            max_hp = getattr(self.target, max_health_attr)
-            current = getattr(self.target, health_attr)
+            if health_attr and max_health_attr:
+                target_name = getattr(self.target, "name", "Неизвестный")
+                current = getattr(self.target, health_attr)
+                max_hp = getattr(self.target, max_health_attr)
 
-            # Снаряд может уменьшить здоровье
-            if self.operation_type == "-":
-                new_value = max(current - self.power,0)
+                if self.operation_type == "-":
+                    new_value = max(current - self.power, 0)
+                elif self.operation_type == "+":
+                    new_value = min(current + self.power, max_hp)
+
                 setattr(self.target, health_attr, new_value)
+                print(self.message_when_receiving_damage)
+                print(f"{hp.YELLOW_STAR_START}Здоровье {target_name}: {new_value}|{max_hp}{hp.YELLOW_STAR_END}")
 
-            #Снаряд может восстановить здоровье
-            elif self.operation_type == "+":
-                new_value = min(current + self.power, max_hp)
-                setattr(self.target, health_attr, new_value)
+            # Проверка auto_recast
+            if not isinstance(self.auto_recast, int) or self.auto_recast < 0:
+                print("Значение auto_recast должно быть неотрицательным целым числом!")
 
-            print(f"{self.message_when_receiving_damage}")
+            elif self.auto_recast > 0:
+                # Создаём новый снаряд с уменьшенным счётчиком
+                new_projectile = Projectile(
+                    target=self.target,
+                    distance=self.duration,
+                    power=self.power,
+                    operation_type=self.operation_type,
+                    message_when_receiving_damage=self.message_when_receiving_damage,
+                    message_when_dodging=self.message_when_dodging,
+                    display_name=self.display_name,
+                    one_time=self.one_time,
+                    dodgeable=self.dodgeable,
+                    auto_recast=self.auto_recast - 1,  # ← уменьшаем здесь, не изменяя self
+                    cooldown_turns=getattr(self, 'cooldown_turns', 0),
+                    cooldown_start_msg=getattr(self, 'cooldown_start_msg', None),
+                    cooldown_end_msg=getattr(self, 'cooldown_end_msg', None)
+                )
+                self.target.add_modifier(new_projectile)
 
-        return is_finished
+            # Всегда деактивируем текущий снаряд
+            self.deactivate()
+            return True
 
+        return False
 
     def dodge_projectile(self):
         """Вызывается из боевого цикла при команде 'у' или каких-либо других действиях"""

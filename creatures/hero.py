@@ -8,8 +8,8 @@ hp = HelpSystem()
 class Hero:
     def __init__(self,name = "Герой"):
         self.name = name
-        self.hero_health = 20
-        self.hero_max_health = 20
+        self.hero_health = self.health = 20
+        self.hero_max_health = self.max_health = 20
         self.hero_attack = 3
         self.hero_range_attack = 6
         self.hero_gold = 1
