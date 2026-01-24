@@ -75,6 +75,7 @@ def create_sub_debuff_melee(target):
 def create_necromancer_skull_projectile(target):
     from creatures import Necromancer
     necromancer = Necromancer()
+    dist = random.choice(necromancer.summon_distance)
     return Projectile(
         target=target,
         distance=random.choice(necromancer.summon_distance),
@@ -84,8 +85,8 @@ def create_necromancer_skull_projectile(target):
                                       f"череп открыв пасть устремился в вашу спину и разбившись о нее наносит вам урон темной магией{hp.END_TIRE}",
         message_when_dodging=f"{hp.START_TIRE}(💀) Череп пролетев мимо вас разбивается об землю. Вам удалось увернуться.{hp.END_TIRE}",
         display_name="Летающий череп",
-        one_time = True,
-        auto_recast=0,
+        one_time = False,
+        auto_recast=10,
         cooldown_turns=10,
         cooldown_start_msg="",
         cooldown_end_msg=f"{hp.START_TIRE}(💀) Позади вас в одной из многочисленных открытых гробниц вылетает призванный Некромантом "

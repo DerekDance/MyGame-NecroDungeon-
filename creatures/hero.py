@@ -1,4 +1,4 @@
-from system import HelpSystem
+from system import HelpSystem,Projectile
 
 # Для использования форматирования строк
 hp = HelpSystem()
@@ -70,6 +70,13 @@ class Hero:
             else:
                 # Если модификатор не поддерживает apply_effect, удаляем (опционально)
                 self.modifiers.remove(modifier)
+
+    #Поиск черепа Некроманта
+    def get_active_skull(self):
+        for mod in self.modifiers:
+            if isinstance(mod, Projectile) and "Летающий череп" in mod.display_name.lower():
+                return mod
+        return None
 
 
     #Стрельба искрами

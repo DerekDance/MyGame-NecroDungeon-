@@ -32,7 +32,7 @@ class Modifier:
 
         # Подготовка модификатора,если есть
         self.cooldown_active = False # Активна ли подготовка
-        self.one_time = one_time
+        self.one_time = one_time # Эффект применяется один раз и сразу завершается (мгновенное действие)
         self.cooldown_turns = cooldown_turns # Сколько ходов длится подготовка
         self.remaining_cooldown_turns = cooldown_turns  # Оставшееся время (изначально равно cooldown_turns)
         self.cooldown_start_msg = cooldown_start_msg
@@ -57,6 +57,9 @@ class Modifier:
             return None, None
 
     def update(self):
+        print(
+            f"[UPDATE] {self.display_name}: active={self.active}, cd={self.remaining_cooldown_turns},"
+            f" rem_dur={self.remaining_duration}, step_counter={self.step_counter}")
         # Фаза 1: Подготовка (cooldown)
         if self.cooldown_turns and self.remaining_cooldown_turns > 0:
             if self.cooldown_start_msg and self.remaining_cooldown_turns == self.cooldown_turns:
@@ -82,6 +85,7 @@ class Modifier:
                 self.step_counter = 0
                 self.remaining_duration -= 1
 
+                # Эффект применяется один раз и сразу завершается (мгновенное действие)
                 if self.one_time or self.remaining_duration <= 0:
                     self.deactivate()
                     return True, True
@@ -332,6 +336,7 @@ class Projectile(Modifier):
             one_time=one_time,
             **kwargs  # ← Без перезаписи параметров!
         )
+
         self.auto_recast = auto_recast #Перезапуск снаряда для работы в цикле while файла main.py
         self.operation_type = operation_type  # Параметр выбора математической операции для модификатора
         self.power = power
@@ -362,13 +367,12 @@ class Projectile(Modifier):
 
     def apply_effect(self):
         is_finished, should_apply = self.update()
-        print(f"[DEBUG] Череп: remaining_duration={self.remaining_duration}, active={self.active}")
 
         if not self.target.is_alive():
             self.deactivate()
             return True
 
-        if should_apply and is_finished:
+        if is_finished:
             # Применяем эффект
             health_attr, max_health_attr = self.get_health_attr_names()
             if health_attr and max_health_attr:
@@ -413,13 +417,6 @@ class Projectile(Modifier):
             return True
 
         return False
-
-    def dodge_projectile(self):
-        """Вызывается из боевого цикла при команде 'у' или каких-либо других действиях"""
-        if self.active and self.dodgeable:
-            self.deactivate()
-            print(self.message_when_dodging)
-
 
 
 class ReverseStep(Modifier):
