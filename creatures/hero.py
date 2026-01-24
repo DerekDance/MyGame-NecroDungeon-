@@ -16,13 +16,13 @@ class Hero:
         self.hero_potion_strength = 999
         self.hero_potion_heal = 0
         self.hero_potion_of_regen_hp = 999
-        self.count_crit_attack  = 0 # НЕ НУЖНЫЙ ПАРАМЕТР
         self.hero_scroll_of_sparks = 999
         self.hero_bullet = 3
         self.bullet_of_sparks = 0
         self.damage_bullet_of_sparks = 12
-        self.modifiers = [] #Список модификаторов Героя
-        self.hero_type_attack = "melee" #Атака мечом(тип атаки) по умолчанию
+        self.modifiers = [] # Список модификаторов Героя
+        self.hero_type_attack = "melee" # Атака мечом(тип атаки) по умолчанию
+        self.reverse_step_active = False # Флаг способности Некроманта 'Реверс-поступь'
 
     # Жив ли герой
     def is_alive(self) -> bool:
@@ -62,15 +62,14 @@ class Hero:
     #Обновление модификатора героя
     def update_all(self):
         for modifier in self.modifiers[:]:
-            if not modifier.active:
-                self.modifiers.remove(modifier)
-                continue
-
+            # ВСЕГДА вызываем apply_effect(), даже если не активен!
             if hasattr(modifier, 'apply_effect'):
                 is_finished = modifier.apply_effect()
-
                 if is_finished:
                     self.modifiers.remove(modifier)
+            else:
+                # Если модификатор не поддерживает apply_effect, удаляем (опционально)
+                self.modifiers.remove(modifier)
 
 
     #Стрельба искрами

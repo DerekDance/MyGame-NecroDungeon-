@@ -60,15 +60,14 @@ class Enemy:
     # Обновление модификатора противника
     def update_all(self):
         for modifier in self.modifiers[:]:
-            if not modifier.active:
-                self.modifiers.remove(modifier)
-                continue
-
+            # Вызываем apply_effect(), даже если не активен!
             if hasattr(modifier, 'apply_effect'):
                 is_finished = modifier.apply_effect()
-
                 if is_finished:
                     self.modifiers.remove(modifier)
+            else:
+                # Если модификатор не поддерживает apply_effect, удаляем (опционально)
+                self.modifiers.remove(modifier)
 
 
 
@@ -170,9 +169,11 @@ class SubMini2(Enemy):
 # Некромант
 class Necromancer(Enemy):
     def __init__(self):
-        super().__init__("\u001b[35;1mНекромант\u001b[0m",30,30,3,3)
         self.summon_distance = range(3, 7)
         self.summon_attack = range(2, 4)
+
+        super().__init__("\u001b[35;1mНекромант\u001b[0m",30,30,3,3)
+
 
     def skull_shoot(self, flag):
         if isinstance(flag, bool):

@@ -1,3 +1,4 @@
+
 from system import HelpSystem
 
 # Для использования форматирования строк
@@ -61,31 +62,31 @@ class Modifier:
             if self.cooldown_start_msg and self.remaining_cooldown_turns == self.cooldown_turns:
                 print(self.cooldown_start_msg)
             self.remaining_cooldown_turns -= 1
+
+            # Если это был последний ход подготовки
+            if self.remaining_cooldown_turns == 0:
+                # Активируем эффект
+                if self.cooldown_end_msg:
+                    print(self.cooldown_end_msg)
+                self.active = True
+                self.remaining_duration = self.duration
+            else:
+                self.active = False
+
             return False, False
 
-        # Фаза 2: Завершение подготовки
-        if self.cooldown_turns and not hasattr(self, '_cooldown_ended'):
-            self._cooldown_ended = True  # Флаг завершения
-            if self.cooldown_end_msg:
-                print(self.cooldown_end_msg)  # ← КЛЮЧЕВАЯ СТРОКА!
-            self.active = True
-            self.remaining_duration = self.duration
-            return False, False
+        # Если уже активен
+        if self.active and self.duration > 0:
+            self.step_counter += 1
+            if self.step_counter >= self.step:
+                self.step_counter = 0
+                self.remaining_duration -= 1
 
-        # Фаза 3: Активная фаза (полёт/действие)
-        if not self.active or self.duration <= 0:
-            return True, False
+                if self.one_time or self.remaining_duration <= 0:
+                    self.deactivate()
+                    return True, True
 
-        self.step_counter += 1
-        if self.step_counter >= self.step:
-            self.step_counter = 0
-            self.remaining_duration -= 1
-
-            if self.one_time or self.remaining_duration <= 0:
-                self.deactivate()
-                return True, True
-
-            return False, True
+                return False, True
 
         return False, False
 
@@ -361,6 +362,7 @@ class Projectile(Modifier):
 
     def apply_effect(self):
         is_finished, should_apply = self.update()
+        print(f"[DEBUG] Череп: remaining_duration={self.remaining_duration}, active={self.active}")
 
         if not self.target.is_alive():
             self.deactivate()
@@ -420,6 +422,64 @@ class Projectile(Modifier):
 
 
 
+class ReverseStep(Modifier):
+    def __init__(self, target, duration, display_name="Реверс-поступь",
+                 cooldown_turns=0,
+                 cooldown_start_msg=None,
+                 cooldown_end_msg=None,
+                 auto_recast=0):  # ← добавляем auto_recast
+        super().__init__(
+            name="ReverseStep",
+            duration=duration,
+            step=1,
+            target=target,
+            one_time=False,  # всегда периодический
+            cooldown_turns=cooldown_turns,
+            cooldown_start_msg=cooldown_start_msg,
+            cooldown_end_msg=cooldown_end_msg,
+            display_name=display_name
+        )
+        # Валидация auto_recast
+        if not isinstance(auto_recast, int) or auto_recast < 0:
+            raise ValueError("auto_recast должен быть неотрицательным целым числом")
+        self.auto_recast = auto_recast
+
+        # Проверка наличия у цели параметра reverse_step_active
+        if not hasattr(self.target, 'reverse_step_active'):
+            raise AttributeError(f"Цель {self.target} не поддерживает reverse_step_active")
+
+
+    def apply_effect(self):
+        is_finished, _ = self.update()
+
+        # Эффект активен только если он вышел из cooldown и ещё не завершился
+        if self.active and not is_finished:
+            self.target.reverse_step_active = True
+        else:
+            self.target.reverse_step_active = False
+
+        # Если эффект завершился
+        if is_finished:
+            self.target.reverse_step_active = False
+            print(f"{hp.START_TIRE}(🦶) Магия заклинания {hp.PURPLE}'Реверс - поступь'{hp.RESET} рассеялась...{hp.END_TIRE}")
+
+            # Проверяем auto_recast
+            if self.auto_recast > 0:
+                # Создаём новый экземпляр с уменьшенным счётчиком
+                new_effect = ReverseStep(
+                    target=self.target,
+                    duration=self.duration,
+                    display_name=self.display_name,
+                    cooldown_turns=self.cooldown_turns,  # можно также перезапускать cooldown
+                    cooldown_start_msg=self.cooldown_start_msg,
+                    cooldown_end_msg=self.cooldown_end_msg,
+                    auto_recast=self.auto_recast - 1
+                )
+                self.target.add_modifier(new_effect)
+
+            return True
+
+        return False
 
 
         

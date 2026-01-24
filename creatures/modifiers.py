@@ -1,5 +1,6 @@
-from system import RegenHP,DamageModifier,Projectile
+from system import RegenHP,DamageModifier,Projectile,ReverseStep
 from system import HelpSystem
+import random
 
 
 hp = HelpSystem()
@@ -72,19 +73,33 @@ def create_sub_debuff_melee(target):
 #########---Готовые шаблоны модификатора Projectile---#########
 
 def create_necromancer_skull_projectile(target):
+    from creatures import Necromancer
+    necromancer = Necromancer()
     return Projectile(
         target=target,
-        distance=3,
-        power=5,
+        distance=random.choice(necromancer.summon_distance),
+        power=random.choice(necromancer.summon_attack),
         operation_type="-",
         message_when_receiving_damage=f"{hp.START_TIRE}(💀) Максимально приблизившись к вам, "
                                       f"череп открыв пасть устремился в вашу спину и разбившись о нее наносит вам урон темной магией{hp.END_TIRE}",
         message_when_dodging=f"{hp.START_TIRE}(💀) Череп пролетев мимо вас разбивается об землю. Вам удалось увернуться.{hp.END_TIRE}",
         display_name="Летающий череп",
         one_time = True,
-        auto_recast=10,
-        cooldown_turns=5,
+        auto_recast=0,
+        cooldown_turns=10,
         cooldown_start_msg="",
         cooldown_end_msg=f"{hp.START_TIRE}(💀) Позади вас в одной из многочисленных открытых гробниц вылетает призванный Некромантом "
-                         f"череп. Он летит в вашу сторону!{hp.END_TIRE}"
+                         f"череп. Он летит в вашу сторону!{hp.END_TIRE}",
+    )
+
+# Через 10 ходов начнётся эффект на 5 ходов, и повторится 2 раза
+def create_necromancer_revers_move(target):
+    return ReverseStep(
+        target=target,
+        duration=5,
+        cooldown_turns=10,
+        cooldown_start_msg=f"{hp.START_TIRE}(🦶) Некромант начинает нашептывать какое-то заклинание...{hp.END_TIRE}",
+        cooldown_end_msg=f"{hp.START_TIRE}(🦶) Направив руку на вас,{hp.PURPLE}, "
+                         f"Некромант{hp.RESET} вызвал заклинание {hp.PURPLE}'Реверс-поступь'{hp.RESET}{hp.END_TIRE}",
+        auto_recast=10
     )
